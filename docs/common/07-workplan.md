@@ -56,7 +56,165 @@ Any active status -> Cancelled
 
 ## Tasks
 
-> AI writes the initial task list at project start.
+### T001: Backend 프로젝트 초기화 (FastAPI + Poetry)
+- Status: Ready
+- Service: intake-assistant-api
+- Description: Poetry 프로젝트 생성, FastAPI 앱 스켈레톤, 환경 변수 설정(ANTHROPIC_API_KEY, SDWC_API_URL), 기본 프로젝트 구조(app/main.py, app/config.py 등) 구성
+- Acceptance Criteria:
+  - [ ] poetry init + pyproject.toml에 핵심 의존성(fastapi, uvicorn, anthropic, httpx, pyyaml, pydantic) 추가
+  - [ ] `uvicorn app.main:app --reload`로 서버 기동 확인
+  - [ ] 환경 변수 로딩 구조 (pydantic Settings)
+  - [ ] 프로젝트 디렉토리 구조 생성
+- Result:
+
+---
+
+### T002: Frontend 프로젝트 초기화 (React + Vite + Tailwind)
+- Status: Ready
+- Service: intake-assistant-web
+- Description: Vite + React + TypeScript 프로젝트 생성, Tailwind CSS 설정, Zustand 설치, 기본 라우팅(ModeSelectorPage, IntakePage) 구조 설정
+- Acceptance Criteria:
+  - [ ] `npm create vite` + React + TypeScript 템플릿
+  - [ ] Tailwind CSS 설정 완료
+  - [ ] Zustand 설치
+  - [ ] React Router로 `/` (ModeSelectorPage) + `/intake` (IntakePage) 라우팅
+  - [ ] `npm run dev`로 개발 서버 기동 확인
+- Result:
+
+---
+
+### T003: 헬스체크 + SDwC 템플릿 동기화
+- Status: Ready
+- Service: intake-assistant-api
+- Description: GET /api/v1/health 엔드포인트 구현. 앱 시작 시 SDwC /api/v1/template에서 최신 intake_template.yaml을 수신하여 메모리 캐시에 저장.
+- Acceptance Criteria:
+  - [ ] GET /api/v1/health → status, sdwc_reachable 응답
+  - [ ] 앱 시작 시 SDwC 템플릿 fetch + 메모리 캐시
+  - [ ] SDwC 접속 불가 시 degraded 상태 반환
+  - [ ] 단위 테스트
+- Result:
+
+---
+
+### T004: POST /api/v1/analyze 구현 (동적 질문 생성)
+- Status: Ready
+- Service: intake-assistant-api
+- Description: 사용자 자유 텍스트를 받아 Haiku를 호출하여 Q1~Q4 동적 질문 + 분석 결과를 반환하는 엔드포인트 구현.
+- Acceptance Criteria:
+  - [ ] POST /api/v1/analyze → questions + analysis 응답
+  - [ ] Anthropic Haiku 호출 + 시스템 프롬프트 작성
+  - [ ] 입력 텍스트 길이 제한 (Pydantic validation)
+  - [ ] Anthropic API 실패 시 재시도 로직 (3회)
+  - [ ] 단위 테스트 (mock Anthropic 응답)
+- Result:
+
+---
+
+### T005: POST /api/v1/generate 구현 (YAML 생성 + validate-retry)
+- Status: Ready
+- Service: intake-assistant-api
+- Description: 사용자 입력 + Q&A 응답을 기반으로 Sonnet을 호출하여 intake_data.yaml을 생성. SDwC /validate로 검증하고, 실패 시 에러 피드백으로 재생성 (최대 2회). 아키텍처 카드 5항목 + 기능 체크리스트 추출.
+- Acceptance Criteria:
+  - [ ] POST /api/v1/generate → yaml_content + architecture_card + feature_checklist 응답
+  - [ ] Anthropic Sonnet 호출 + 시스템 프롬프트 (DELETE 원칙, 템플릿 구조 포함)
+  - [ ] SDwC /api/v1/validate 호출로 YAML 검증
+  - [ ] validate-retry 루프 (최대 2회 재시도)
+  - [ ] 수정 반복 지원 (revision_request + previous_yaml 파라미터)
+  - [ ] 단위 테스트 (mock Anthropic + SDwC 응답)
+- Result:
+
+---
+
+### T006: POST /api/v1/finalize 구현 (ZIP 생성)
+- Status: Ready
+- Service: intake-assistant-api
+- Description: 확정된 YAML을 SDwC /api/v1/generate에 전달하여 ZIP 파일을 받아 클라이언트에 스트림 응답.
+- Acceptance Criteria:
+  - [ ] POST /api/v1/finalize → ZIP 바이너리 스트림 응답
+  - [ ] SDwC /api/v1/generate 호출
+  - [ ] 30초 타임아웃 설정
+  - [ ] 에러 시 적절한 에러 응답
+  - [ ] 단위 테스트
+- Result:
+
+---
+
+### T007: ModeSelectorPage 구현
+- Status: Ready
+- Service: intake-assistant-web
+- Description: Simple/Advanced 모드 선택 페이지. ModeCard 컴포넌트로 각 모드 설명 표시. Simple → /intake, Advanced → sdwc-web 리다이렉트.
+- Acceptance Criteria:
+  - [ ] ModeCard 컴포넌트 (모드 설명, 대상, 차이점)
+  - [ ] Simple 선택 → /intake 라우팅
+  - [ ] Advanced 선택 → sdwc-web URL 리다이렉트 (환경 변수)
+  - [ ] 반응형 레이아웃
+- Result:
+
+---
+
+### T008: IntakePage - 자유 텍스트 입력 + 질문 표시
+- Status: Ready
+- Service: intake-assistant-web
+- Description: TextInput 컴포넌트로 자유 텍스트 입력, '분석' 버튼 클릭 시 /api/v1/analyze 호출, QuestionCard로 Q1~Q4 동적 질문 표시 및 응답 수집.
+- Acceptance Criteria:
+  - [ ] TextInput 컴포넌트 (가이드 힌트 포함)
+  - [ ] /api/v1/analyze API 호출 + 로딩 상태
+  - [ ] QuestionCard 컴포넌트 (선택지 라디오/체크박스)
+  - [ ] Zustand store로 대화 상태 관리
+  - [ ] 에러 상태 처리
+- Result:
+
+---
+
+### T009: IntakePage - 아키텍처 카드 + 수정 반복
+- Status: Ready
+- Service: intake-assistant-web
+- Description: Q&A 응답 완료 후 /api/v1/generate 호출. ArchitectureCard(5항목) + FeatureChecklist 표시. RevisionInput으로 수정 요청 → 전체 재생성 반복.
+- Acceptance Criteria:
+  - [ ] /api/v1/generate API 호출 + 로딩 상태
+  - [ ] ArchitectureCard 컴포넌트 (서비스 구성, 데이터 저장, 인증, 외부 서비스, 화면 수)
+  - [ ] FeatureChecklist 컴포넌트 (읽기 전용)
+  - [ ] RevisionInput 컴포넌트 + 수정 요청 시 재생성
+  - [ ] 에러 상태 처리
+- Result:
+
+---
+
+### T010: IntakePage - ZIP 다운로드 (finalize 연동)
+- Status: Ready
+- Service: intake-assistant-web
+- Description: '이대로 진행' 버튼 클릭 시 /api/v1/finalize 호출 → ZIP 파일 브라우저 다운로드. complete 상태 표시.
+- Acceptance Criteria:
+  - [ ] '이대로 진행' 버튼 + /api/v1/finalize API 호출
+  - [ ] ZIP 바이너리 다운로드 처리 (Blob + download)
+  - [ ] finalizing 로딩 상태 + complete 상태
+  - [ ] 에러 시 재시도 안내
+- Result:
+
+---
+
+### T011: E2E 통합 테스트
+- Status: Backlog
+- Service: intake-assistant-api, intake-assistant-web
+- Description: Playwright로 전체 흐름 E2E 테스트. 텍스트 입력 → 질문 응답 → 카드 확인 → ZIP 다운로드.
+- Acceptance Criteria:
+  - [ ] 전체 Simple 모드 흐름 E2E 테스트
+  - [ ] Advanced 모드 리다이렉트 테스트
+  - [ ] 에러 시나리오 테스트 (API 실패, SDwC 불가)
+- Result:
+
+---
+
+### T012: 컨테이너화 + CI 파이프라인
+- Status: Backlog
+- Service: intake-assistant-api, intake-assistant-web
+- Description: 각 서비스 Dockerfile 작성, GitHub Actions CI 파이프라인 구성 (lint, test, build).
+- Acceptance Criteria:
+  - [ ] intake-assistant-api Dockerfile
+  - [ ] intake-assistant-web Dockerfile
+  - [ ] GitHub Actions 워크플로우 (lint + test + build)
+  - [ ] GHCR 이미지 push
+- Result:
 
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
