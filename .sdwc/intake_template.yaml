@@ -1,0 +1,895 @@
+# ============================================================================
+# SDwC v1 -- intake_template.yaml
+# ============================================================================
+# Copy this file as intake_data.yaml and fill in the values.
+# - required fields: Must be filled (validation fails if empty)
+# - optional fields: Leave empty to omit the section from docs
+# - IMPORTANT: If an optional field does not apply to your project,
+#   REMOVE THE ENTIRE FIELD (key + value) rather than leaving it empty.
+#   Empty values ("", {}, []) will trigger validation errors on sub-fields.
+#   Example: If no push notifications, delete the entire push_notification block.
+# - array ([]) fields: Any number of items, at least 1 recommended
+# - conditional sections: See condition comments (ignored if service type not selected)
+# - services array: Contains examples for all 5 types
+#   (backend_api, web_ui, worker, mobile_app, data_pipeline).
+#   Keep only the types you use and delete the rest.
+# ============================================================================
+
+# ============================================================================
+# Phase 1: WHY -- Project Identity
+# -> docs/common/00-project-overview.md S1~4
+# ============================================================================
+
+project:                                    # required
+  name: ""                                  # required -- official project name
+  codename: ""                              # optional -- internal codename
+  one_liner: ""                             # required -- one-line description
+  elevator_pitch: ""                        # required -- 2~3 sentence elevator pitch
+
+problem:                                    # required
+  statement: ""                             # required -- core problem to solve
+  who_has_this_problem: ""                  # required -- who experiences this problem
+  severity: ""                              # required -- values: high | medium | low
+  frequency: ""                             # required -- values: daily | weekly | monthly | occasional
+  current_workaround: ""                    # required -- current solution method
+  workaround_pain_points:                   # required -- pain points of current workaround
+    - ""
+  prior_attempts: ""                        # optional -- previous attempts and why they failed
+
+motivation:                                 # required
+  why_now: ""                               # required -- why build this now
+  trigger_event: ""                         # optional -- what triggered the project
+  opportunity_cost: ""                      # optional -- what is lost by not building
+  competitive_landscape: ""                 # optional -- competing products/environment
+  inspiration_references:                   # optional -- inspiring products/services
+    - ""
+
+value_proposition:                          # required
+  core_value: ""                            # required -- core value in one sentence
+  unique_differentiator: ""                 # required -- what differentiates from competitors
+  value_hypothesis: ""                      # optional -- hypothesis to validate
+
+project_characteristics:                    # optional -- project traits that override default skill patterns
+  # Each item tells Claude what patterns to ignore or emphasize.
+  # If omitted, all skill patterns apply as-is.
+  # Examples:
+  #   - label: "Stateless"
+  #     description: "No database, no ORM, no migrations. Ignore DB-related patterns in skills."
+  #   - label: "No authentication"
+  #     description: "Public utility service. Ignore auth middleware/guard patterns in skills."
+  #   - label: "Single-page UI"
+  #     description: "One page with state transitions. Ignore multi-page routing patterns in skills."
+  - label: ""                              # required per item -- short trait name
+    description: ""                        # required per item -- what it means for Claude
+
+# ============================================================================
+# Phase 2: WHAT -- Goals and Scope
+# -> docs/common/01-requirements.md, docs/common/06-glossary.md
+# ============================================================================
+
+goals:                                      # required
+  primary:                                  # required -- core goals (at least 1)
+    - goal: ""                              # required -- goal description
+      measurable_criterion: ""              # required -- measurement criteria
+      priority: ""                          # required -- values: P0 | P1 | P2
+  success_scenario: ""                      # required -- "what does success look like"
+  success_metrics:                          # optional -- quantitative success metrics
+    - metric: ""
+      current_value: ""
+      target_value: ""
+      measurement_method: ""
+
+non_goals:                                  # required -- explicit non-goals (at least 1)
+  - statement: ""                           # required
+    rationale: ""                           # required -- why this is a non-goal
+    reconsider_when: ""                     # optional -- when to reconsider
+
+scope:                                      # required
+  in_scope:                                 # required -- included features (at least 1)
+    - feature: ""                           # required -- feature name
+      user_story: ""                        # required -- user story
+      priority: ""                          # required -- values: must | should | could
+      complexity_estimate: ""               # optional -- values: S | M | L | XL
+  out_of_scope:                             # required -- excluded features (at least 1)
+    - feature: ""
+      reason: ""
+      planned_phase: ""                     # optional -- values: v2 | v3 | post_launch | backlog
+
+assumptions:                                # required -- assumptions (at least 1)
+  - assumption: ""
+    if_wrong: ""                            # required -- impact if wrong
+    validation_plan: ""                     # optional -- how to validate
+
+constraints:                                # optional
+  - constraint: ""
+    source: ""                              # optional -- values: technical | business | legal | regulatory
+    negotiable: ""                          # optional -- values: yes | no | partially
+
+timeline:                                   # optional
+  deadline: ""
+  reason: ""
+  flexibility: ""                           # optional -- values: rigid | flexible | aspirational
+
+budget:                                     # optional
+  monthly_budget: ""
+  one_time_budget: ""
+  constraint_items:
+    - ""
+
+glossary:                                   # optional -- project glossary
+  - term: ""                                # -> docs/common/06-glossary.md
+    definition: ""
+    aliases: ""                             # optional -- synonyms
+    example: ""                             # optional -- usage example
+
+# ============================================================================
+# Phase 3: WHO -- Users and Stakeholders
+# -> docs/common/00-project-overview.md S5
+# ============================================================================
+
+user_personas:                              # required -- target users (at least 1)
+  - name: ""                                # required -- persona name
+    description: ""                         # required
+    primary_goal: ""                        # required
+    pain_points:                            # required
+      - ""
+    is_primary: false                       # optional -- whether this is the primary persona
+    tech_proficiency: ""                    # optional -- values: beginner | intermediate | expert
+    usage_frequency: ""                     # optional -- values: daily | weekly | monthly
+
+anti_personas:                              # optional -- who this is NOT for
+  - name: ""
+    reason: ""
+
+stakeholders:                               # optional -- stakeholders
+  - role: ""
+    concern: ""
+    influence_level: ""                     # optional -- values: high | medium | low
+
+# ============================================================================
+# Phase 3.1: WHO -- AI Collaboration Settings
+# -> CLAUDE.md (separate template)
+# ============================================================================
+# [!] per_service must match 1:1 with Phase 4 services[].name.
+#    Validation will fail if they don't match.
+# ============================================================================
+
+collaboration:                              # required
+  human_developers: 1                       # required -- number of human developers
+  review_policy: ""                         # required -- e.g. "review after every task"
+  model_routing:                            # required
+    primary: ""                             # required -- primary model (e.g. opus)
+    secondary: ""                           # optional -- secondary model (e.g. sonnet)
+    routing_rule: ""                        # optional -- routing rule
+  use_subagent: false                       # required -- whether to use sub-agents
+  absolute_rules:                           # required -- project-wide absolute rules (at least 1)
+    - ""                                    # e.g. "no hardcoded secrets", "no direct push to main"
+
+  per_service:                              # required -- per-service AI settings (must match services 1:1)
+    - service: ""                           # required -- must exactly match services[].name
+      mode: ""                              # required -- values: autonomous | collaborative | learning  [!] used for CLAUDE.md branching
+                                            #   autonomous: Claude writes code, human reviews
+                                            #   collaborative: Claude and human share responsibilities
+                                            #   learning: Claude only plans/explains/suggests, human codes
+      test_case_coverage: ""                # required -- values: basic | standard | thorough  -> skills/testing/
+                                            #   basic: happy path only
+                                            #   standard: happy path + edge cases + failure cases
+                                            #   thorough: happy path + edge cases + failure cases + security cases
+      human_roles:                          # optional -- human responsibilities for this service
+        - ""
+      claude_roles:                         # optional -- Claude responsibilities for this service
+        - ""
+      claude_boundaries:                    # optional -- what Claude must NOT do for this service
+        - ""
+      decision_authority:                   # required
+        claude_autonomous:                  # required -- scope of Claude's independent decisions
+          - ""
+        requires_approval:                  # required -- requires human approval
+          - ""
+
+# ============================================================================
+# Phase 4: HOW -- Technical Architecture
+# -> docs/common/02-architecture-decisions.md, docs/{service_name}/ service docs
+# ============================================================================
+
+architecture:                               # required
+  pattern: ""                               # required -- values: monolith | microservices | modular_monolith
+  pattern_rationale: ""                     # required -- rationale for selection
+  pattern_alternatives:                     # required -- considered alternatives (at least 1)
+    - pattern: ""
+      pros: ""
+      cons: ""
+      rejection_reason: ""
+  internal_style: ""                        # optional -- values: hexagonal | clean | layered | none
+  internal_style_rationale: ""              # optional
+  principles:                               # optional -- design principles
+    - ""
+
+# ============================================================================
+# services -- Service List
+# ============================================================================
+# Each service fills in fields according to its type:
+# - backend_api -> tech stack, DB, API, deployment
+# - web_ui -> tech stack, pages, deployment
+# - worker -> worker list, deployment
+# - mobile_app -> app config, screens, deployment
+# - data_pipeline -> pipeline list, deployment
+#
+# Service docs are generated in docs/{name}/ folder.
+# ============================================================================
+
+services:                                   # required -- service list (at least 1)
+
+  # --------------------------------------------------------------------------
+  # backend_api example
+  # --------------------------------------------------------------------------
+  - name: ""                                # required -- service name (used as folder name)
+    type: ""                                # required -- values: backend_api | web_ui | worker | mobile_app | data_pipeline
+    responsibility: ""                      # required -- service responsibility
+    communication_with:                     # optional -- communication with other services
+      - target: ""                          # target service name
+        protocol: ""                        # values: http | grpc | amqp | kafka | websocket
+        sync_async: ""                      # values: sync | async
+
+    # --- Tech Stack (backend_api) ---
+    language: ""                            # required -- values: python | typescript | java | go | rust | ruby | csharp | kotlin
+    framework: ""                           # required -- values: fastapi | django | express | nestjs | spring | gin | actix | rails | aspnet
+    framework_rationale: ""                 # optional -- rationale for selection
+    framework_alternatives:                 # optional -- considered alternatives
+      - name: ""
+        rejection_reason: ""
+    build_tool: ""                          # required -- values: poetry | pip | npm | pnpm | yarn | gradle | maven | cargo | go_mod
+    build_tool_rationale: ""                # optional
+    key_libraries:                          # optional -- key libraries
+      - name: ""
+        purpose: ""
+        version_constraint: ""             # optional
+
+    # --- Database (backend_api, optional) -> docs/{name}/20-data-design.md ---
+    databases:                              # optional -- fill if using DB
+      - engine: ""                          # required -- values: postgresql | mysql | mongodb | redis | sqlite | dynamodb | elasticsearch | neo4j
+        role: ""                            # required -- values: primary | cache | search | queue | analytics | session
+        rationale: ""                       # required
+        alternatives_considered:            # optional
+          - engine: ""
+            rejection_reason: ""
+    entities:                               # optional -- fill if using DB (at least 1 recommended)
+      - name: ""                            # required
+        description: ""                     # required
+        key_attributes:                     # required -- key attributes
+          - name: ""
+            type: ""                        # values: string | integer | uuid | timestamp | boolean | float | text | json | enum | date
+            nullable: false
+            description: ""
+        relationships:                      # optional -- relationships (define from one side only; e.g., if User->Post is defined, do not add Post->User)
+          - target: ""                      # target entity name
+            cardinality: ""                 # values: 1:1 | 1:N | N:M
+            description: ""
+        indexes:                            # optional
+          - ""
+    data_storage_decisions:                 # optional
+      - decision: ""
+        rationale: ""
+        tradeoff: ""
+    schema_evolution_strategy: ""           # optional -- migration strategy description
+    file_storage:                           # optional
+      strategy: ""                          # values: local | s3 | gcs | azure_blob | minio
+      rationale: ""
+      size_limits: ""
+      retention_policy: ""
+
+    # --- API -> docs/{name}/21-api-contract.md ---
+    api_style: ""                           # required -- values: rest | graphql | grpc  [!] used for template branching
+    api_style_rationale: ""                 # optional
+    api_versioning: ""                      # optional -- values: url_prefix | header | query_param | none
+    pagination: ""                          # optional -- values: cursor | offset | none
+    rate_limiting:                          # optional
+      enabled: false
+      strategy: ""
+    auth:                                   # required
+      method: ""                            # required -- values: jwt | session | api_key | oauth2 | none
+      rationale: ""                         # optional
+      if_none_risks_accepted: ""            # optional -- accepted risks when method is none
+    error_response_format: ""               # optional -- values: rfc7807 | custom | graphql_errors
+    error_response_example: ""              # optional -- JSON example (multiline OK)
+
+    # --- REST endpoints (condition: when api_style is rest) ---
+    endpoints:                              # conditional -- required when api_style is rest
+      - method: ""                          # required -- values: GET | POST | PUT | PATCH | DELETE
+        path: ""                            # required -- /api/v1/resource
+        description: ""                     # required
+        auth_required: true                 # optional -- default true
+        idempotent: false                   # optional
+        sync_async: ""                      # optional -- values: sync | async
+        request_fields:                     # optional -- request fields
+          - name: ""
+            type: ""
+            required: true
+            description: ""
+        response_fields:                    # optional -- response fields
+          - name: ""
+            type: ""
+            description: ""
+        processing_steps:                   # optional -- processing logic steps
+          - ""
+
+    # --- GraphQL (condition: when api_style is graphql) ---
+    graphql:                                # conditional
+      schema_types:                         # GraphQL schema definitions
+        - ""                                # type User { id: ID!, name: String! }
+      queries:
+        - name: ""
+          arguments: ""
+          return_type: ""
+          description: ""
+      mutations:
+        - name: ""
+          arguments: ""
+          return_type: ""
+          description: ""
+
+    # --- gRPC (condition: when api_style is grpc) ---
+    grpc:                                   # conditional
+      services:
+        - name: ""
+          description: ""
+      rpc_methods:
+        - service: ""
+          method: ""
+          request_type: ""
+          response_type: ""
+          streaming: ""                     # values: none | server | client | bidirectional
+          description: ""
+
+    # --- Deployment ---
+    deployment:                             # required
+      target: ""                            # required -- values: docker_compose | kubernetes | ecs | lambda | cloud_run | fly_io | railway | vercel | bare_metal | app_store | play_store | both_stores
+      target_rationale: ""                  # optional
+      target_alternatives:                  # optional
+        - target: ""
+          rejection_reason: ""
+      environments:                         # optional
+        - name: ""                          # values: dev | staging | production
+          purpose: ""
+          differences: ""                   # differences from production
+      ci:                                   # optional
+        tool: ""                            # values: github_actions | gitlab_ci | jenkins | circleci | bitbucket_pipelines | xcode_cloud | bitrise | codemagic
+        pipeline_stages: ""                 # e.g. "lint -> test -> build -> deploy"
+      cd:                                 # optional
+        tool: ""                            # values: argocd | fluxcd | spinnaker | none | fastlane | app_center
+        strategy: ""                        # values: gitops | push | manual
+      infrastructure_as_code:               # optional -- DELETE THIS BLOCK if not using IaC
+        enabled: false
+        tool: ""                            # values: terraform | pulumi | cdk | cloudformation | ansible
+      container_registry: ""                # optional -- values: dockerhub | ecr | gcr | ghcr | acr
+      secrets_management: ""                # optional -- values: env_file | vault | aws_ssm | doppler | infisical
+
+  # --------------------------------------------------------------------------
+  # web_ui example
+  # --------------------------------------------------------------------------
+  - name: ""
+    type: "web_ui"
+    responsibility: ""
+    communication_with:                     # optional
+      - target: ""
+        protocol: ""
+        sync_async: ""
+
+    # --- Tech Stack (web_ui) ---
+    language: ""                            # required -- values: typescript | javascript
+    framework: ""                           # required -- values: react | vue | svelte | next | nuxt | angular | solid | astro
+    framework_rationale: ""                 # optional
+    framework_alternatives:                 # optional
+      - name: ""
+        rejection_reason: ""
+    build_tool: ""                          # required -- values: vite | webpack | turbopack | pnpm | npm | yarn
+    build_tool_rationale: ""                # optional
+    rendering_strategy: ""                  # optional -- values: spa | ssr | ssg | isr
+    rendering_rationale: ""                 # optional
+    css_strategy: ""                        # optional -- values: tailwind | css_modules | styled_components | sass | vanilla_css | emotion
+    state_management: ""                    # optional -- values: zustand | redux | recoil | jotai | context | pinia | mobx
+    accessibility_level: ""                 # optional -- values: wcag_aa | wcag_aaa | basic | none
+    i18n_required: false                    # optional
+    supported_languages: ""                 # optional -- comma separated (e.g. "ko, en, ja")
+    responsive_strategy: ""                 # optional -- values: mobile_first | desktop_first
+    browser_support: ""                     # optional -- minimum supported browsers
+    offline_support: false                  # optional
+    seo_requirements: ""                    # optional
+    design_references:                      # optional -- design reference URLs
+      - ""
+
+    # --- Pages -> docs/{name}/30-ui-design.md ---
+    pages:                                  # required -- page list
+      - name: ""                            # required -- page name
+        purpose: ""                         # required -- purpose
+        key_interactions:                   # optional -- key interactions
+          - ""
+        connected_endpoints:                # required -- connected APIs (empty [] if none)
+          - ""                              # e.g. "POST /api/v1/generate"
+        states:                             # optional -- UI states
+          - ""                              # e.g. "loading / empty / loaded / error"
+        components:                         # optional -- key components
+          - name: ""
+            purpose: ""
+    page_transitions:                       # optional -- page transitions (for Mermaid auto-generation)
+      - from: ""                            # source page name
+        to: ""                              # target page name
+        condition: ""                       # transition condition (e.g. "on form submit")
+
+    # --- Deployment ---
+    deployment:                             # required
+      target: ""                            # required -- values: docker_compose | kubernetes | ecs | lambda | cloud_run | fly_io | railway | vercel | bare_metal | app_store | play_store | both_stores
+      target_rationale: ""                  # optional
+      target_alternatives:                  # optional
+        - target: ""
+          rejection_reason: ""
+      environments:                         # optional
+        - name: ""
+          purpose: ""
+          differences: ""
+      ci:                                   # optional
+        tool: ""                            # values: github_actions | gitlab_ci | jenkins | circleci | bitbucket_pipelines | xcode_cloud | bitrise | codemagic
+        pipeline_stages: ""
+      cd:                                 # optional
+        tool: ""                            # values: argocd | fluxcd | spinnaker | none | fastlane | app_center
+        strategy: ""
+      infrastructure_as_code:               # optional -- DELETE THIS BLOCK if not using IaC
+        enabled: false
+        tool: ""
+      container_registry: ""                # optional
+      secrets_management: ""                # optional
+
+  # --------------------------------------------------------------------------
+  # worker example
+  # --------------------------------------------------------------------------
+  - name: ""
+    type: "worker"
+    responsibility: ""
+    communication_with:                     # optional
+      - target: ""
+        protocol: ""
+        sync_async: ""
+
+    # --- Tech Stack (worker) ---
+    language: ""                            # required -- values: python | typescript | java | kotlin | ruby | go
+    framework: ""                           # required -- values: celery | bullmq | sidekiq | spring_batch | temporal
+    framework_rationale: ""                 # optional -- rationale for selection
+    framework_alternatives:                 # optional -- considered alternatives
+      - name: ""
+        rejection_reason: ""
+    build_tool: ""                          # required -- values: poetry | pip | npm | pnpm | yarn | gradle | maven | go_mod | bundler
+    build_tool_rationale: ""                # optional
+    key_libraries:                          # optional -- key libraries
+      - name: ""
+        purpose: ""
+        version_constraint: ""             # optional
+
+    # --- Worker List -> docs/{name}/40-worker-design.md ---
+    workers:                                # required -- worker list
+      - name: ""                            # required
+        responsibility: ""                  # required
+        trigger_type: ""                    # required -- values: queue | cron | event | webhook  [!] used for template branching
+        trigger_config: ""                  # required -- queue name / cron expression / event name
+        processing_steps:                   # optional -- processing steps
+          - ""
+        input_fields:                       # optional -- input data
+          - name: ""
+            type: ""
+            description: ""
+        outputs:                            # optional -- outputs/side effects
+          - result: ""
+            description: ""
+        concurrency: 1                      # optional -- concurrent processing count
+        batch_size: 1                       # optional -- batch size
+        ordering_required: false            # optional -- whether ordering is required
+        ordering_key: ""                    # optional -- ordering key (when ordering_required)
+        overlap_policy: ""                  # optional -- cron only. values: skip | queue | parallel
+        retry_policy: ""                    # optional -- e.g. "3 retries, exponential backoff"
+        timeout: ""                         # optional -- e.g. "5m"
+        idempotent: false                   # required
+        idempotent_strategy: ""             # optional -- idempotency guarantee method
+        failure_destination: ""             # optional -- DLQ / error table / ...
+        graceful_shutdown: ""               # optional -- shutdown method
+        execution_logging: ""               # optional -- execution history logging method
+        dependencies:                       # optional
+          - service: ""
+            failure_behavior: ""            # values: retry | skip | fail
+
+    # --- Deployment ---
+    deployment:                             # required
+      target: ""                            # required -- values: docker_compose | kubernetes | ecs | lambda | cloud_run | fly_io | railway | vercel | bare_metal | app_store | play_store | both_stores
+      target_rationale: ""                  # optional
+      target_alternatives:                  # optional
+        - target: ""
+          rejection_reason: ""
+      environments:                         # optional
+        - name: ""
+          purpose: ""
+          differences: ""
+      ci:                                   # optional
+        tool: ""                            # values: github_actions | gitlab_ci | jenkins | circleci | bitbucket_pipelines | xcode_cloud | bitrise | codemagic
+        pipeline_stages: ""
+      cd:                                 # optional
+        tool: ""                            # values: argocd | fluxcd | spinnaker | none | fastlane | app_center
+        strategy: ""
+      infrastructure_as_code:               # optional -- DELETE THIS BLOCK if not using IaC
+        enabled: false
+        tool: ""
+      container_registry: ""                # optional
+      secrets_management: ""                # optional
+
+  # --------------------------------------------------------------------------
+  # mobile_app example
+  # --------------------------------------------------------------------------
+  - name: ""
+    type: "mobile_app"
+    responsibility: ""
+    communication_with:                     # optional
+      - target: ""
+        protocol: ""
+        sync_async: ""
+
+    # --- App Config (mobile_app) -> docs/{name}/50-mobile-design.md ---
+    approach: ""                            # required -- values: native | cross_platform | hybrid
+    framework: ""                           # required -- values: react_native | flutter | swift | kotlin | swiftui | jetpack_compose
+    framework_rationale: ""                 # optional
+    framework_alternatives:                 # optional
+      - name: ""
+        rejection_reason: ""
+    min_os_versions: ""                     # required -- e.g. "iOS 15+ / Android 12+"
+    navigation_pattern: ""                  # optional -- values: tab | drawer | stack | bottom_nav
+
+    screens:                                # required -- screen list
+      - name: ""
+        purpose: ""
+        key_interactions:
+          - ""
+        connected_endpoints:                # required -- connected APIs (empty [] if none)
+          - ""                              # e.g. "POST /api/v1/generate"
+        states:
+          - ""
+        components:
+          - name: ""
+            purpose: ""
+    screen_transitions:                     # optional -- screen transitions (for Mermaid auto-generation)
+      - from: ""
+        to: ""
+        condition: ""
+
+    offline_support: false                  # optional
+    local_storage: ""                       # optional -- values: sqlite | realm | async_storage | mmkv | core_data
+    sync_strategy: ""                       # optional -- offline->online sync strategy
+    cache_policy: ""                        # optional
+
+    device_features:                        # optional -- device feature usage
+      - feature: ""                         # values: camera | gps | biometrics | push | nfc | bluetooth | accelerometer | contacts
+        purpose: ""
+        permission: ""
+        denial_behavior: ""                 # behavior when permission denied
+
+    push_notification:                      # optional -- DELETE THIS BLOCK if not using push notifications
+      service: ""                           # values: fcm | apns | onesignal | expo_push
+      types:
+        - type: ""
+          trigger: ""
+          content: ""
+
+    distribution: ""                        # optional -- values: app_store | play_store | enterprise | both_stores | testflight
+    update_strategy: ""                     # optional -- values: force | soft | in_app | code_push
+    deep_link_scheme: ""                    # optional -- e.g. "myapp://"
+    app_size_target: ""                     # optional -- e.g. "< 50MB"
+
+    # --- Deployment ---
+    deployment:                             # required
+      target: ""                            # required -- values: docker_compose | kubernetes | ecs | lambda | cloud_run | fly_io | railway | vercel | bare_metal | app_store | play_store | both_stores
+      target_rationale: ""                  # optional
+      target_alternatives:                  # optional
+        - target: ""
+          rejection_reason: ""
+      environments:                         # optional
+        - name: ""
+          purpose: ""
+          differences: ""
+      ci:                                   # optional
+        tool: ""                            # values: github_actions | gitlab_ci | jenkins | circleci | bitbucket_pipelines | xcode_cloud | bitrise | codemagic
+        pipeline_stages: ""
+      cd:                                 # optional
+        tool: ""                            # values: argocd | fluxcd | spinnaker | none | fastlane | app_center
+        strategy: ""
+      infrastructure_as_code:               # optional -- DELETE THIS BLOCK if not using IaC
+        enabled: false
+        tool: ""
+      container_registry: ""                # optional
+      secrets_management: ""                # optional
+
+  # --------------------------------------------------------------------------
+  # data_pipeline example
+  # --------------------------------------------------------------------------
+  - name: ""
+    type: "data_pipeline"
+    responsibility: ""
+    communication_with:                     # optional
+      - target: ""
+        protocol: ""
+        sync_async: ""
+
+    # --- Tech Stack (data_pipeline) ---
+    language: ""                            # required -- values: python | java | scala | sql
+    framework: ""                           # required -- values: airflow | dagster | prefect | spark | dbt | flink
+    framework_rationale: ""                 # optional -- rationale for selection
+    framework_alternatives:                 # optional -- considered alternatives
+      - name: ""
+        rejection_reason: ""
+    build_tool: ""                          # required -- values: poetry | pip | gradle | maven | sbt
+    build_tool_rationale: ""                # optional
+    key_libraries:                          # optional -- key libraries
+      - name: ""
+        purpose: ""
+        version_constraint: ""             # optional
+
+    # --- Pipeline List -> docs/{name}/60-pipeline-design.md ---
+    pipelines:                              # required -- pipeline list
+      - name: ""                            # required
+        responsibility: ""                  # required
+        type: ""                            # required -- values: batch | streaming | micro_batch | hybrid
+        sources:                            # required -- data sources
+          - name: ""                        # required
+            system: ""                      # required
+            extraction_method: ""           # optional -- values: full | incremental | cdc | api_poll
+            format: ""                      # optional -- values: json | csv | parquet | avro | protobuf | xml
+        transformation_steps:               # optional -- transformation steps
+          - ""
+        sinks:                              # required -- load targets
+          - name: ""                        # required
+            system: ""                      # required
+            load_method: ""                 # optional -- values: upsert | append | overwrite | merge
+            format: ""                      # optional
+        schedule: ""                        # required -- values: cron | real_time | trigger_based
+        expected_duration: ""               # optional
+        volume_per_run: ""                  # optional
+        quality_checks:                     # optional
+          - rule: ""
+            target: ""
+            on_failure: ""                  # values: abort | warn | quarantine
+        retry_policy: ""                    # optional
+        partial_failure_strategy: ""        # optional -- values: skip_bad | fail_all | dead_letter
+        recovery_strategy: ""               # optional
+        sla: ""                             # optional
+        schema_change_handling: ""          # optional -- values: auto_detect | fail | alert
+        backfill_strategy: ""               # optional
+        depends_on:                         # optional -- predecessor pipelines
+          - ""
+    pipeline_dependencies:                  # optional -- dependency graph (for Mermaid)
+      - pipeline: ""
+        depends_on: ""
+        reason: ""
+
+    # --- Deployment ---
+    deployment:                             # required
+      target: ""                            # required -- values: docker_compose | kubernetes | ecs | lambda | cloud_run | fly_io | railway | vercel | bare_metal | app_store | play_store | both_stores
+      target_rationale: ""                  # optional
+      target_alternatives:                  # optional
+        - target: ""
+          rejection_reason: ""
+      environments:                         # optional
+        - name: ""
+          purpose: ""
+          differences: ""
+      ci:                                   # optional
+        tool: ""                            # values: github_actions | gitlab_ci | jenkins | circleci | bitbucket_pipelines | xcode_cloud | bitrise | codemagic
+        pipeline_stages: ""
+      cd:                                 # optional
+        tool: ""                            # values: argocd | fluxcd | spinnaker | none | fastlane | app_center
+        strategy: ""
+      infrastructure_as_code:               # optional -- DELETE THIS BLOCK if not using IaC
+        enabled: false
+        tool: ""
+      container_registry: ""                # optional
+      secrets_management: ""                # optional
+
+external_systems:                           # optional -- external system integrations
+  - name: ""
+    purpose: ""
+    protocol: ""
+    reliability: ""                         # optional -- values: high | medium | low
+    fallback: ""                            # optional -- fallback on failure
+
+# ============================================================================
+# Phase 5: WHAT-IF -- Error Handling, Security, Risks
+# -> docs/common/03-quality-plan.md, docs/common/05-roadmap.md S3~4
+# ============================================================================
+
+critical_flows:                             # required -- failure analysis per critical flow (at least 1)
+  - flow_name: ""                           # required -> docs/common/03-quality-plan.md S3
+    happy_path: ""                          # required -- normal flow description
+    failure_scenarios:                      # optional -- failure scenarios
+      - scenario: ""
+        likelihood: ""                      # values: high | medium | low
+        impact: ""                          # values: high | medium | low
+        handling_strategy: ""               # required -- response strategy
+
+global_error_handling:                      # optional
+  retry_policy: ""                          # global retry policy
+  circuit_breaker: ""                       # circuit breaker strategy
+  graceful_degradation: ""                  # graceful degradation method
+  dead_letter_queue: ""                     # DLQ policy
+
+data_consistency: ""                        # optional -- data consistency strategy
+
+security:                                   # required -> docs/common/03-quality-plan.md S2
+  requirements:                             # required
+    - category: ""                          # values: authentication | authorization | encryption | input_validation | audit | transport_security
+      requirement: ""
+      implementation_approach: ""
+  input_validation_strategy: ""             # optional
+  threat_model:                             # optional
+    - threat: ""
+      mitigation: ""
+  sensitive_data:                           # optional
+    - data_type: ""
+      protection_method: ""
+      retention_policy: ""
+  compliance_requirements:                  # optional -- GDPR / HIPAA / PCI-DSS / ...
+    - ""
+  accepted_security_risks:                  # optional
+    - risk: ""
+      acceptance_rationale: ""
+      reconsider_when: ""
+
+risks:                                      # required -> docs/common/05-roadmap.md S3~5
+  technical:                                # required -- technical risks (at least 1)
+    - risk: ""
+      likelihood: ""                        # values: high | medium | low
+      impact: ""                            # values: high | medium | low
+      mitigation: ""
+      contingency: ""                       # Plan B
+  irreversible_decisions:                   # required -- hard-to-reverse decisions (at least 1)
+    - decision: ""
+      why_irreversible: ""
+      confidence_level: ""                  # values: high | medium | low
+      reversal_cost: ""
+  known_technical_debt:                     # optional
+    - debt: ""
+      reason: ""                            # why not addressing now
+      resolution_plan: ""
+
+# ============================================================================
+# Phase 6: HOW-WELL -- Performance, Availability, Observability
+# -> docs/common/04-infrastructure.md S2~4
+# ============================================================================
+
+performance:                                # required -> docs/common/04-infrastructure.md S4
+  expected_concurrent_users: ""             # required -- expected concurrent users
+  response_time_targets:                    # optional
+    - endpoint_or_flow: ""
+      p50_target: ""
+      p99_target: ""
+  throughput_target: ""                     # optional -- e.g. "100 req/s"
+  data_volume:                              # optional
+    initial: ""
+    one_year: ""
+    growth_rate: ""
+  caching_strategy: ""                      # optional
+  long_running_operations:                  # optional
+    - operation: ""
+      expected_duration: ""
+      handling: ""                          # values: background | queue | streaming
+      timeout_policy: ""
+      progress_feedback: ""                 # values: polling | websocket | sse | none
+
+availability:                               # optional -> docs/common/04-infrastructure.md S3
+  target: ""                                # e.g. "99.9%"
+  acceptable_downtime: ""                   # e.g. "< 10min/month"
+  disaster_recovery:                        # optional -- DELETE THIS BLOCK if not applicable
+    rpo: ""                                 # Recovery Point Objective
+    rto: ""                                 # Recovery Time Objective
+    backup_strategy: ""
+  single_points_of_failure:                 # optional
+    - ""
+
+observability:                              # optional -> docs/common/04-infrastructure.md S2
+  logging:                                  # optional
+    framework: ""
+    structured: false
+    sensitive_data_masking: false
+    retention_period: ""                    # required -- e.g. "30 days", "7 days on device"
+  metrics:                                  # optional -- DELETE THIS BLOCK if not collecting metrics
+    tool: ""
+    key_metrics:
+      - ""
+    dashboards: ""
+  alerting:                                 # optional -- DELETE THIS BLOCK if not using alerting
+    tool: ""
+    critical_alerts:
+      - ""
+  tracing:                                  # optional
+    enabled: false
+    tool: ""
+  health_checks:                            # optional
+    - endpoint: ""
+      checks: ""
+
+scalability:                                # optional
+  strategy: ""                              # values: vertical | horizontal | auto
+  bottlenecks:                              # optional -- expected bottlenecks
+    - ""
+  scaling_trigger: ""                       # optional -- scaling criteria
+
+# ============================================================================
+# Phase 7: HOW-TO-WORK -- Development Process
+# -> docs/common/04-infrastructure.md S5~7
+# ============================================================================
+
+process:                                    # required -> docs/common/04-infrastructure.md S5
+  methodology: ""                           # required -- values: scrum | kanban | scrumban | xp  [!] used for CLAUDE.md branching
+  sprint_length: ""                         # optional -- in weeks (not needed for kanban)
+  wip_limit: ""                             # optional
+  task_review_minutes: ""                   # optional
+  definition_of_done:                       # optional
+    - ""
+
+code_quality:                               # optional -> docs/common/04-infrastructure.md S6, skills/
+  coding_standards:                         # optional
+    - language: ""
+      style_guide: ""
+      linter: ""
+      formatter: ""
+  code_review:                              # optional
+    required: true
+    min_reviewers: 1
+    auto_merge_allowed: false
+  documentation:                            # optional
+    code_comments: ""                       # e.g. "docstring for public API only"
+    adr_usage: ""                           # e.g. "record every major tech decision"
+    changelog_policy: ""                    # e.g. "Keep a Changelog format"
+
+testing:                                    # required -> docs/common/03-quality-plan.md S1
+  approach: ""                              # required -- values: tdd | bdd | test_after | test_first
+  levels:                                   # required -- test levels (at least 1)
+    - level: ""                             # values: unit | integration | e2e | contract | smoke | performance
+      coverage_target: ""                   # optional -- e.g. "80%"
+      framework: ""                         # required -- values: pytest | jest | vitest | playwright | cypress | junit | go_test | rspec | xctest | espresso | robolectric | flutter_test | detox
+      approach: ""                          # optional -- approach description
+  test_data_strategy: ""                    # optional -- values: fixtures | factories | snapshots | seed_scripts
+  test_environment:                         # optional
+    db_strategy: ""                         # values: in_memory | testcontainers | shared_test_db | docker_compose
+    external_service_strategy: ""           # values: mocks | stubs | sandbox | wiremock
+
+version_control:                            # required -> docs/common/04-infrastructure.md S7
+  branch_strategy: ""                       # required -- values: github_flow | gitflow | trunk_based | master_develop_task
+  branch_strategy_description: ""           # optional -- detailed description
+  commit_convention: ""                     # optional -- values: conventional | gitmoji | angular | free
+  monorepo_or_polyrepo: ""                  # optional -- values: monorepo | polyrepo
+  pr_policy:                                # optional
+    created_by: ""                          # values: human | claude | both
+    template_required: true
+    squash_merge: true
+
+# ============================================================================
+# Phase 8: WHAT-NEXT -- Evolution Plan
+# -> docs/common/05-roadmap.md S1~2, S6~7
+# ============================================================================
+
+evolution:                                  # optional -> docs/common/05-roadmap.md S1~2
+  future_features:                          # optional
+    - feature: ""
+      planned_phase: ""                     # values: v2 | v3 | post_launch | backlog
+      architectural_impact: ""              # architectural impact
+      preparation_needed: ""                # what to prepare now
+  migration_path: ""                        # optional -- evolution path description
+  sunset_criteria: ""                       # optional -- decommission criteria
+
+rollout:                                    # optional -> docs/common/05-roadmap.md S6
+  strategy: ""                              # values: big_bang | canary | blue_green | rolling | feature_flag
+  phases:                                   # optional
+    - phase: ""
+      audience: ""
+      success_criteria: ""
+  rollback_plan: ""                         # optional
+  db_migration_strategy: ""                 # optional -- e.g. "forward-only with alembic"
+
+operations:                                 # optional -> docs/common/05-roadmap.md S7
+  on_call_policy: ""
+  incident_response: ""
+  maintenance_window: ""
+  documentation_maintenance: ""
