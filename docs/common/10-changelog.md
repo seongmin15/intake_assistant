@@ -22,8 +22,15 @@
 - intake-assistant-web: Dockerfile (2-stage, node:20-slim → nginx:alpine) + nginx.conf (SPA fallback, API reverse proxy) + .dockerignore (T012)
 - CI: GitHub Actions 워크플로우 — ci-api.yml (ruff + pytest + GHCR push), ci-web.yml (eslint + build + GHCR push) (T012)
 
+### Changed
+- intake-assistant-api: config.py sdwc_api_url 기본값을 K8s 내부 DNS(`sdwc-api.sdwc.svc.cluster.local:8000`)로 변경 (T014)
+
 ### Fixed
 - intake-assistant-api: SDwC API 연동 — JSON body → multipart file upload으로 변경 (validate, generate 엔드포인트), validate 응답 필드명 `success`→`valid`, `error`→`errors`로 수정 (T013)
+
+### Infrastructure
+- intake-assistant-api: K8s Deployment + ClusterIP Service 매니페스트 추가 (SDWC_API_URL env, ANTHROPIC_API_KEY secret, liveness/readiness probes) (T014)
+- intake-assistant-web: K8s Deployment + ClusterIP Service 매니페스트 추가 (T014)
 
 <!-- Claude: §5.8 작업 완료 시 해당 변경을 [Unreleased]에 기록.
      분류 기준:
