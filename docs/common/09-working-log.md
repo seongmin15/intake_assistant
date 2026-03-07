@@ -21,6 +21,8 @@
 | 2026-03-07 | T010: IntakePage ZIP 다운로드 — finalizing/complete phase UI | 완료 |
 | 2026-03-07 | T011: E2E 통합 테스트 — Playwright 기반 Simple 모드/Advanced 모드/에러 시나리오 | 완료 |
 | 2026-03-07 | T012: 컨테이너화 + CI 파이프라인 — Dockerfile, nginx.conf, GitHub Actions CI | 완료 |
+| 2026-03-08 | T020: Prompt Caching — generate 시스템 프롬프트에 cache_control 적용 | 완료 |
+| 2026-03-08 | T021: Streaming Generate — SSE 스트리밍 엔드포인트 + 프론트엔드 실시간 진행 상태 | 완료 |
 | 2026-03-07 | T016: .env.example 수정 — SDWC_API_URL 값 보정 + 환경별 주석 | 완료 |
 | 2026-03-07 | T017: Frontend API URL fallback 수정 — k3d에서 ERR_CONNECTION_REFUSED 해결 | 완료 |
 | 2026-03-07 | T018: analyze API JSON 파싱 오류 수정 — markdown 코드 블록 스트리핑 누락 | 완료 |
@@ -172,6 +174,21 @@
 - **작업**: client.ts의 VITE_API_URL fallback을 http://localhost:8000 → ""(빈 문자열)로 변경. k3d에서 브라우저가 상대 경로(/api/v1/...)로 요청하면 nginx가 intake-assistant-api:8000으로 프록시. .env.example에 환경별 안내 주석 추가.
 - **변경된 파일**: src/api/client.ts (수정), .env.example (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: Docker build 시 .env 없이 빌드되므로 fallback이 production 기본값이 됨. 빈 문자열 = 상대 경로 = nginx 프록시 경유.
+- **미완료/후속**: 없음.
+
+### 2026-03-08 — T020: Prompt Caching
+
+- **작업**: generate_service.py의 _call_anthropic()에서 system 파라미터를 cache_control: ephemeral 포함 리스트 형식으로 변경. generate_stream()에도 동일 적용. validate-retry 루프 내 재시도 및 5분 이내 수정 요청 시 시스템 프롬프트 캐싱 활용.
+- **변경된 파일**: services/generate_service.py (수정), tests/unit/test_generate_service.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: analyze 프롬프트(~400 토큰)는 1024 토큰 최소 요건 미달로 캐싱 미적용
+- **미완료/후속**: 없음.
+
+### 2026-03-08 — T021: Streaming Generate Endpoint
+
+- **계획**: POST /api/v1/generate/stream SSE 스트리밍 엔드포인트 추가. client.messages.stream()으로 LLM 응답 실시간 전달. 프론트엔드에서 ReadableStream 파싱으로 진행 상태 표시. 기존 /generate 하위 호환 유지.
+- **작업**: Backend — generate_stream() AsyncGenerator(SSE 이벤트: status/chunk/result/error), _sse_event() 헬퍼, POST /generate/stream StreamingResponse 엔드포인트. Frontend — generateStream()(fetch + ReadableStream 수동 SSE 파싱 + onEvent 콜백), SSE 타입 4종(StatusData/ChunkData/ResultData/ErrorData/StreamEvent), intakeStore에 streamStatus/streamAttempt 상태 + submitGenerate/submitRevision 스트리밍 전환, IntakePage generating phase에 동적 상태 텍스트 + 시도 횟수 표시.
+- **변경된 파일**: services/generate_service.py (수정), routers/generate.py (수정), api/client.ts (수정), api/types.ts (수정), stores/intakeStore.ts (수정), pages/IntakePage/index.tsx (수정), tests/unit/test_generate_service.py (수정), tests/unit/test_generate_api.py (수정), docs/intake-assistant-api/21-api-contract.md (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: EventSource는 POST 미지원이므로 fetch + ReadableStream 수동 파싱 사용. chunk 이벤트는 현재 UI에서 미표시하나 향후 활용 가능.
 - **미완료/후속**: 없음.
 
 ### 2026-03-07 — T016: .env.example 수정

@@ -44,3 +44,27 @@ export interface GenerateResponse {
   architecture_card: ArchitectureCard;
   feature_checklist: FeatureItem[];
 }
+
+// SSE streaming types
+export interface StatusData {
+  phase: "generating" | "validating" | "retry";
+  attempt: number;
+  max_attempts?: number;
+  reason?: string;
+}
+
+export interface ChunkData {
+  text: string;
+}
+
+export interface ResultData extends GenerateResponse {}
+
+export interface ErrorData {
+  message: string;
+}
+
+export type StreamEvent =
+  | { event: "status"; data: StatusData }
+  | { event: "chunk"; data: ChunkData }
+  | { event: "result"; data: ResultData }
+  | { event: "error"; data: ErrorData };

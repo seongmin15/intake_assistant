@@ -81,6 +81,39 @@
 
 ---
 
+### POST /api/v1/generate/stream
+
+> SSE 스트리밍 방식으로 intake_data.yaml 생성 (실시간 진행 상태 표시)
+
+- **인증**: False
+
+**요청**
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| user_input | string | True | 사용자의 첫 입력 텍스트 |
+| qa_answers | json | True | Q1~Q4 응답 (질문ID + 선택값) |
+| revision_request | string | False | 수정 요청 텍스트 (수정 반복 시) |
+| previous_yaml | string | False | 이전 생성된 intake_data.yaml (수정 반복 시) |
+
+**응답**: `text/event-stream` (Server-Sent Events)
+
+| SSE 이벤트 | data 필드 | 설명 |
+|------------|-----------|------|
+| status | phase, attempt, max_attempts | 진행 상태 (generating, validating, retry) |
+| chunk | text | LLM 응답 텍스트 조각 (실시간 스트리밍) |
+| result | yaml_content, architecture_card, feature_checklist | 최종 생성 결과 (/generate 응답과 동일) |
+| error | message | 에러 발생 시 에러 메시지 |
+
+**처리 로직**
+
+1. /api/v1/generate와 동일한 로직 (SDwC 템플릿 + Sonnet 호출 + validate-retry)
+2. 차이점: LLM 응답을 실시간 스트리밍 (`client.messages.stream()` 사용)
+3. 진행 상태를 SSE 이벤트로 클라이언트에 실시간 전달
+4. 시스템 프롬프트에 prompt caching 적용 (`cache_control: ephemeral`)
+
+---
+
 ### POST /api/v1/finalize
 
 > '이대로 진행' -- 검증 완료된 YAML을 SDwC에 전달하여 ZIP 생성
