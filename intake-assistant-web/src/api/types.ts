@@ -57,7 +57,7 @@ export interface ChunkData {
   text: string;
 }
 
-export interface ResultData extends GenerateResponse {}
+export type ResultData = GenerateResponse;
 
 export interface ErrorData {
   message: string;
