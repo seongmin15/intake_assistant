@@ -22,8 +22,8 @@ from intake_assistant_api.services.sdwc_client import SDwCClient
 
 logger = structlog.get_logger()
 
-MAX_RETRIES = 3
-BACKOFF_SECONDS = [1, 2, 4]
+MAX_RETRIES = 2
+BACKOFF_SECONDS = [1, 2]
 MAX_VALIDATION_RETRIES = 2
 MODEL = "claude-sonnet-4-6"
 

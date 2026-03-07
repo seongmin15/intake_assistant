@@ -24,38 +24,84 @@ into a complete, valid intake_data.yaml.
 
 ## Required Sections Checklist
 
-The following top-level sections are REQUIRED and must always be present:
+The following top-level sections are REQUIRED and must always be present.
+Required child fields are shown in parentheses.
+
 - project (name, one_liner, elevator_pitch)
 - problem (statement, who_has_this_problem, severity, frequency,
-  current_workaround, workaround_pain_points)
+  current_workaround, workaround_pain_points[≥1])
 - motivation (why_now)
 - value_proposition (core_value, unique_differentiator)
-- goals (primary, success_scenario)
-- non_goals (at least 1 item with statement + rationale)
-- scope (in_scope: at least 1, out_of_scope: at least 1)
-- assumptions (at least 1 item with assumption + if_wrong)
-- user_personas (at least 1 item with name, description, primary_goal, pain_points)
-- collaboration (human_developers, review_policy, model_routing
-  with primary required, use_subagent, absolute_rules, per_service
-  each with decision_authority containing claude_autonomous + requires_approval)
-- architecture (pattern, pattern_rationale, pattern_alternatives)
-- services (at least 1 service)
-- critical_flows (at least 1 flow with flow_name + happy_path)
-- security (requirements: at least 1, each with category + requirement +
-  implementation_approach)
-- risks (technical: at least 1 each with risk + likelihood + impact +
-  mitigation + contingency, irreversible_decisions: at least 1)
+- goals (primary[≥1], success_scenario)
+  - each primary item: goal, measurable_criterion, priority
+- non_goals[≥1] (each: statement, rationale)
+- scope
+  - in_scope[≥1] (each: feature, user_story, priority)
+  - out_of_scope[≥1] (each: feature, reason)
+- assumptions[≥1] (each: assumption, if_wrong)
+- user_personas[≥1] (each: name, description, primary_goal, pain_points[≥1])
+- collaboration (human_developers, review_policy, model_routing.primary,
+  use_subagent, absolute_rules[≥1], per_service[≥1])
+  - each per_service: service, mode, test_case_coverage, decision_authority
+  - decision_authority: claude_autonomous[≥1], requires_approval[≥1]
+- architecture (pattern, pattern_rationale, pattern_alternatives[≥1])
+  - each pattern_alternative: pattern, pros, cons, rejection_reason
+- services[≥1] (see Per-Service Type Required Fields below)
+- critical_flows[≥1] (each: flow_name, happy_path)
+- security (requirements[≥1])
+  - each requirement: category, requirement, implementation_approach
+- risks
+  - technical[≥1] (each: risk, likelihood, impact, mitigation, contingency)
+  - irreversible_decisions[≥1] (each: decision, why_irreversible,
+    confidence_level, reversal_cost)
 - performance (expected_concurrent_users)
 - process (methodology)
-- testing (approach, levels: at least 1)
+- testing (approach, levels[≥1])
+  - each level: level, framework
 - version_control (branch_strategy)
+
+## Per-Service Type Required Fields
+
+All service types share: name, type, responsibility, build_tool, deployment.target
+
+### backend_api
+- language, framework, api_style, auth.method
+- When api_style is "rest": endpoints[] (each: method, path, summary)
+- When api_style is "graphql": graphql section
+- When api_style is "grpc": grpc section
+
+### web_ui
+- language, framework, css_strategy, state_management, rendering_strategy
+- pages[≥1] (each: name, purpose, connected_endpoints)
+
+### worker
+- language, framework
+- workers[≥1] (each: name, responsibility, trigger_type, trigger_config, idempotent)
+
+### mobile_app
+- language, framework, approach, min_os_versions
+- screens[≥1] (each: name, purpose, key_interactions, connected_endpoints,
+  states, components[])
+
+### data_pipeline
+- language, framework
+- pipelines[≥1] (each: name, responsibility, type, sources[],
+  sinks[], schedule)
+  - each source: name, system
+  - each sink: name, system
 
 ## Array Minimum Requirements
 
 These array fields require at least 1 item:
+- problem.workaround_pain_points
 - goals.primary, non_goals, scope.in_scope, scope.out_of_scope, assumptions
-- user_personas, collaboration.absolute_rules, collaboration.per_service
+- user_personas, user_personas[].pain_points
+- collaboration.absolute_rules, collaboration.per_service
+- collaboration.per_service[].decision_authority.claude_autonomous
+- collaboration.per_service[].decision_authority.requires_approval
 - architecture.pattern_alternatives, services
+- services[web_ui].pages, services[mobile_app].screens
+- services[worker].workers, services[data_pipeline].pipelines
 - critical_flows, security.requirements
 - risks.technical, risks.irreversible_decisions
 - testing.levels
@@ -64,6 +110,7 @@ These array fields require at least 1 item:
 
 Use ONLY these exact values for enum fields:
 
+### General
 - problem.severity: high | medium | low
 - problem.frequency: daily | weekly | monthly | occasional
 - scope.in_scope[].priority: must | should | could
@@ -72,44 +119,100 @@ Use ONLY these exact values for enum fields:
 - goals.primary[].priority: P0 | P1 | P2
 - user_personas[].tech_proficiency: beginner | intermediate | expert
 - user_personas[].usage_frequency: daily | weekly | monthly
-- collaboration.per_service[].mode: autonomous | collaborative | learning
-- collaboration.per_service[].test_case_coverage: basic | standard | thorough
+
+### Collaboration
+- per_service[].mode: autonomous | collaborative | learning
+- per_service[].test_case_coverage: basic | standard | thorough
+
+### Architecture
 - architecture.pattern: monolith | microservices | modular_monolith
 - architecture.internal_style: hexagonal | clean | layered | none
+
+### Services (shared)
 - services[].type: backend_api | web_ui | worker | mobile_app | data_pipeline
-- services[].language (backend_api): python | typescript | java | go | rust | ruby | csharp | kotlin
-- services[].framework (backend_api): fastapi | django | express |
-  nestjs | spring | gin | actix | rails | aspnet
-- services[].language (web_ui): typescript | javascript
-- services[].framework (web_ui): react | vue | svelte | next | nuxt | angular | solid | astro
 - services[].build_tool: poetry | pip | npm | pnpm | yarn | gradle |
-  maven | cargo | go_mod | vite | webpack | turbopack | bundler
-- services[].api_style: rest | graphql | grpc
-- services[].auth.method: jwt | session | api_key | oauth2 | none
-- services[].databases[].engine: postgresql | mysql | mongodb | redis |
-  sqlite | dynamodb | elasticsearch | neo4j
-- services[].databases[].role: primary | cache | search | queue | analytics | session
-- services[].approach (mobile_app): native | cross_platform | hybrid
-- services[].framework (mobile_app): react_native | flutter | swift |
-  kotlin | swiftui | jetpack_compose
+  maven | cargo | go_mod | vite | webpack | turbopack | bundler | sbt
 - services[].deployment.target: docker_compose | kubernetes | ecs |
   lambda | cloud_run | fly_io | railway | vercel | bare_metal |
   app_store | play_store | both_stores
+- services[].databases[].engine: postgresql | mysql | mongodb | redis |
+  sqlite | dynamodb | elasticsearch | neo4j
+- services[].databases[].role: primary | cache | search | queue | analytics | session
+- services[].communication_with[].protocol: http | grpc | amqp | kafka | websocket
+- services[].communication_with[].sync_async: sync | async
+
+### backend_api
+- language: python | typescript | java | go | rust | ruby | csharp | kotlin
+- framework: fastapi | django | express | nestjs | spring | gin | actix | rails | aspnet
+- api_style: rest | graphql | grpc
+- auth.method: jwt | session | api_key | oauth2 | none
+- api_versioning: url_prefix | header | query_param | none
+- pagination: cursor | offset | none
+- error_response_format: rfc7807 | custom | graphql_errors
+- endpoints[].method: GET | POST | PUT | PATCH | DELETE
+- file_storage.strategy: local | s3 | gcs | azure_blob
+
+### web_ui
+- language: typescript | javascript
+- framework: react | vue | svelte | next | nuxt | angular | solid | astro
+- css_strategy: tailwind | css_modules | styled_components | sass | vanilla_css | emotion
+- state_management: zustand | redux | recoil | jotai | context | pinia | mobx
+- rendering_strategy: spa | ssr | ssg | isr
+- accessibility_level: wcag_aa | wcag_aaa | basic | none
+- responsive_strategy: mobile_first | desktop_first
+
+### worker
+- language: python | typescript | java | kotlin | ruby | go
+- framework: celery | bullmq | sidekiq | spring_batch | temporal
+- workers[].trigger_type: queue | cron | event | webhook
+- workers[].overlap_policy: skip | queue | parallel
+
+### mobile_app
+- approach: native | cross_platform | hybrid
+- framework: react_native | flutter | swift | kotlin_mobile | swiftui | jetpack_compose
+- navigation_pattern: tab | drawer | stack | bottom_nav
+- local_storage: sqlite | realm | async_storage | mmkv | core_data
+- distribution: app_store | play_store | enterprise | both_stores | testflight
+- update_strategy: force | soft | in_app | code_push
+
+### data_pipeline
+- language: python | java | scala | sql
+- framework: airflow | dagster | prefect | spark | dbt | flink
+- pipelines[].type: batch | streaming | micro_batch | hybrid
+- pipelines[].schedule: cron | real_time | trigger_based
+- pipelines[].sources[].extraction_method: full | incremental | cdc | api_poll
+- pipelines[].sources[].format: json | csv | parquet | avro | protobuf | xml
+- pipelines[].sinks[].load_method: upsert | append | overwrite | merge
+- pipelines[].quality_checks[].on_failure: abort | warn | quarantine
+- pipelines[].partial_failure_strategy: skip_bad | fail_all | dead_letter
+- pipelines[].schema_change_handling: auto_detect | fail | alert
+
+### Security / Risks
 - security.requirements[].category: authentication | authorization |
   encryption | input_validation | audit | transport_security
-- services[].css_strategy (web_ui): tailwind | css_modules |
-  styled_components | sass | vanilla_css | emotion
-- services[].state_management (web_ui): zustand | redux | recoil | jotai | context | pinia | mobx
-- services[].rendering_strategy (web_ui): spa | ssr | ssg | isr
+- risks.technical[].likelihood: high | medium | low
+- risks.technical[].impact: high | medium | low
+- risks.irreversible_decisions[].confidence_level: high | medium | low
+
+### Process / Testing / Version Control
 - process.methodology: scrum | kanban | scrumban | xp
 - testing.approach: tdd | bdd | test_after | test_first
 - testing.levels[].level: unit | integration | e2e | contract | smoke | performance
 - testing.levels[].framework: pytest | jest | vitest | playwright | cypress |
   junit | go_test | rspec | xctest | espresso | robolectric | flutter_test | detox
+- testing.test_data_strategy: fixtures | factories | snapshots | seed_scripts
 - version_control.branch_strategy: github_flow | gitflow | trunk_based | master_develop_task
-- risks.technical[].likelihood: high | medium | low
-- risks.technical[].impact: high | medium | low
-- risks.irreversible_decisions[].confidence_level: high | medium | low
+- version_control.commit_convention: conventional | gitmoji | angular | free
+
+### Deployment (optional section — include only when relevant)
+- deployment.environments[].name: dev | staging | production
+- deployment.ci.tool: github_actions | gitlab_ci | jenkins | circleci |
+  bitbucket_pipelines | xcode_cloud | bitrise | codemagic
+- deployment.cd.tool: argocd | fluxcd | spinnaker | none | fastlane | app_center
+- deployment.cd.strategy: gitops | push | manual
+- deployment.infrastructure_as_code.tool: terraform | pulumi | cdk | cloudformation | ansible
+- deployment.container_registry: dockerhub | ecr | gcr | ghcr | acr
+- deployment.secrets_management: env_file | vault | aws_ssm | doppler | infisical
 
 ## Common Mistakes to Avoid
 
@@ -137,25 +240,46 @@ WRONG — mismatched per_service and services names:
     per_service:
       - service: "api"     # WRONG, must be "my-api"
 
-WRONG — missing decision_authority in per_service:
+WRONG — missing test_case_coverage or decision_authority in per_service:
   collaboration:
     per_service:
       - service: "my-api"
-        mode: autonomous    # missing decision_authority!
-  # MUST include decision_authority with claude_autonomous + requires_approval
+        mode: autonomous
+        # MUST also include: test_case_coverage (enum),
+        # decision_authority with claude_autonomous[] + requires_approval[]
+
+WRONG — web_ui service missing pages:
+  services:
+    - name: "my-web"
+      type: web_ui
+      # MUST also include: pages (at least 1, each with name, purpose, connected_endpoints)
+
+WRONG — worker service missing workers:
+  services:
+    - name: "my-worker"
+      type: worker
+      # MUST include: workers (at least 1, each with name, responsibility,
+      # trigger_type, trigger_config, idempotent)
 
 WRONG — mobile_app service missing required fields:
   services:
     - name: "my-app"
       type: mobile_app
-      # MUST also include: responsibility, approach, framework,
-      # min_os_versions, screens (with at least 1), deployment
+      # MUST include: responsibility, approach, framework,
+      # min_os_versions, screens (at least 1 with name, purpose,
+      # key_interactions, connected_endpoints, states, components)
 
 WRONG — security requirement missing required fields:
   security:
     requirements:
       - requirement: "JWT 인증"
       # MUST also include: category (from enum), implementation_approach
+
+WRONG — irreversible_decision missing required fields:
+  risks:
+    irreversible_decisions:
+      - decision: "PostgreSQL 선택"
+      # MUST also include: why_irreversible, confidence_level (enum), reversal_cost
 
 ## SDwC Template Structure Reference
 

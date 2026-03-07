@@ -7,6 +7,8 @@
 ## [Unreleased]
 
 ### Changed
+- intake-assistant-api: Anthropic API 재시도 횟수 3→2회로 축소 (analyze_service, generate_service), backoff [1,2,4]→[1,2] (T029)
+- intake-assistant-api: generate 시스템 프롬프트를 field_requirements.yaml 기반으로 전면 보정 — Per-Service Type Required Fields 섹션 신설, 누락 required 필드/enum/array minimum 추가, kotlin→kotlin_mobile 수정, worker/data_pipeline/deployment 등 30+ enum 추가 (T029)
 - intake-assistant-api: 객관식 질문(3~4개, single/multi select)을 자유 텍스트 질문(5~6개, open-ended)으로 변경 — Choice 클래스 삭제, Question 단순화(placeholder 추가), QaAnswer.selected_ids→answer, analyze/generate 프롬프트 재작성 (T028)
 - intake-assistant-web: QuestionCard를 radio/checkbox에서 textarea 기반으로 전환, intakeStore answers 타입을 Record<string, string>으로 변경, E2E 테스트를 textarea.fill()로 전환 (T028)
 

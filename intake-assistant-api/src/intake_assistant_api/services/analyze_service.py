@@ -13,8 +13,8 @@ from intake_assistant_api.services.prompts.analyze import ANALYZE_SYSTEM_PROMPT
 
 logger = structlog.get_logger()
 
-MAX_RETRIES = 3
-BACKOFF_SECONDS = [1, 2, 4]
+MAX_RETRIES = 2
+BACKOFF_SECONDS = [1, 2]
 MODEL = "claude-haiku-4-5-20251001"
 
 

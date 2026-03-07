@@ -140,7 +140,7 @@ async def test_generate_anthropic_failure_retries_exhausted() -> None:
     with (
         patch("intake_assistant_api.services.generate_service.template_cache") as tc,
         patch("intake_assistant_api.services.generate_service.asyncio.sleep"),
-        pytest.raises(ExternalServiceError, match="Failed after 3 retries"),
+        pytest.raises(ExternalServiceError, match="Failed after 2 retries"),
     ):
         tc.get_template.return_value = "mock template"
         await generate(anthropic, sdwc, DEFAULT_REQUEST)
