@@ -1,3 +1,5 @@
+from typing import Any
+
 from pydantic import BaseModel, Field, field_validator
 
 from intake_assistant_api.core.sanitizer import sanitize_text
@@ -29,7 +31,7 @@ class Question(BaseModel):
 
 class Analysis(BaseModel):
     detected_keywords: list[str]
-    inferred_hints: dict[str, str]
+    inferred_hints: dict[str, Any]
 
 
 class AnalyzeResponse(BaseModel):

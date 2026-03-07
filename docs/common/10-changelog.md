@@ -6,6 +6,9 @@
 
 ## [Unreleased]
 
+### Fixed
+- intake-assistant-api: analyze API의 inferred_hints 타입을 dict[str, Any]로 변경 — Haiku가 bool 값을 반환할 때 Pydantic 검증 실패 수정
+
 ### Added
 - intake-assistant-api: IP 기반 rate limiting 미들웨어 — sliding window 방식 20req/60s, 429 + Retry-After 응답, /health 제외 (T026)
 - intake-assistant-api: 입력 텍스트 sanitization — HTML 태그 제거, 과도한 공백/개행 축소, whitespace-only 입력 거부 (T026)
