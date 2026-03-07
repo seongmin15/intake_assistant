@@ -260,6 +260,18 @@ Any active status -> Cancelled
 
 ---
 
+### T016: .env.example 수정 (SDWC_API_URL 값 보정)
+- Status: Done
+- Service: intake-assistant-api
+- Description: .env.example의 SDWC_API_URL이 http://localhost:8080으로 되어 있으나, k3d 로컬 배포 시 Traefik Host 기반 라우팅으로 인해 http://sdwc.local:8080이 올바른 값. 환경별 가이드 주석도 추가.
+- Acceptance Criteria:
+  - [x] .env.example의 SDWC_API_URL → http://sdwc.local:8080 변경
+  - [x] 환경별 SDWC_API_URL 주석 추가
+  - [x] 10-changelog 기록
+- Result: .env.example의 SDWC_API_URL을 http://sdwc.local:8080으로 수정. K8s/k3d/direct 3가지 환경별 URL 주석 추가. README.md 환경 변수 섹션도 이전에 업데이트 완료.
+
+---
+
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
      Claude fills the Tasks section during Init based on docs/common/05-roadmap.md.

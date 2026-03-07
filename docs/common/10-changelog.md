@@ -24,6 +24,7 @@
 
 ### Changed
 - intake-assistant-api: config.py sdwc_api_url 기본값을 K8s 내부 DNS(`sdwc-api.sdwc.svc.cluster.local:8000`)로 변경 (T014)
+- intake-assistant-api: .env.example SDWC_API_URL을 `http://sdwc.local:8080`으로 수정 + 환경별 가이드 주석 추가 (T016)
 
 ### Fixed
 - intake-assistant-api: SDwC API 연동 — JSON body → multipart file upload으로 변경 (validate, generate 엔드포인트), validate 응답 필드명 `success`→`valid`, `error`→`errors`로 수정 (T013)

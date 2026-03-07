@@ -49,9 +49,22 @@
 ### 환경 변수
 
 ```bash
-ANTHROPIC_API_KEY=<your-api-key>
-SDWC_API_URL=<sdwc-server-url>
+cp intake-assistant-api/.env.example intake-assistant-api/.env
 ```
+
+`.env` 파일에서 `ANTHROPIC_API_KEY`만 실제 키로 변경하면 됩니다.
+
+```bash
+ANTHROPIC_API_KEY=sk-ant-your-actual-key   # 필수: Anthropic API 키
+SDWC_API_URL=http://sdwc.local:8080         # k3d 로컬 배포 시 기본값
+DEBUG=false
+```
+
+| 환경 | `SDWC_API_URL` |
+|------|----------------|
+| K8s 클러스터 내부 | `http://sdwc-api.sdwc.svc.cluster.local:8000` |
+| 로컬 개발 (k3d 배포 후) | `http://sdwc.local:8080` |
+| 로컬 개발 (직접 실행) | `http://localhost:8000` |
 
 ### Backend (intake-assistant-api)
 
