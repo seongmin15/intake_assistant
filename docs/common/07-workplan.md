@@ -111,17 +111,17 @@ Any active status -> Cancelled
 ---
 
 ### T005: POST /api/v1/generate 구현 (YAML 생성 + validate-retry)
-- Status: Ready
+- Status: Done
 - Service: intake-assistant-api
 - Description: 사용자 입력 + Q&A 응답을 기반으로 Sonnet을 호출하여 intake_data.yaml을 생성. SDwC /validate로 검증하고, 실패 시 에러 피드백으로 재생성 (최대 2회). 아키텍처 카드 5항목 + 기능 체크리스트 추출.
 - Acceptance Criteria:
-  - [ ] POST /api/v1/generate → yaml_content + architecture_card + feature_checklist 응답
-  - [ ] Anthropic Sonnet 호출 + 시스템 프롬프트 (DELETE 원칙, 템플릿 구조 포함)
-  - [ ] SDwC /api/v1/validate 호출로 YAML 검증
-  - [ ] validate-retry 루프 (최대 2회 재시도)
-  - [ ] 수정 반복 지원 (revision_request + previous_yaml 파라미터)
-  - [ ] 단위 테스트 (mock Anthropic + SDwC 응답)
-- Result:
+  - [x] POST /api/v1/generate → yaml_content + architecture_card + feature_checklist 응답
+  - [x] Anthropic Sonnet 호출 + 시스템 프롬프트 (DELETE 원칙, 템플릿 구조 포함)
+  - [x] SDwC /api/v1/validate 호출로 YAML 검증
+  - [x] validate-retry 루프 (최대 2회 재시도)
+  - [x] 수정 반복 지원 (revision_request + previous_yaml 파라미터)
+  - [x] 단위 테스트 (mock Anthropic + SDwC 응답)
+- Result: schemas/generate.py, services/prompts/generate.py, services/generate_service.py, routers/generate.py 신규 생성. services/sdwc_client.py에 validate_yaml 추가. main.py에 generate router 등록. Sonnet 호출 + exponential backoff 재시도(3회) + SDwC validate-retry(최대 3회 시도). 단위 테스트 14개(서비스 7 + API 4 + SDwC 3) 신규 추가, 전체 29개 통과. ruff lint/format 통과.
 
 ---
 

@@ -11,6 +11,7 @@
 - intake-assistant-web: Vite + React + TypeScript 프로젝트 초기화, Tailwind·Zustand·Router 설정 (T002)
 - intake-assistant-api: 헬스체크 엔드포인트 개선 (healthy/degraded + sdwc_reachable), SDwC 템플릿 fetch + 메모리 캐시 (T003)
 - intake-assistant-api: POST /api/v1/analyze 엔드포인트 — Haiku 기반 동적 질문 생성, exponential backoff 재시도, Pydantic 입력 검증 (T004)
+- intake-assistant-api: POST /api/v1/generate 엔드포인트 — Sonnet 기반 intake_data.yaml 생성, SDwC validate-retry(최대 3회), 아키텍처 카드 + 기능 체크리스트 추출, 수정 반복 지원 (T005)
 
 <!-- Claude: §5.8 작업 완료 시 해당 변경을 [Unreleased]에 기록.
      분류 기준:
