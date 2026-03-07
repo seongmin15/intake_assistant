@@ -1,11 +1,15 @@
 import { expect, test } from "@playwright/test";
 
-import { MOCK_ANALYZE_RESPONSE, setupApiMocks } from "./fixtures";
+import {
+  buildSseErrorBody,
+  MOCK_ANALYZE_RESPONSE,
+  setupApiMocks,
+} from "./fixtures";
 
 test.describe("에러 시나리오", () => {
-  test("analyze API 실패 시 에러 메시지 표시", async ({ page }) => {
-    // analyze만 실패하도록 mock
-    await page.route("**/api/v1/analyze", (route) =>
+  test("analyze 스트림 HTTP 실패 시 에러 메시지 표시", async ({ page }) => {
+    // analyze/stream만 실패하도록 mock
+    await page.route("**/api/v1/analyze/stream", (route) =>
       route.fulfill({
         status: 500,
         contentType: "application/json",
@@ -25,7 +29,7 @@ test.describe("에러 시나리오", () => {
   });
 
   test("analyze 실패 후 '처음부터 다시 시작'으로 복구", async ({ page }) => {
-    await page.route("**/api/v1/analyze", (route) =>
+    await page.route("**/api/v1/analyze/stream", (route) =>
       route.fulfill({
         status: 500,
         contentType: "application/json",
@@ -44,10 +48,34 @@ test.describe("에러 시나리오", () => {
     await expect(page.locator("#user-input")).toBeVisible();
   });
 
-  test("generate API 실패 시 에러 메시지 표시", async ({ page }) => {
-    // analyze는 성공, generate는 실패
+  test("analyze 스트림 SSE error 이벤트 시 에러 메시지 표시", async ({
+    page,
+  }) => {
+    await page.route("**/api/v1/analyze/stream", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "text/event-stream",
+        headers: { "Cache-Control": "no-cache" },
+        body: buildSseErrorBody("AI 서비스에 일시적 문제가 발생했습니다."),
+      }),
+    );
+
+    await page.goto("/intake");
+    await page.locator("#user-input").fill("테스트 입력");
+    await page.getByRole("button", { name: "분석하기" }).click();
+
+    await expect(
+      page.getByText("AI 서비스에 일시적 문제가 발생했습니다."),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "처음부터 다시 시작" }),
+    ).toBeVisible();
+  });
+
+  test("generate 스트림 HTTP 실패 시 에러 메시지 표시", async ({ page }) => {
+    // analyze는 성공, generate/stream만 실패
     await setupApiMocks(page);
-    await page.route("**/api/v1/generate", (route) =>
+    await page.route("**/api/v1/generate/stream", (route) =>
       route.fulfill({
         status: 502,
         contentType: "application/json",
