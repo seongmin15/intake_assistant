@@ -51,3 +51,24 @@ async def test_validate_yaml_server_error(sdwc_client, respx_mock):
     respx_mock.post("http://sdwc-test:8080/api/v1/validate").respond(500)
     with pytest.raises(ExternalServiceError, match="SDwC"):
         await sdwc_client.validate_yaml("project:\n  name: test\n")
+
+
+async def test_generate_zip_success(sdwc_client, respx_mock):
+    zip_bytes = b"PK\x03\x04fake-zip"
+    respx_mock.post("http://sdwc-test:8080/api/v1/generate").respond(200, content=zip_bytes)
+    result = await sdwc_client.generate_zip("project:\n  name: test\n")
+    assert result == zip_bytes
+
+
+async def test_generate_zip_server_error(sdwc_client, respx_mock):
+    respx_mock.post("http://sdwc-test:8080/api/v1/generate").respond(500)
+    with pytest.raises(ExternalServiceError, match="SDwC"):
+        await sdwc_client.generate_zip("project:\n  name: test\n")
+
+
+async def test_generate_zip_timeout(sdwc_client, respx_mock):
+    respx_mock.post("http://sdwc-test:8080/api/v1/generate").side_effect = httpx.ReadTimeout(
+        "timed out"
+    )
+    with pytest.raises(ExternalServiceError, match="ZIP generation failed"):
+        await sdwc_client.generate_zip("project:\n  name: test\n")

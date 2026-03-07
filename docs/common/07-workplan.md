@@ -126,16 +126,16 @@ Any active status -> Cancelled
 ---
 
 ### T006: POST /api/v1/finalize 구현 (ZIP 생성)
-- Status: Ready
+- Status: Done
 - Service: intake-assistant-api
 - Description: 확정된 YAML을 SDwC /api/v1/generate에 전달하여 ZIP 파일을 받아 클라이언트에 스트림 응답.
 - Acceptance Criteria:
-  - [ ] POST /api/v1/finalize → ZIP 바이너리 스트림 응답
-  - [ ] SDwC /api/v1/generate 호출
-  - [ ] 30초 타임아웃 설정
-  - [ ] 에러 시 적절한 에러 응답
-  - [ ] 단위 테스트
-- Result:
+  - [x] POST /api/v1/finalize → ZIP 바이너리 스트림 응답
+  - [x] SDwC /api/v1/generate 호출
+  - [x] 30초 타임아웃 설정
+  - [x] 에러 시 적절한 에러 응답
+  - [x] 단위 테스트
+- Result: schemas/finalize.py, routers/finalize.py 신규 생성. SDwCClient.generate_zip 추가(30초 타임아웃). main.py에 finalize router 등록. StreamingResponse로 ZIP 바이너리 반환. 단위 테스트 7개(API 4 + SDwC 3) 신규 추가, 전체 36개 통과. ruff lint/format 통과.
 
 ---
 
