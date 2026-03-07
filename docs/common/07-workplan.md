@@ -84,15 +84,15 @@ Any active status -> Cancelled
 ---
 
 ### T003: 헬스체크 + SDwC 템플릿 동기화
-- Status: Ready
+- Status: Done
 - Service: intake-assistant-api
 - Description: GET /api/v1/health 엔드포인트 구현. 앱 시작 시 SDwC /api/v1/template에서 최신 intake_template.yaml을 수신하여 메모리 캐시에 저장.
 - Acceptance Criteria:
-  - [ ] GET /api/v1/health → status, sdwc_reachable 응답
-  - [ ] 앱 시작 시 SDwC 템플릿 fetch + 메모리 캐시
-  - [ ] SDwC 접속 불가 시 degraded 상태 반환
-  - [ ] 단위 테스트
-- Result:
+  - [x] GET /api/v1/health → status, sdwc_reachable 응답
+  - [x] 앱 시작 시 SDwC 템플릿 fetch + 메모리 캐시
+  - [x] SDwC 접속 불가 시 degraded 상태 반환
+  - [x] 단위 테스트
+- Result: HealthResponse 스키마, SDwCClient 서비스, template_cache 모듈, health 라우터 분리. lifespan에서 SDwC 템플릿 fetch + 캐시. respx 기반 단위 테스트 5개 통과. ruff lint/format 통과.
 
 ---
 

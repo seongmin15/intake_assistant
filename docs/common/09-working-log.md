@@ -46,3 +46,11 @@
 - **변경된 파일**: intake-assistant-web/ 전체 (신규), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: Tailwind v4 (@tailwindcss/vite 플러그인), path alias `@/` 사용, `src/app/` 하위에 App·router·providers 분리
 - **미완료/후속**: 없음. T003~T007 중 선택하여 진행 가능.
+
+### 2026-03-07 — T003: 헬스체크 + SDwC 템플릿 동기화
+
+- **계획**: GET /api/v1/health 엔드포인트 개선 (status + sdwc_reachable), SDwCClient 서비스 모듈, template_cache 모듈, lifespan에서 template fetch, 라우터 분리, 단위 테스트.
+- **작업**: HealthResponse 스키마, SDwCClient(httpx 기반), template_cache(모듈 변수), health 라우터 분리, lifespan에 startup fetch + shutdown close 통합. respx로 httpx mock 테스트.
+- **변경된 파일**: schemas/health.py, services/sdwc_client.py, services/template_cache.py, routers/health.py (신규), main.py (수정), tests/unit/test_health.py, tests/unit/test_sdwc_client.py (신규), pyproject.toml (respx 추가), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: template_cache를 모듈 변수로 단순 관리 (stateless 서버), respx로 httpx mock
+- **미완료/후속**: 없음. T004~T007 중 선택하여 진행 가능.
