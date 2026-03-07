@@ -10,5 +10,8 @@ class Settings(BaseSettings):
     app_name: str = "intake-assistant-api"
     debug: bool = False
 
+    rate_limit_requests: int = 20
+    rate_limit_window_seconds: int = 60
+
 
 settings = Settings()

@@ -1,4 +1,6 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+from intake_assistant_api.core.sanitizer import sanitize_text
 
 
 class QaAnswer(BaseModel):
@@ -11,6 +13,13 @@ class GenerateRequest(BaseModel):
     qa_answers: list[QaAnswer] = Field(..., min_length=1)
     revision_request: str | None = Field(default=None, max_length=2000)
     previous_yaml: str | None = None
+
+    @field_validator("user_input", mode="before")
+    @classmethod
+    def sanitize_user_input(cls, v: str) -> str:
+        if isinstance(v, str):
+            return sanitize_text(v)
+        return v
 
 
 class ArchitectureCard(BaseModel):

@@ -27,6 +27,7 @@
 | 2026-03-08 | T023: Prompt Quality Tuning — generate 프롬프트 강화로 validation 첫 시도 통과율 향상 | 완료 |
 | 2026-03-08 | T024: E2E Tests for Streaming — Playwright E2E 테스트를 SSE 스트리밍 API 모킹으로 전환 | 완료 |
 | 2026-03-08 | T025: Error Recovery UX — 에러 시 errorSource별 재시도 버튼 추가 | 완료 |
+| 2026-03-08 | T026: Rate Limiting / Input Sanitization — IP 기반 rate limiter + 입력 텍스트 sanitizer | 완료 |
 | 2026-03-07 | T016: .env.example 수정 — SDWC_API_URL 값 보정 + 환경별 주석 | 완료 |
 | 2026-03-07 | T017: Frontend API URL fallback 수정 — k3d에서 ERR_CONNECTION_REFUSED 해결 | 완료 |
 | 2026-03-07 | T018: analyze API JSON 파싱 오류 수정 — markdown 코드 블록 스트리핑 누락 | 완료 |
@@ -224,6 +225,14 @@
 - **작업**: fixtures.ts를 SSE 응답 빌더 패턴으로 전면 재작성(formatSseEvent, buildAnalyzeSseBody, buildGenerateSseBody, buildSseErrorBody). setupApiMocks에서 analyze/stream, generate/stream 라우트로 변경. simple-mode.spec.ts에 "스트리밍 중 진행 상태 텍스트 표시" 테스트 추가(300ms 지연 라우트로 UI status text 검증). error-scenarios.spec.ts를 스트리밍 엔드포인트 모킹으로 전환 + SSE error 이벤트 시나리오 추가.
 - **변경된 파일**: tests/e2e/fixtures.ts (재작성), tests/e2e/simple-mode.spec.ts (재작성), tests/e2e/error-scenarios.spec.ts (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: HTTP 에러(500 응답)와 SSE 에러(200 + error 이벤트) 두 시나리오 모두 커버. finalize는 비스트리밍이므로 변경 없음.
+- **미완료/후속**: 없음.
+
+### 2026-03-08 — T026: Rate Limiting / Input Sanitization
+
+- **계획**: IP 기반 in-memory rate limiter(sliding window) + 입력 텍스트 sanitizer(HTML 태그 제거, 공백 정규화) + ASGI 미들웨어 + Pydantic validator 적용.
+- **작업**: core/rate_limiter.py(dict[str, list[float]] 기반 sliding window, 20req/60s 기본값, 주기적 expired entry cleanup), core/sanitizer.py(HTML 태그 제거, leading/trailing strip, 과도한 공백/개행 축소), RateLimitError(AppError 서브클래스, 429 + Retry-After 헤더), RateLimitMiddleware(BaseHTTPMiddleware, /health 제외), config.py에 rate_limit_requests/rate_limit_window_seconds 설정 추가, schemas/analyze.py·generate.py에 field_validator(mode="before")로 sanitization 적용.
+- **변경된 파일**: core/config.py (수정), core/exceptions.py (수정), core/rate_limiter.py (신규), core/sanitizer.py (신규), schemas/analyze.py (수정), schemas/generate.py (수정), main.py (수정), tests/unit/test_rate_limiter.py (신규), tests/unit/test_sanitizer.py (신규), tests/unit/test_rate_limit_api.py (신규), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: field_validator에 mode="before" 사용 — sanitization이 min_length 검증 전에 실행되어 whitespace-only 입력도 거부. stateless API이므로 in-memory rate limiter 적합(인스턴스 간 공유 불필요).
 - **미완료/후속**: 없음.
 
 ### 2026-03-08 — T025: Error Recovery UX

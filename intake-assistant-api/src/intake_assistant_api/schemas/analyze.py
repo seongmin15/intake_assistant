@@ -1,8 +1,17 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+from intake_assistant_api.core.sanitizer import sanitize_text
 
 
 class AnalyzeRequest(BaseModel):
     user_input: str = Field(..., min_length=1, max_length=5000)
+
+    @field_validator("user_input", mode="before")
+    @classmethod
+    def sanitize_user_input(cls, v: str) -> str:
+        if isinstance(v, str):
+            return sanitize_text(v)
+        return v
 
 
 class Choice(BaseModel):

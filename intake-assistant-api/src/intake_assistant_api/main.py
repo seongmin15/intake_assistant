@@ -7,9 +7,13 @@ import structlog
 from anthropic import AsyncAnthropic
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.requests import Request as StarletteRequest
+from starlette.responses import Response as StarletteResponse
 
+from intake_assistant_api.core import rate_limiter
 from intake_assistant_api.core.config import settings
-from intake_assistant_api.core.exceptions import AppError, app_error_handler
+from intake_assistant_api.core.exceptions import AppError, RateLimitError, app_error_handler
 from intake_assistant_api.routers.analyze import router as analyze_router
 from intake_assistant_api.routers.finalize import router as finalize_router
 from intake_assistant_api.routers.generate import router as generate_router
@@ -18,6 +22,29 @@ from intake_assistant_api.services import template_cache
 from intake_assistant_api.services.sdwc_client import SDwCClient
 
 logger = structlog.get_logger()
+
+_RATE_LIMIT_SKIP_PATHS = {"/api/v1/health"}
+
+
+class RateLimitMiddleware(BaseHTTPMiddleware):
+    async def dispatch(
+        self, request: StarletteRequest, call_next: RequestResponseEndpoint,
+    ) -> StarletteResponse:
+        if request.url.path in _RATE_LIMIT_SKIP_PATHS:
+            return await call_next(request)
+
+        client_ip = request.client.host if request.client else "unknown"
+        try:
+            rate_limiter.check(client_ip)
+        except RateLimitError as exc:
+            from fastapi.responses import JSONResponse
+
+            return JSONResponse(
+                status_code=429,
+                content={"error": exc.message},
+                headers={"Retry-After": str(exc.retry_after)},
+            )
+        return await call_next(request)
 
 
 @asynccontextmanager
@@ -68,6 +95,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(RateLimitMiddleware)
 
 app.add_exception_handler(AppError, app_error_handler)  # type: ignore[arg-type]
 
