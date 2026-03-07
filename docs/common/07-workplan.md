@@ -232,15 +232,15 @@ Any active status -> Cancelled
 ---
 
 ### T014: 인프라 매니페스트 커밋 (infra/ + config.py)
-- Status: Ready
+- Status: Done
 - Service: intake-assistant-api, intake-assistant-web
 - Description: sdwc-platform-infra-guide에 따라 수동 생성된 infra/ K8s 매니페스트와 config.py 기본값 변경을 커밋. infra/intake-assistant-api/deployment.yaml, infra/intake-assistant-web/deployment.yaml, config.py sdwc_api_url 기본값 K8s 내부 DNS로 변경.
 - Acceptance Criteria:
-  - [ ] infra/intake-assistant-api/deployment.yaml 커밋
-  - [ ] infra/intake-assistant-web/deployment.yaml 커밋
-  - [ ] config.py sdwc_api_url 기본값 변경 커밋
-  - [ ] 10-changelog 기록
-- Result:
+  - [x] infra/intake-assistant-api/deployment.yaml 커밋
+  - [x] infra/intake-assistant-web/deployment.yaml 커밋
+  - [x] config.py sdwc_api_url 기본값 변경 커밋
+  - [x] 10-changelog 기록
+- Result: infra/ 디렉토리(API Deployment+Service, Web Deployment+Service) 및 config.py 기본값 변경 커밋. sdwc-platform-infra-guide 섹션 3-3, 3-4 완료.
 
 ---
 

@@ -140,3 +140,11 @@
 - **변경된 파일**: services/sdwc_client.py (수정), services/generate_service.py (수정), tests/unit/test_sdwc_client.py (수정), tests/unit/test_generate_service.py (수정), tests/unit/test_generate_api.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: SDwC API 소스(routers/intake.py)에서 UploadFile 파라미터 + ValidationResponse(valid/errors/warnings) 스키마 확인 후 수정
 - **미완료/후속**: T014(인프라 매니페스트 커밋) Ready 상태.
+
+### 2026-03-07 — T014: 인프라 매니페스트 커밋
+
+- **계획**: sdwc-platform-infra-guide에 따라 수동 생성된 infra/ K8s 매니페스트와 config.py 기본값 변경을 커밋.
+- **작업**: 기존 수동 생성된 infra/ 디렉토리와 config.py 변경을 feature branch에서 커밋.
+- **변경된 파일**: infra/intake-assistant-api/deployment.yaml (신규), infra/intake-assistant-web/deployment.yaml (신규), intake-assistant-api/src/intake_assistant_api/core/config.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: sdwc-platform-infra-guide 지시대로 config.py 기본값을 K8s 내부 DNS로 변경. 로컬 개발은 .env 오버라이드.
+- **미완료/후속**: 없음. T013~T014 완료.
