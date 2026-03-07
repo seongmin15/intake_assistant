@@ -167,16 +167,16 @@ Any active status -> Cancelled
 ---
 
 ### T009: IntakePage - 아키텍처 카드 + 수정 반복
-- Status: Ready
+- Status: Done
 - Service: intake-assistant-web
 - Description: Q&A 응답 완료 후 /api/v1/generate 호출. ArchitectureCard(5항목) + FeatureChecklist 표시. RevisionInput으로 수정 요청 → 전체 재생성 반복.
 - Acceptance Criteria:
-  - [ ] /api/v1/generate API 호출 + 로딩 상태
-  - [ ] ArchitectureCard 컴포넌트 (서비스 구성, 데이터 저장, 인증, 외부 서비스, 화면 수)
-  - [ ] FeatureChecklist 컴포넌트 (읽기 전용)
-  - [ ] RevisionInput 컴포넌트 + 수정 요청 시 재생성
-  - [ ] 에러 상태 처리
-- Result:
+  - [x] /api/v1/generate API 호출 + 로딩 상태
+  - [x] ArchitectureCard 컴포넌트 (서비스 구성, 데이터 저장, 인증, 외부 서비스, 화면 수)
+  - [x] FeatureChecklist 컴포넌트 (읽기 전용)
+  - [x] RevisionInput 컴포넌트 + 수정 요청 시 재생성
+  - [x] 에러 상태 처리
+- Result: ArchitectureCard(5항목 dl/dd 표시), FeatureChecklist(체크 아이콘 + 이름/설명), RevisionInput(textarea + 수정반영/취소 버튼) 컴포넌트 신규. IntakePage에 review/revising phase 추가 + '수정 요청'/'이대로 진행' 버튼. ESLint + 빌드 통과.
 
 ---
 
