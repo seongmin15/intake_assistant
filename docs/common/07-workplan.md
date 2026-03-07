@@ -362,6 +362,21 @@ Any active status -> Cancelled
 
 ---
 
+### T023: Prompt Quality Tuning (검증 실패율 감소)
+- Status: Done
+- Service: intake-assistant-api
+- Description: generate 시스템 프롬프트에 enum 값 치트시트, 필수 섹션 체크리스트, 배열 최소 요건, 교차 참조 규칙, 흔한 실수 예시를 추가하여 SDwC validation 첫 시도 통과율을 높인다.
+- Acceptance Criteria:
+  - [x] 시스템 프롬프트에 enum 값 치트시트 추가
+  - [x] 필수 섹션 체크리스트 추가
+  - [x] 배열 최소 1개 요건 명시
+  - [x] collaboration.per_service ↔ services 1:1 교차 참조 규칙 추가
+  - [x] 흔한 실수 예시 (빈 문자열, 빈 배열, enum 위반) 추가
+  - [x] 기존 테스트 전체 통과
+- Result: generate 시스템 프롬프트에 5개 섹션 추가: Required Sections Checklist(19개 필수 섹션), Array Minimum Requirements(16개 배열 필드), Enum Value Reference(35+ enum 필드), Cross-reference rule(per_service↔services 1:1), Common Mistakes to Avoid(5개 안티패턴). 기존 50개 테스트 전체 통과. ruff lint 통과.
+
+---
+
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
      Claude fills the Tasks section during Init based on docs/common/05-roadmap.md.

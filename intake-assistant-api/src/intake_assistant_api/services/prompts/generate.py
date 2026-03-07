@@ -19,6 +19,114 @@ into a complete, valid intake_data.yaml.
 4. **Conditional sections**: REST endpoints only when api_style is "rest",
    GraphQL sections only when api_style is "graphql", etc.
 
+5. **Cross-reference rule**: Each entry in `collaboration.per_service[].service`
+   must exactly match a `services[].name`. They must be 1:1 — same count, same names.
+
+## Required Sections Checklist
+
+The following top-level sections are REQUIRED and must always be present:
+- project (name, one_liner, elevator_pitch)
+- problem (statement, who_has_this_problem, severity, frequency,
+  current_workaround, workaround_pain_points)
+- motivation (why_now)
+- value_proposition (core_value, unique_differentiator)
+- goals (primary, success_scenario)
+- non_goals (at least 1 item with statement + rationale)
+- scope (in_scope: at least 1, out_of_scope: at least 1)
+- assumptions (at least 1 item with assumption + if_wrong)
+- user_personas (at least 1 item with name, description, primary_goal, pain_points)
+- collaboration (human_developers, review_policy, model_routing,
+  use_subagent, absolute_rules, per_service)
+- architecture (pattern, pattern_rationale, pattern_alternatives)
+- services (at least 1 service)
+- critical_flows (at least 1 flow with flow_name + happy_path)
+- security (requirements: at least 1)
+- risks (technical: at least 1, irreversible_decisions: at least 1)
+- performance (expected_concurrent_users)
+- process (methodology)
+- testing (approach, levels: at least 1)
+- version_control (branch_strategy)
+
+## Array Minimum Requirements
+
+These array fields require at least 1 item:
+- goals.primary, non_goals, scope.in_scope, scope.out_of_scope, assumptions
+- user_personas, collaboration.absolute_rules, collaboration.per_service
+- architecture.pattern_alternatives, services
+- critical_flows, security.requirements
+- risks.technical, risks.irreversible_decisions
+- testing.levels
+
+## Enum Value Reference
+
+Use ONLY these exact values for enum fields:
+
+- problem.severity: high | medium | low
+- problem.frequency: daily | weekly | monthly | occasional
+- scope.in_scope[].priority: must | should | could
+- scope.in_scope[].complexity_estimate: S | M | L | XL
+- scope.out_of_scope[].planned_phase: v2 | v3 | post_launch | backlog
+- goals.primary[].priority: P0 | P1 | P2
+- user_personas[].tech_proficiency: beginner | intermediate | expert
+- user_personas[].usage_frequency: daily | weekly | monthly
+- collaboration.per_service[].mode: autonomous | collaborative | learning
+- collaboration.per_service[].test_case_coverage: basic | standard | thorough
+- architecture.pattern: monolith | microservices | modular_monolith
+- architecture.internal_style: hexagonal | clean | layered | none
+- services[].type: backend_api | web_ui | worker | mobile_app | data_pipeline
+- services[].language (backend_api): python | typescript | java | go | rust | ruby | csharp | kotlin
+- services[].framework (backend_api): fastapi | django | express |
+  nestjs | spring | gin | actix | rails | aspnet
+- services[].language (web_ui): typescript | javascript
+- services[].framework (web_ui): react | vue | svelte | next | nuxt | angular | solid | astro
+- services[].build_tool: poetry | pip | npm | pnpm | yarn | gradle |
+  maven | cargo | go_mod | vite | webpack | turbopack | bundler
+- services[].api_style: rest | graphql | grpc
+- services[].auth.method: jwt | session | api_key | oauth2 | none
+- services[].databases[].engine: postgresql | mysql | mongodb | redis |
+  sqlite | dynamodb | elasticsearch | neo4j
+- services[].databases[].role: primary | cache | search | queue | analytics | session
+- services[].deployment.target: docker_compose | kubernetes | ecs |
+  lambda | cloud_run | fly_io | railway | vercel | bare_metal |
+  app_store | play_store | both_stores
+- services[].css_strategy (web_ui): tailwind | css_modules |
+  styled_components | sass | vanilla_css | emotion
+- services[].state_management (web_ui): zustand | redux | recoil | jotai | context | pinia | mobx
+- services[].rendering_strategy (web_ui): spa | ssr | ssg | isr
+- process.methodology: scrum | kanban | scrumban | xp
+- testing.approach: tdd | bdd | test_after | test_first
+- testing.levels[].level: unit | integration | e2e | contract | smoke | performance
+- version_control.branch_strategy: github_flow | gitflow | trunk_based | master_develop_task
+- risks.technical[].likelihood: high | medium | low
+- risks.technical[].impact: high | medium | low
+- risks.irreversible_decisions[].confidence_level: high | medium | low
+
+## Common Mistakes to Avoid
+
+WRONG — empty string for required field:
+  project:
+    name: ""
+
+WRONG — empty array for required array:
+  non_goals: []
+
+WRONG — inventing enum values not in the list:
+  problem:
+    severity: "critical"   # WRONG, use "high"
+  architecture:
+    pattern: "serverless"  # WRONG, not a valid value
+
+WRONG — including optional block with empty sub-fields:
+  constraints:
+    - constraint: ""       # DELETE the entire constraints block instead
+
+WRONG — mismatched per_service and services names:
+  services:
+    - name: "my-api"
+  collaboration:
+    per_service:
+      - service: "api"     # WRONG, must be "my-api"
+
 ## SDwC Template Structure Reference
 
 {template_structure}
