@@ -194,14 +194,14 @@ Any active status -> Cancelled
 ---
 
 ### T011: E2E 통합 테스트
-- Status: Backlog
+- Status: Done
 - Service: intake-assistant-api, intake-assistant-web
 - Description: Playwright로 전체 흐름 E2E 테스트. 텍스트 입력 → 질문 응답 → 카드 확인 → ZIP 다운로드.
 - Acceptance Criteria:
-  - [ ] 전체 Simple 모드 흐름 E2E 테스트
-  - [ ] Advanced 모드 리다이렉트 테스트
-  - [ ] 에러 시나리오 테스트 (API 실패, SDwC 불가)
-- Result:
+  - [x] 전체 Simple 모드 흐름 E2E 테스트
+  - [x] Advanced 모드 리다이렉트 테스트
+  - [x] 에러 시나리오 테스트 (API 실패, SDwC 불가)
+- Result: Playwright 설치+설정(chromium only, webServer 자동 시작). page.route() 기반 API 모킹. simple-mode.spec.ts(3개 — 전체 흐름/수정 반복/초기화), advanced-mode.spec.ts(2개 — 리다이렉트/Simple 이동), error-scenarios.spec.ts(4개 — analyze/generate/finalize 실패+복구). 총 9개 E2E 테스트 통과. ESLint + 빌드 통과.
 
 ---
 

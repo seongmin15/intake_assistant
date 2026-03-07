@@ -19,6 +19,7 @@
 | 2026-03-07 | T008: IntakePage 입력+질문 — TextInput, QuestionCard, Zustand store, API 연동 | 완료 |
 | 2026-03-07 | T009: IntakePage 아키텍처 카드+수정 — ArchitectureCard, FeatureChecklist, RevisionInput | 완료 |
 | 2026-03-07 | T010: IntakePage ZIP 다운로드 — finalizing/complete phase UI | 완료 |
+| 2026-03-07 | T011: E2E 통합 테스트 — Playwright 기반 Simple 모드/Advanced 모드/에러 시나리오 | 완료 |
 
 <!-- Claude: §5.8 작업 완료, §5.12 작업 중단/취소 시 한 줄 추가.
      작업 내용은 "무엇을 왜" 중심 1줄 요약.
@@ -115,3 +116,10 @@
 - **변경된 파일**: pages/IntakePage/index.tsx (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: complete 상태에서 '새 프로젝트 시작' 버튼으로 store reset → input phase로 복귀
 - **미완료/후속**: T001~T010 전체 완료. T011(E2E 테스트), T012(컨테이너화+CI) Backlog 상태.
+
+### 2026-03-07 — T011: E2E 통합 테스트
+
+- **작업**: Playwright 설치+설정, chromium 브라우저 설치. page.route() 기반 API 모킹으로 3개 테스트 파일 작성. simple-mode.spec.ts(전체 흐름 3개 — 입력→질문→카드→완료, 수정 반복, 초기화), advanced-mode.spec.ts(리다이렉트+Simple이동 2개), error-scenarios.spec.ts(analyze/generate/finalize 실패+복구 4개). 총 9개 E2E 테스트 통과.
+- **변경된 파일**: playwright.config.ts (신규), package.json (수정 — @playwright/test + test:e2e 스크립트), tests/e2e/fixtures.ts (신규), tests/e2e/simple-mode.spec.ts (신규), tests/e2e/advanced-mode.spec.ts (신규), tests/e2e/error-scenarios.spec.ts (신규), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: MSW 대신 Playwright 내장 page.route() 사용 — E2E에서 더 적합. chromium만 사용하여 빠른 실행. webServer로 Vite dev server 자동 시작.
+- **미완료/후속**: T012(컨테이너화+CI) Backlog 상태.
