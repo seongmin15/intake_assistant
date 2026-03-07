@@ -21,6 +21,7 @@
 | 2026-03-07 | T010: IntakePage ZIP 다운로드 — finalizing/complete phase UI | 완료 |
 | 2026-03-07 | T011: E2E 통합 테스트 — Playwright 기반 Simple 모드/Advanced 모드/에러 시나리오 | 완료 |
 | 2026-03-07 | T012: 컨테이너화 + CI 파이프라인 — Dockerfile, nginx.conf, GitHub Actions CI | 완료 |
+| 2026-03-07 | T016: .env.example 수정 — SDWC_API_URL 값 보정 + 환경별 주석 | 완료 |
 
 <!-- Claude: §5.8 작업 완료, §5.12 작업 중단/취소 시 한 줄 추가.
      작업 내용은 "무엇을 왜" 중심 1줄 요약.
@@ -148,6 +149,13 @@
 - **변경된 파일**: infra/intake-assistant-api/deployment.yaml (신규), infra/intake-assistant-web/deployment.yaml (신규), intake-assistant-api/src/intake_assistant_api/core/config.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: sdwc-platform-infra-guide 지시대로 config.py 기본값을 K8s 내부 DNS로 변경. 로컬 개발은 .env 오버라이드.
 - **미완료/후속**: 없음. T013~T014 완료.
+
+### 2026-03-07 — T016: .env.example 수정
+
+- **작업**: .env.example의 SDWC_API_URL을 http://localhost:8080 → http://sdwc.local:8080으로 수정. K8s cluster / k3d 로컬 / direct 실행 3가지 환경별 URL 가이드 주석 추가. README.md 환경 변수 섹션도 업데이트 (이전 대화에서 완료).
+- **변경된 파일**: intake-assistant-api/.env.example (수정), README.md (수정 — 이전 대화), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: k3d 배포 시 Traefik이 Host 헤더 기반 라우팅을 사용하므로 localhost:8080은 동작하지 않음. sdwc.local:8080이 올바른 값.
+- **미완료/후속**: 없음.
 
 ### 2026-03-07 — T015: infra/ 매니페스트를 sdwc-platform으로 이관
 
