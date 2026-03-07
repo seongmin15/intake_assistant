@@ -7,6 +7,8 @@
 ## [Unreleased]
 
 ### Added
+- intake-assistant-api: IP 기반 rate limiting 미들웨어 — sliding window 방식 20req/60s, 429 + Retry-After 응답, /health 제외 (T026)
+- intake-assistant-api: 입력 텍스트 sanitization — HTML 태그 제거, 과도한 공백/개행 축소, whitespace-only 입력 거부 (T026)
 - intake-assistant-web: Error Recovery UX — 에러 발생 시 errorSource별 재시도 버튼(분석 재시도/생성 재시도/다시 시도) 추가, 기존 "처음부터 다시 시작" 버튼도 유지, E2E 재시도 성공 테스트 2개 추가 (T025)
 
 ### Changed

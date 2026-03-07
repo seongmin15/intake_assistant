@@ -19,8 +19,21 @@ class ValidationError(AppError):
         super().__init__(message=message, status_code=422)
 
 
+class RateLimitError(AppError):
+    def __init__(self, retry_after: int) -> None:
+        self.retry_after = retry_after
+        super().__init__(
+            message="요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.",
+            status_code=429,
+        )
+
+
 async def app_error_handler(_request: Request, exc: AppError) -> JSONResponse:
+    headers: dict[str, str] = {}
+    if isinstance(exc, RateLimitError):
+        headers["Retry-After"] = str(exc.retry_after)
     return JSONResponse(
         status_code=exc.status_code,
         content={"error": exc.message},
+        headers=headers if headers else None,
     )

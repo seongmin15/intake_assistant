@@ -405,16 +405,16 @@ Any active status -> Cancelled
 ---
 
 ### T026: Rate Limiting / Input Sanitization
-- Status: Ready
+- Status: Done
 - Service: intake-assistant-api
 - Description: 프로덕션 사용 전 기본 요청 제한(rate limiting)과 입력 정제(sanitization) 추가. IP 기반 요청 제한, 입력 텍스트 정제(XSS 방지, 과도한 공백 제거 등).
 - Acceptance Criteria:
-  - [ ] IP 기반 rate limiting 미들웨어 추가
-  - [ ] 입력 텍스트 sanitization (user_input 필드)
-  - [ ] rate limit 초과 시 429 응답 + 적절한 에러 메시지
-  - [ ] 단위 테스트
-  - [ ] 기존 테스트 전체 통과
-- Result:
+  - [x] IP 기반 rate limiting 미들웨어 추가
+  - [x] 입력 텍스트 sanitization (user_input 필드)
+  - [x] rate limit 초과 시 429 응답 + 적절한 에러 메시지
+  - [x] 단위 테스트
+  - [x] 기존 테스트 전체 통과
+- Result: core/rate_limiter.py(in-memory sliding window, IP별 20req/60s), core/sanitizer.py(HTML 태그 제거, 과도한 공백/개행 축소), RateLimitError(429 + Retry-After), RateLimitMiddleware(/health 제외), schemas에 mode="before" field_validator로 sanitization 적용. 단위 테스트 19개 신규(rate_limiter 5 + sanitizer 13 + API 2), 전체 69개 통과. ruff lint 통과.
 
 ---
 
