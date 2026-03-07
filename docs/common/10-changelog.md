@@ -7,6 +7,7 @@
 ## [Unreleased]
 
 ### Changed
+- intake-assistant-web: Playwright E2E 테스트를 SSE 스트리밍 API 모킹으로 전환 — fixtures.ts SSE 응답 빌더, simple-mode/error-scenarios 테스트 업데이트, 스트리밍 진행 상태 검증 테스트 추가, 총 11개 E2E 통과 (T024)
 - intake-assistant-api: generate 시스템 프롬프트 강화 — enum 값 치트시트, 필수 섹션 체크리스트, 배열 최소 요건, 교차 참조 규칙, 흔한 실수 예시 추가로 SDwC validation 첫 시도 통과율 향상 (T023)
 
 ### Added

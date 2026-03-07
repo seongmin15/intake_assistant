@@ -377,6 +377,47 @@ Any active status -> Cancelled
 
 ---
 
+### T024: E2E Tests for Streaming
+- Status: Done
+- Service: intake-assistant-web
+- Origin: T021, T022
+- Description: Playwright E2E 테스트를 업데이트하여 새로운 SSE 스트리밍 흐름(generate/stream, analyze/stream)을 커버. 기존 E2E 테스트가 non-streaming API를 모킹하고 있으므로, 스트리밍 SSE 응답 모킹으로 전환하거나 별도 테스트 추가.
+- Acceptance Criteria:
+  - [x] simple-mode E2E 테스트가 스트리밍 API 응답을 모킹
+  - [x] 스트리밍 중 진행 상태 텍스트가 UI에 표시되는지 검증
+  - [x] 스트리밍 에러 시나리오 테스트
+  - [x] 기존 E2E 테스트 전체 통과
+- Result: fixtures.ts를 SSE 스트리밍 API 모킹으로 전환(formatSseEvent, buildAnalyzeSseBody, buildGenerateSseBody, buildSseErrorBody 헬퍼 + setupApiMocks에서 analyze/stream, generate/stream 라우트). simple-mode.spec.ts에 "스트리밍 중 진행 상태 텍스트 표시" 테스트 추가(300ms 지연 라우트로 status text 검증). error-scenarios.spec.ts를 스트리밍 엔드포인트 모킹으로 전환 + SSE error 이벤트 테스트 추가. 총 11개 E2E 테스트 전체 통과. build + lint 통과.
+
+---
+
+### T025: Error Recovery UX
+- Status: Ready
+- Service: intake-assistant-web
+- Description: generate 에러 발생 시 "처음부터 다시 시작" 대신 "생성 재시도" 옵션을 제공하여, 사용자가 질문 응답을 다시 하지 않고 generate만 재시도할 수 있게 한다. analyze 에러도 동일하게 "분석 재시도" 옵션 제공.
+- Acceptance Criteria:
+  - [ ] generate 에러 시 "생성 재시도" 버튼 추가 (questions phase로 복귀)
+  - [ ] analyze 에러 시 "분석 재시도" 버튼 추가 (input phase로 복귀, 입력 유지)
+  - [ ] "처음부터 다시 시작" 버튼도 유지 (전체 리셋)
+  - [ ] 기존 테스트 통과 + 빌드 성공
+- Result:
+
+---
+
+### T026: Rate Limiting / Input Sanitization
+- Status: Ready
+- Service: intake-assistant-api
+- Description: 프로덕션 사용 전 기본 요청 제한(rate limiting)과 입력 정제(sanitization) 추가. IP 기반 요청 제한, 입력 텍스트 정제(XSS 방지, 과도한 공백 제거 등).
+- Acceptance Criteria:
+  - [ ] IP 기반 rate limiting 미들웨어 추가
+  - [ ] 입력 텍스트 sanitization (user_input 필드)
+  - [ ] rate limit 초과 시 429 응답 + 적절한 에러 메시지
+  - [ ] 단위 테스트
+  - [ ] 기존 테스트 전체 통과
+- Result:
+
+---
+
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
      Claude fills the Tasks section during Init based on docs/common/05-roadmap.md.

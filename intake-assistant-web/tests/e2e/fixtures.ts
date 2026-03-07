@@ -60,20 +60,51 @@ const MOCK_ZIP_BYTES = new Uint8Array([
   0x50, 0x4b, 0x03, 0x04, 0x00, 0x00, 0x00, 0x00,
 ]);
 
+function formatSseEvent(event: string, data: unknown): string {
+  return `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+}
+
+export function buildAnalyzeSseBody(): string {
+  return (
+    formatSseEvent("status", { phase: "analyzing" }) +
+    formatSseEvent("chunk", { text: '{"partial":' }) +
+    formatSseEvent("result", MOCK_ANALYZE_RESPONSE)
+  );
+}
+
+export function buildGenerateSseBody(): string {
+  return (
+    formatSseEvent("status", { phase: "generating", attempt: 1, max_attempts: 3 }) +
+    formatSseEvent("chunk", { text: "```yaml\nproject:" }) +
+    formatSseEvent("status", { phase: "validating", attempt: 1 }) +
+    formatSseEvent("result", MOCK_GENERATE_RESPONSE)
+  );
+}
+
+export function buildSseErrorBody(message: string): string {
+  return (
+    formatSseEvent("status", { phase: "generating" }) +
+    formatSseEvent("error", { message })
+  );
+}
+
 export async function setupApiMocks(page: Page) {
-  await page.route("**/api/v1/analyze", (route) =>
+  // Streaming endpoints (used by frontend)
+  await page.route("**/api/v1/analyze/stream", (route) =>
     route.fulfill({
       status: 200,
-      contentType: "application/json",
-      body: JSON.stringify(MOCK_ANALYZE_RESPONSE),
+      contentType: "text/event-stream",
+      headers: { "Cache-Control": "no-cache" },
+      body: buildAnalyzeSseBody(),
     }),
   );
 
-  await page.route("**/api/v1/generate", (route) =>
+  await page.route("**/api/v1/generate/stream", (route) =>
     route.fulfill({
       status: 200,
-      contentType: "application/json",
-      body: JSON.stringify(MOCK_GENERATE_RESPONSE),
+      contentType: "text/event-stream",
+      headers: { "Cache-Control": "no-cache" },
+      body: buildGenerateSseBody(),
     }),
   );
 

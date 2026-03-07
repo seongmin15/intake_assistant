@@ -25,6 +25,7 @@
 | 2026-03-08 | T021: Streaming Generate — SSE 스트리밍 엔드포인트 + 프론트엔드 실시간 진행 상태 | 완료 |
 | 2026-03-08 | T022: Streaming Analyze — SSE 스트리밍 분석 엔드포인트 + 프론트엔드 실시간 진행 상태 | 완료 |
 | 2026-03-08 | T023: Prompt Quality Tuning — generate 프롬프트 강화로 validation 첫 시도 통과율 향상 | 완료 |
+| 2026-03-08 | T024: E2E Tests for Streaming — Playwright E2E 테스트를 SSE 스트리밍 API 모킹으로 전환 | 완료 |
 | 2026-03-07 | T016: .env.example 수정 — SDWC_API_URL 값 보정 + 환경별 주석 | 완료 |
 | 2026-03-07 | T017: Frontend API URL fallback 수정 — k3d에서 ERR_CONNECTION_REFUSED 해결 | 완료 |
 | 2026-03-07 | T018: analyze API JSON 파싱 오류 수정 — markdown 코드 블록 스트리핑 누락 | 완료 |
@@ -214,6 +215,14 @@
 - **작업**: Backend — analyze_stream() AsyncGenerator(SSE 이벤트: status/chunk/result/error), _sse_event() 헬퍼, _strip_code_block() 리팩토링(기존 analyze()에서도 사용), POST /analyze/stream StreamingResponse 엔드포인트. Frontend — analyzeStream()(fetch + ReadableStream 수동 SSE 파싱 + onEvent 콜백), AnalyzeStreamEvent 타입, intakeStore의 submitAnalyze를 스트리밍 전환, IntakePage analyzing phase에 동적 streamStatus 표시.
 - **변경된 파일**: services/analyze_service.py (수정), routers/analyze.py (수정), api/types.ts (수정), api/client.ts (수정), stores/intakeStore.ts (수정), pages/IntakePage/index.tsx (수정), tests/unit/test_analyze_service.py (수정), tests/unit/test_analyze_api.py (수정), docs/intake-assistant-api/21-api-contract.md (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: analyze는 validate-retry 없이 단일 LLM 호출이므로 generate_stream보다 단순한 구조. StatusData.phase에 "analyzing" 추가, attempt를 optional로 변경.
+- **미완료/후속**: 없음.
+
+### 2026-03-08 — T024: E2E Tests for Streaming
+
+- **계획**: T021/T022에서 프론트엔드가 스트리밍 API(/api/v1/analyze/stream, /api/v1/generate/stream)를 사용하도록 전환했으나, E2E 테스트는 여전히 non-streaming 엔드포인트를 모킹하고 있어 업데이트 필요.
+- **작업**: fixtures.ts를 SSE 응답 빌더 패턴으로 전면 재작성(formatSseEvent, buildAnalyzeSseBody, buildGenerateSseBody, buildSseErrorBody). setupApiMocks에서 analyze/stream, generate/stream 라우트로 변경. simple-mode.spec.ts에 "스트리밍 중 진행 상태 텍스트 표시" 테스트 추가(300ms 지연 라우트로 UI status text 검증). error-scenarios.spec.ts를 스트리밍 엔드포인트 모킹으로 전환 + SSE error 이벤트 시나리오 추가.
+- **변경된 파일**: tests/e2e/fixtures.ts (재작성), tests/e2e/simple-mode.spec.ts (재작성), tests/e2e/error-scenarios.spec.ts (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: HTTP 에러(500 응답)와 SSE 에러(200 + error 이벤트) 두 시나리오 모두 커버. finalize는 비스트리밍이므로 변경 없음.
 - **미완료/후속**: 없음.
 
 ### 2026-03-07 — T015: infra/ 매니페스트를 sdwc-platform으로 이관
