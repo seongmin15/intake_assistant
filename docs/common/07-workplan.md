@@ -216,6 +216,34 @@ Any active status -> Cancelled
   - [x] GHCR 이미지 push
 - Result: 2-stage Dockerfile (API: python:3.12-slim + non-root user, Web: node:20-slim → nginx:alpine), .dockerignore, nginx.conf (SPA fallback + API reverse proxy), ci-api.yml (ruff + pytest + GHCR push), ci-web.yml (eslint + tsc+build + GHCR push). Docker build 검증 완료.
 
+### T013: SDwC API 연동 수정 (multipart upload + response 필드)
+- Status: Done
+- Service: intake-assistant-api
+- Origin: T005, T006
+- Description: SDwC API가 multipart/form-data file upload을 기대하지만 sdwc_client.py가 JSON body를 전송하는 문제 수정. validate 응답 필드명 불일치(`success`→`valid`, `error`→`errors`) 수정. 단위 테스트 반영.
+- Acceptance Criteria:
+  - [x] sdwc_client.validate_yaml — multipart file upload으로 변경
+  - [x] sdwc_client.generate_zip — multipart file upload으로 변경
+  - [x] generate_service.py — validate 응답 필드 `valid`/`errors` 사용으로 변경
+  - [x] 단위 테스트 업데이트 (multipart 요청 mock + 응답 필드 반영)
+  - [x] 기존 테스트 전체 통과
+- Result: sdwc_client.py의 validate_yaml/generate_zip을 files= multipart upload으로 변경. generate_service.py의 validate 응답 필드 valid/errors로 수정. 테스트 3개 파일(test_sdwc_client.py, test_generate_service.py, test_generate_api.py) 업데이트. ruff lint/format 통과. 전체 36개 테스트 통과.
+
+---
+
+### T014: 인프라 매니페스트 커밋 (infra/ + config.py)
+- Status: Ready
+- Service: intake-assistant-api, intake-assistant-web
+- Description: sdwc-platform-infra-guide에 따라 수동 생성된 infra/ K8s 매니페스트와 config.py 기본값 변경을 커밋. infra/intake-assistant-api/deployment.yaml, infra/intake-assistant-web/deployment.yaml, config.py sdwc_api_url 기본값 K8s 내부 DNS로 변경.
+- Acceptance Criteria:
+  - [ ] infra/intake-assistant-api/deployment.yaml 커밋
+  - [ ] infra/intake-assistant-web/deployment.yaml 커밋
+  - [ ] config.py sdwc_api_url 기본값 변경 커밋
+  - [ ] 10-changelog 기록
+- Result:
+
+---
+
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
      Claude fills the Tasks section during Init based on docs/common/05-roadmap.md.

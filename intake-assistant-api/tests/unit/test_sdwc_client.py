@@ -34,17 +34,32 @@ async def test_fetch_template_timeout(sdwc_client, respx_mock):
 
 
 async def test_validate_yaml_success(sdwc_client, respx_mock):
-    respx_mock.post("http://sdwc-test:8080/api/v1/validate").respond(200, json={"success": True})
+    respx_mock.post("http://sdwc-test:8080/api/v1/validate").respond(
+        200, json={"valid": True, "errors": [], "warnings": []}
+    )
     result = await sdwc_client.validate_yaml("project:\n  name: test\n")
-    assert result == {"success": True}
+    assert result["valid"] is True
+    assert result["errors"] == []
 
 
 async def test_validate_yaml_validation_failure(sdwc_client, respx_mock):
-    error_response = {"success": False, "error": {"field": "project.name", "message": "empty"}}
+    error_response = {
+        "valid": False,
+        "errors": [
+            {
+                "type": "https://sdwc.dev/errors/validation-failed",
+                "title": "Validation Failed",
+                "status": 422,
+                "detail": "project.name: empty",
+                "instance": "/api/v1/validate",
+            }
+        ],
+        "warnings": [],
+    }
     respx_mock.post("http://sdwc-test:8080/api/v1/validate").respond(200, json=error_response)
     result = await sdwc_client.validate_yaml("project:\n  name: \n")
-    assert result["success"] is False
-    assert "error" in result
+    assert result["valid"] is False
+    assert len(result["errors"]) == 1
 
 
 async def test_validate_yaml_server_error(sdwc_client, respx_mock):
