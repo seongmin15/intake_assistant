@@ -40,6 +40,20 @@ def _extract_block(text: str, language: str) -> str | None:
 _YAML_START_KEYS = ("project_name:", "project:")
 
 
+def _default_metadata() -> dict:
+    """Return default metadata when JSON block is missing from LLM response."""
+    return {
+        "architecture_card": {
+            "service_composition": "-",
+            "data_storage": "-",
+            "authentication": "-",
+            "external_services": "-",
+            "screen_count": "-",
+        },
+        "feature_checklist": [],
+    }
+
+
 def _find_raw_json(text: str) -> str | None:
     """Find a raw JSON object containing 'architecture_card' using brace balancing."""
     keyword = '"architecture_card"'
@@ -114,10 +128,15 @@ def _parse_response(text: str) -> tuple[str, dict]:
     if not json_content:
         json_content = _find_raw_json(text)
 
+    # Fallback 3: no JSON found — use default metadata
     if not json_content:
-        raise ValueError("No JSON block found in response")
+        return yaml_content, _default_metadata()
 
-    metadata: dict = json.loads(json_content)
+    try:
+        metadata: dict = json.loads(json_content)
+    except json.JSONDecodeError:
+        return yaml_content, _default_metadata()
+
     return yaml_content, metadata
 
 
