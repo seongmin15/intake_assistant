@@ -30,6 +30,8 @@ interface IntakeState {
   architectureCard: ArchitectureCard | null;
   featureChecklist: FeatureItem[];
   error: string | null;
+  streamStatus: string | null;
+  streamAttempt: number;
 
   setUserInput: (input: string) => void;
   submitAnalyze: () => Promise<void>;
@@ -51,6 +53,8 @@ const initialState = {
   architectureCard: null as ArchitectureCard | null,
   featureChecklist: [] as FeatureItem[],
   error: null as string | null,
+  streamStatus: null as string | null,
+  streamAttempt: 0,
 };
 
 export const useIntakeStore = create<IntakeState>((set, get) => ({
@@ -87,19 +91,37 @@ export const useIntakeStore = create<IntakeState>((set, get) => ({
       question_id: questionId,
       selected_ids: selectedIds,
     }));
-    set({ phase: "generating", error: null });
+    set({ phase: "generating", error: null, streamStatus: "프로젝트를 생성하고 있습니다...", streamAttempt: 1 });
     try {
-      const result = await api.generate(userInput, qaAnswers);
-      set({
-        phase: "review",
-        yamlContent: result.yaml_content,
-        architectureCard: result.architecture_card,
-        featureChecklist: result.feature_checklist,
+      await api.generateStream(userInput, qaAnswers, (event) => {
+        if (event.event === "status") {
+          const { phase, attempt } = event.data;
+          if (phase === "generating") {
+            set({ streamStatus: "AI가 YAML을 생성하고 있습니다...", streamAttempt: attempt });
+          } else if (phase === "validating") {
+            set({ streamStatus: "생성된 YAML을 검증하고 있습니다..." });
+          } else if (phase === "retry") {
+            set({ streamStatus: `검증 실패 — ${attempt}/${event.data.max_attempts ?? "?"}차 재시도 중...`, streamAttempt: attempt });
+          }
+        } else if (event.event === "result") {
+          set({
+            phase: "review",
+            yamlContent: event.data.yaml_content,
+            architectureCard: event.data.architecture_card,
+            featureChecklist: event.data.feature_checklist,
+            streamStatus: null,
+            streamAttempt: 0,
+          });
+        } else if (event.event === "error") {
+          set({ phase: "error", error: event.data.message, streamStatus: null, streamAttempt: 0 });
+        }
       });
     } catch (err) {
       set({
         phase: "error",
         error: err instanceof Error ? err.message : "생성 중 오류가 발생했습니다.",
+        streamStatus: null,
+        streamAttempt: 0,
       });
     }
   },
@@ -112,24 +134,43 @@ export const useIntakeStore = create<IntakeState>((set, get) => ({
       question_id: questionId,
       selected_ids: selectedIds,
     }));
-    set({ phase: "generating", error: null });
+    set({ phase: "generating", error: null, streamStatus: "수정 사항을 반영하고 있습니다...", streamAttempt: 1 });
     try {
-      const result = await api.generate(
+      await api.generateStream(
         userInput,
         qaAnswers,
+        (event) => {
+          if (event.event === "status") {
+            const { phase, attempt } = event.data;
+            if (phase === "generating") {
+              set({ streamStatus: "AI가 YAML을 수정하고 있습니다...", streamAttempt: attempt });
+            } else if (phase === "validating") {
+              set({ streamStatus: "수정된 YAML을 검증하고 있습니다..." });
+            } else if (phase === "retry") {
+              set({ streamStatus: `검증 실패 — ${attempt}/${event.data.max_attempts ?? "?"}차 재시도 중...`, streamAttempt: attempt });
+            }
+          } else if (event.event === "result") {
+            set({
+              phase: "review",
+              yamlContent: event.data.yaml_content,
+              architectureCard: event.data.architecture_card,
+              featureChecklist: event.data.feature_checklist,
+              streamStatus: null,
+              streamAttempt: 0,
+            });
+          } else if (event.event === "error") {
+            set({ phase: "error", error: event.data.message, streamStatus: null, streamAttempt: 0 });
+          }
+        },
         revisionRequest,
         yamlContent ?? undefined,
       );
-      set({
-        phase: "review",
-        yamlContent: result.yaml_content,
-        architectureCard: result.architecture_card,
-        featureChecklist: result.feature_checklist,
-      });
     } catch (err) {
       set({
         phase: "error",
         error: err instanceof Error ? err.message : "수정 중 오류가 발생했습니다.",
+        streamStatus: null,
+        streamAttempt: 0,
       });
     }
   },

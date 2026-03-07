@@ -1,6 +1,7 @@
 import asyncio
 import json
 import re
+from collections.abc import AsyncGenerator
 
 import structlog
 from anthropic import APIConnectionError, APIError, AsyncAnthropic
@@ -83,7 +84,13 @@ async def _call_anthropic(
             response = await client.messages.create(
                 model=MODEL,
                 max_tokens=8192,
-                system=system_prompt,
+                system=[
+                    {
+                        "type": "text",
+                        "text": system_prompt,
+                        "cache_control": {"type": "ephemeral"},
+                    }
+                ],
                 messages=[{"role": "user", "content": user_message}],
             )
             return response.content[0].text  # type: ignore[union-attr]
@@ -99,6 +106,142 @@ async def _call_anthropic(
                 await asyncio.sleep(BACKOFF_SECONDS[attempt])
 
     raise ExternalServiceError("Anthropic", f"Failed after {MAX_RETRIES} retries: {last_error}")
+
+
+def _sse_event(event: str, data: dict) -> str:
+    """Format a Server-Sent Event."""
+    return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+
+
+async def generate_stream(
+    client: AsyncAnthropic,
+    sdwc: SDwCClient,
+    request: GenerateRequest,
+) -> AsyncGenerator[str, None]:
+    """Generate intake_data.yaml with SSE streaming for real-time progress."""
+    template = template_cache.get_template()
+    system_prompt = build_system_prompt(template)
+    system_block = [
+        {
+            "type": "text",
+            "text": system_prompt,
+            "cache_control": {"type": "ephemeral"},
+        }
+    ]
+
+    qa_dicts = [a.model_dump() for a in request.qa_answers]
+    error_feedback: str | None = None
+
+    for validation_attempt in range(MAX_VALIDATION_RETRIES + 1):
+        user_message = build_user_message(
+            user_input=request.user_input,
+            qa_answers=qa_dicts,
+            template=template,
+            revision_request=request.revision_request,
+            previous_yaml=request.previous_yaml,
+            error_feedback=error_feedback,
+        )
+
+        yield _sse_event(
+            "status",
+            {
+                "phase": "generating",
+                "attempt": validation_attempt + 1,
+                "max_attempts": MAX_VALIDATION_RETRIES + 1,
+            },
+        )
+
+        # Stream LLM response with retry logic
+        raw_text = ""
+        last_error: Exception | None = None
+
+        for api_attempt in range(MAX_RETRIES):
+            try:
+                async with client.messages.stream(
+                    model=MODEL,
+                    max_tokens=8192,
+                    system=system_block,
+                    messages=[{"role": "user", "content": user_message}],
+                ) as stream:
+                    raw_text = ""
+                    async for text in stream.text_stream:
+                        raw_text += text
+                        yield _sse_event("chunk", {"text": text})
+                break  # Success, exit retry loop
+
+            except (APIError, APIConnectionError) as exc:
+                last_error = exc
+                await logger.awarning(
+                    "anthropic_api_retry",
+                    attempt=api_attempt + 1,
+                    error=str(exc),
+                )
+                if api_attempt < MAX_RETRIES - 1:
+                    await asyncio.sleep(BACKOFF_SECONDS[api_attempt])
+        else:
+            yield _sse_event(
+                "error",
+                {"message": f"AI 서비스 호출 실패 ({MAX_RETRIES}회 재시도 후): {last_error}"},
+            )
+            return
+
+        # Parse response
+        try:
+            yaml_content, metadata = _parse_response(raw_text)
+        except (ValueError, json.JSONDecodeError) as exc:
+            await logger.aerror("generate_response_parse_error", error=str(exc))
+            yield _sse_event("error", {"message": f"응답 형식 오류: {exc}"})
+            return
+
+        # Validate
+        yield _sse_event(
+            "status",
+            {"phase": "validating", "attempt": validation_attempt + 1},
+        )
+
+        validate_result = await sdwc.validate_yaml(yaml_content)
+
+        if validate_result.get("valid"):
+            await logger.ainfo(
+                "generate_validation_passed",
+                attempt=validation_attempt + 1,
+            )
+            card_data = metadata.get("architecture_card", {})
+            features_data = metadata.get("feature_checklist", [])
+
+            result = GenerateResponse(
+                yaml_content=yaml_content,
+                architecture_card=ArchitectureCard.model_validate(card_data),
+                feature_checklist=[
+                    FeatureItem.model_validate(f) for f in features_data
+                ],
+            )
+            yield _sse_event("result", result.model_dump())
+            return
+
+        error_info = validate_result.get("errors", [])
+        error_feedback = json.dumps(error_info, ensure_ascii=False)
+        await logger.awarning(
+            "generate_validation_failed",
+            attempt=validation_attempt + 1,
+            error=error_feedback,
+        )
+
+        if validation_attempt < MAX_VALIDATION_RETRIES:
+            yield _sse_event(
+                "status",
+                {
+                    "phase": "retry",
+                    "attempt": validation_attempt + 2,
+                    "max_attempts": MAX_VALIDATION_RETRIES + 1,
+                    "reason": "validation_failed",
+                },
+            )
+
+    yield _sse_event(
+        "error",
+        {"message": f"YAML 검증이 {MAX_VALIDATION_RETRIES + 1}회 시도 후 실패했습니다."},
+    )
 
 
 async def generate(

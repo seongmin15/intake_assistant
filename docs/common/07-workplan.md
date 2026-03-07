@@ -312,6 +312,36 @@ Any active status -> Cancelled
 
 ---
 
+### T020: Prompt Caching (generate 시스템 프롬프트)
+- Status: Done
+- Service: intake-assistant-api
+- Description: generate API의 Anthropic 호출 시 시스템 프롬프트에 cache_control: ephemeral을 적용하여 validate-retry 루프 내 재시도 및 5분 이내 수정 요청 시 프롬프트 캐싱 활용.
+- Acceptance Criteria:
+  - [x] _call_anthropic()의 system 파라미터를 cache_control 포함 리스트 형식으로 변경
+  - [x] 단위 테스트에서 system arg가 cache_control을 포함하는지 검증
+- Result: _call_anthropic()의 system 파라미터를 `[{"type": "text", "text": ..., "cache_control": {"type": "ephemeral"}}]` 형식으로 변경. generate_stream()에도 동일 적용. 단위 테스트 1개 추가, 전체 46개 통과.
+
+---
+
+### T021: Streaming Generate Endpoint (실시간 진행 상태)
+- Status: Done
+- Service: intake-assistant-api, intake-assistant-web
+- Description: POST /api/v1/generate/stream SSE 스트리밍 엔드포인트 추가. 프론트엔드에서 generateStream() 함수로 실시간 진행 상태(generating, validating, retry) 표시. 기존 /generate 엔드포인트는 하위 호환 유지.
+- Acceptance Criteria:
+  - [x] generate_service.py에 generate_stream() + _sse_event() 추가
+  - [x] routers/generate.py에 POST /generate/stream 엔드포인트 추가
+  - [x] api/client.ts에 generateStream() 함수 추가 (ReadableStream SSE 파싱)
+  - [x] api/types.ts에 SSE 이벤트 타입 추가
+  - [x] stores/intakeStore.ts에 streamStatus/streamAttempt 상태 추가 + submitGenerate/submitRevision 스트리밍 전환
+  - [x] IntakePage generating phase에 동적 상태 텍스트 + 시도 횟수 표시
+  - [x] 스트리밍 단위 테스트 (성공/재시도/파싱에러/API에러)
+  - [x] API 테스트 (text/event-stream 응답 확인)
+  - [x] 기존 테스트 전체 통과
+  - [x] 21-api-contract.md에 스트리밍 엔드포인트 사양 추가
+- Result: Backend: generate_stream() AsyncGenerator + _sse_event() 헬퍼 + POST /generate/stream StreamingResponse 엔드포인트. Frontend: generateStream() (fetch + ReadableStream SSE 파싱) + SSE 타입 4종 + intakeStore 스트리밍 상태 + IntakePage 동적 진행 텍스트. 테스트: 서비스 5개 + API 1개 신규, 전체 46개 통과. ruff + build 통과.
+
+---
+
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
      Claude fills the Tasks section during Init based on docs/common/05-roadmap.md.

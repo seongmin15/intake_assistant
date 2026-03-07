@@ -1,4 +1,4 @@
-import type { AnalyzeResponse, GenerateResponse, QaAnswer } from "./types";
+import type { AnalyzeResponse, GenerateResponse, QaAnswer, StreamEvent } from "./types";
 
 const API_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 
@@ -31,6 +31,64 @@ export async function generate(
     revision_request: revisionRequest ?? null,
     previous_yaml: previousYaml ?? null,
   });
+}
+
+export async function generateStream(
+  userInput: string,
+  qaAnswers: QaAnswer[],
+  onEvent: (event: StreamEvent) => void,
+  revisionRequest?: string,
+  previousYaml?: string,
+): Promise<void> {
+  const resp = await fetch(`${API_URL}/api/v1/generate/stream`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_input: userInput,
+      qa_answers: qaAnswers,
+      revision_request: revisionRequest ?? null,
+      previous_yaml: previousYaml ?? null,
+    }),
+  });
+  if (!resp.ok) {
+    const data = (await resp.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(data?.error ?? `요청 실패 (${resp.status})`);
+  }
+
+  const reader = resp.body?.getReader();
+  if (!reader) throw new Error("스트림을 읽을 수 없습니다.");
+
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const parts = buffer.split("\n\n");
+    buffer = parts.pop() ?? "";
+
+    for (const part of parts) {
+      const trimmed = part.trim();
+      if (!trimmed) continue;
+
+      let eventType = "";
+      let dataStr = "";
+
+      for (const line of trimmed.split("\n")) {
+        if (line.startsWith("event: ")) eventType = line.slice(7);
+        else if (line.startsWith("data: ")) dataStr = line.slice(6);
+      }
+
+      if (eventType && dataStr) {
+        onEvent({
+          event: eventType,
+          data: JSON.parse(dataStr),
+        } as StreamEvent);
+      }
+    }
+  }
 }
 
 export async function finalize(yamlContent: string): Promise<Blob> {

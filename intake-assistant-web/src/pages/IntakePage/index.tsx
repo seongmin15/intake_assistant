@@ -14,6 +14,8 @@ export function IntakePage() {
     architectureCard,
     featureChecklist,
     error,
+    streamStatus,
+    streamAttempt,
     setUserInput,
     submitAnalyze,
     setAnswer,
@@ -73,7 +75,14 @@ export function IntakePage() {
         {phase === "generating" && (
           <div className="flex flex-col items-center gap-3 py-16">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
-            <p className="text-sm text-gray-500">프로젝트를 생성하고 있습니다...</p>
+            <p className="text-sm text-gray-500">
+              {streamStatus ?? "프로젝트를 생성하고 있습니다..."}
+            </p>
+            {streamAttempt > 1 && (
+              <p className="text-xs text-gray-400">
+                시도 {streamAttempt}회차
+              </p>
+            )}
           </div>
         )}
 
