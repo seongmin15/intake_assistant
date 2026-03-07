@@ -58,7 +58,7 @@ SDWC_API_URL=<sdwc-server-url>
 ```bash
 cd intake-assistant-api
 poetry install
-poetry run uvicorn app.main:app --reload
+poetry run uvicorn intake_assistant_api.main:app --reload
 ```
 
 ### Frontend (intake-assistant-web)
@@ -67,6 +67,34 @@ poetry run uvicorn app.main:app --reload
 cd intake-assistant-web
 npm install
 npm run dev
+```
+
+### 테스트
+
+```bash
+# Backend 단위 테스트
+cd intake-assistant-api
+poetry run pytest tests/
+
+# Frontend E2E 테스트
+cd intake-assistant-web
+npx playwright test
+```
+
+## 배포
+
+- **컨테이너**: 각 서비스별 multi-stage Dockerfile
+- **오케스트레이션**: Kubernetes (k3d/k3s), Traefik Ingress
+- **CI**: GitHub Actions (lint + test + GHCR push)
+- **CD**: ArgoCD (sdwc-platform 레포에서 관리)
+
+```bash
+# 로컬 K8s 배포 (sdwc-platform 레포)
+./scripts/deploy-all.sh
+
+# 접속
+# http://intake.local:8080     (Web UI)
+# http://intake.local:8080/api (API)
 ```
 
 ## 프로젝트 구조
@@ -82,8 +110,12 @@ intake-assistant/
 │   ├── common/                        # 공통 스킬 (git, 관측성 등)
 │   ├── intake-assistant-api/          # API 코딩/배포/테스트 규칙
 │   └── intake-assistant-web/          # Web 코딩/배포/테스트 규칙
-├── intake-assistant-api/              # Backend 소스 (예정)
-└── intake-assistant-web/              # Frontend 소스 (예정)
+├── intake-assistant-api/              # Backend 소스 (FastAPI + Poetry)
+├── intake-assistant-web/              # Frontend 소스 (React + Vite)
+├── infra/                             # K8s Deployment + Service 매니페스트
+│   ├── intake-assistant-api/
+│   └── intake-assistant-web/
+└── .github/workflows/                 # CI 파이프라인 (lint, test, GHCR push)
 ```
 
 ## 문서
