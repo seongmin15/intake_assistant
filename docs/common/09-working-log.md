@@ -16,6 +16,7 @@
 | 2026-03-07 | T005: POST /api/v1/generate — Sonnet 기반 YAML 생성 + validate-retry 엔드포인트 | 완료 |
 | 2026-03-07 | T006: POST /api/v1/finalize — SDwC ZIP 생성 + 스트림 응답 엔드포인트 | 완료 |
 | 2026-03-07 | T007: ModeSelectorPage — Simple/Advanced 모드 선택 페이지 | 완료 |
+| 2026-03-07 | T008: IntakePage 입력+질문 — TextInput, QuestionCard, Zustand store, API 연동 | 완료 |
 
 <!-- Claude: §5.8 작업 완료, §5.12 작업 중단/취소 시 한 줄 추가.
      작업 내용은 "무엇을 왜" 중심 1줄 요약.
@@ -90,3 +91,11 @@
 - **변경된 파일**: pages/ModeSelectorPage/index.tsx (수정), pages/ModeSelectorPage/ModeCard.tsx (신규), .env.example (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: ModeCard를 button 요소로 구현(접근성), SDWC_WEB_URL 미설정 시 Advanced 클릭해도 아무 동작 안 함(graceful)
 - **미완료/후속**: 없음. T008~T010 프론트엔드 태스크 진행 가능.
+
+### 2026-03-07 — T008: IntakePage - 자유 텍스트 입력 + 질문 표시
+
+- **계획**: API 타입 정의, API 클라이언트(analyze 호출), Zustand intake store(전체 IntakePage 상태), TextInput 컴포넌트(textarea + 가이드 힌트 + 분석 버튼), QuestionCard 컴포넌트(single→radio, multi→checkbox), IntakePage(input→analyzing→questions 흐름 + 에러 처리).
+- **작업**: api/types.ts(AnalyzeResponse, GenerateResponse, QaAnswer 등 전체 타입), api/client.ts(fetch 기반 analyze/generate/finalize 함수), stores/intakeStore.ts(Zustand store — phase 기반 상태 머신, 전 흐름 액션 포함), TextInput(textarea+placeholder+가이드힌트+분석버튼), QuestionCard(single→radio/multi→checkbox, 선택 시 파란 하이라이트), IntakePage(phase별 조건부 렌더링 — input/analyzing/questions/generating/error).
+- **변경된 파일**: api/types.ts (신규), api/client.ts (신규), stores/intakeStore.ts (신규), pages/IntakePage/index.tsx (수정), pages/IntakePage/components/TextInput.tsx (신규), pages/IntakePage/components/QuestionCard.tsx (신규), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: Zustand store에 T009/T010 액션(revision, finalize)도 미리 포함 — 중복 작업 방지. API client는 fetch 기반(axios 불필요). allAnswered 체크로 모든 질문 응답 시에만 '생성하기' 활성화.
+- **미완료/후속**: 없음. T009(아키텍처 카드+수정) 진행 시 review/revising phase 컴포넌트만 추가하면 됨.

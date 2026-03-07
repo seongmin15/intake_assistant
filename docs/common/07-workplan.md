@@ -153,16 +153,16 @@ Any active status -> Cancelled
 ---
 
 ### T008: IntakePage - 자유 텍스트 입력 + 질문 표시
-- Status: Ready
+- Status: Done
 - Service: intake-assistant-web
 - Description: TextInput 컴포넌트로 자유 텍스트 입력, '분석' 버튼 클릭 시 /api/v1/analyze 호출, QuestionCard로 Q1~Q4 동적 질문 표시 및 응답 수집.
 - Acceptance Criteria:
-  - [ ] TextInput 컴포넌트 (가이드 힌트 포함)
-  - [ ] /api/v1/analyze API 호출 + 로딩 상태
-  - [ ] QuestionCard 컴포넌트 (선택지 라디오/체크박스)
-  - [ ] Zustand store로 대화 상태 관리
-  - [ ] 에러 상태 처리
-- Result:
+  - [x] TextInput 컴포넌트 (가이드 힌트 포함)
+  - [x] /api/v1/analyze API 호출 + 로딩 상태
+  - [x] QuestionCard 컴포넌트 (선택지 라디오/체크박스)
+  - [x] Zustand store로 대화 상태 관리
+  - [x] 에러 상태 처리
+- Result: api/types.ts(전체 API 타입), api/client.ts(analyze/generate/finalize), stores/intakeStore.ts(Zustand, 전체 IntakePage 상태+액션), TextInput(textarea+가이드힌트+분석버튼), QuestionCard(single→radio, multi→checkbox, 선택 하이라이트). IntakePage에서 input→analyzing→questions→generating+error 흐름 구현. ESLint + 빌드 통과.
 
 ---
 
