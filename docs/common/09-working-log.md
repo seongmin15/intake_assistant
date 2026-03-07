@@ -20,6 +20,7 @@
 | 2026-03-07 | T009: IntakePage 아키텍처 카드+수정 — ArchitectureCard, FeatureChecklist, RevisionInput | 완료 |
 | 2026-03-07 | T010: IntakePage ZIP 다운로드 — finalizing/complete phase UI | 완료 |
 | 2026-03-07 | T011: E2E 통합 테스트 — Playwright 기반 Simple 모드/Advanced 모드/에러 시나리오 | 완료 |
+| 2026-03-07 | T012: 컨테이너화 + CI 파이프라인 — Dockerfile, nginx.conf, GitHub Actions CI | 완료 |
 
 <!-- Claude: §5.8 작업 완료, §5.12 작업 중단/취소 시 한 줄 추가.
      작업 내용은 "무엇을 왜" 중심 1줄 요약.
@@ -123,3 +124,11 @@
 - **변경된 파일**: playwright.config.ts (신규), package.json (수정 — @playwright/test + test:e2e 스크립트), tests/e2e/fixtures.ts (신규), tests/e2e/simple-mode.spec.ts (신규), tests/e2e/advanced-mode.spec.ts (신규), tests/e2e/error-scenarios.spec.ts (신규), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: MSW 대신 Playwright 내장 page.route() 사용 — E2E에서 더 적합. chromium만 사용하여 빠른 실행. webServer로 Vite dev server 자동 시작.
 - **미완료/후속**: T012(컨테이너화+CI) Backlog 상태.
+
+### 2026-03-07 — T012: 컨테이너화 + CI 파이프라인
+
+- **계획**: SDwC 프로젝트의 Dockerfile/CI 패턴을 참조하여 intake-assistant-api, intake-assistant-web 각각 2-stage Dockerfile, .dockerignore, GitHub Actions CI 워크플로우 작성. Web은 nginx.conf(SPA fallback + API reverse proxy) 추가.
+- **작업**: API Dockerfile(python:3.12-slim builder → runtime, poetry export → pip install, non-root appuser, healthcheck /api/v1/health). Web Dockerfile(node:20-slim builder → nginx:alpine, npm ci → npm run build). nginx.conf(SPA try_files, /assets 캐시, /api/ reverse proxy). ci-api.yml(PR/push path trigger, ruff check + pytest, main push 시 GHCR 이미지 push). ci-web.yml(PR/push path trigger, eslint + npm run build, main push 시 GHCR push). 양쪽 .dockerignore.
+- **변경된 파일**: intake-assistant-api/Dockerfile (신규), intake-assistant-api/.dockerignore (신규), intake-assistant-web/Dockerfile (신규), intake-assistant-web/.dockerignore (신규), intake-assistant-web/nginx.conf (신규), .github/workflows/ci-api.yml (신규), .github/workflows/ci-web.yml (신규), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: SDwC 패턴 그대로 따르되, API healthcheck 경로 /api/v1/health로 변경, .sdwc/ COPY 불필요, mypy 제외 (현재 CI에서 미사용), Web CI에서 typecheck/format:check 별도 스크립트 없이 npm run build(tsc -b 포함)로 대체
+- **미완료/후속**: T001~T012 전체 완료. 초기 로드맵 태스크 모두 Done.

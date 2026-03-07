@@ -18,6 +18,9 @@
 - intake-assistant-web: IntakePage 아키텍처 카드+수정 — ArchitectureCard, FeatureChecklist, RevisionInput (T009)
 - intake-assistant-web: IntakePage ZIP 다운로드 — finalizing/complete phase UI (T010)
 - intake-assistant-web: Playwright E2E 테스트 — Simple 모드 전체 흐름(3개), Advanced 모드 리다이렉트(2개), 에러 시나리오(4개), 총 9개 테스트 (T011)
+- intake-assistant-api: Dockerfile (2-stage, python:3.12-slim, non-root user, healthcheck) + .dockerignore (T012)
+- intake-assistant-web: Dockerfile (2-stage, node:20-slim → nginx:alpine) + nginx.conf (SPA fallback, API reverse proxy) + .dockerignore (T012)
+- CI: GitHub Actions 워크플로우 — ci-api.yml (ruff + pytest + GHCR push), ci-web.yml (eslint + build + GHCR push) (T012)
 
 <!-- Claude: §5.8 작업 완료 시 해당 변경을 [Unreleased]에 기록.
      분류 기준:

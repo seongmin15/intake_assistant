@@ -206,15 +206,15 @@ Any active status -> Cancelled
 ---
 
 ### T012: 컨테이너화 + CI 파이프라인
-- Status: Backlog
+- Status: Done
 - Service: intake-assistant-api, intake-assistant-web
 - Description: 각 서비스 Dockerfile 작성, GitHub Actions CI 파이프라인 구성 (lint, test, build).
 - Acceptance Criteria:
-  - [ ] intake-assistant-api Dockerfile
-  - [ ] intake-assistant-web Dockerfile
-  - [ ] GitHub Actions 워크플로우 (lint + test + build)
-  - [ ] GHCR 이미지 push
-- Result:
+  - [x] intake-assistant-api Dockerfile
+  - [x] intake-assistant-web Dockerfile
+  - [x] GitHub Actions 워크플로우 (lint + test + build)
+  - [x] GHCR 이미지 push
+- Result: 2-stage Dockerfile (API: python:3.12-slim + non-root user, Web: node:20-slim → nginx:alpine), .dockerignore, nginx.conf (SPA fallback + API reverse proxy), ci-api.yml (ruff + pytest + GHCR push), ci-web.yml (eslint + tsc+build + GHCR push). Docker build 검증 완료.
 
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
