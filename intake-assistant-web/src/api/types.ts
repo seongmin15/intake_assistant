@@ -47,8 +47,8 @@ export interface GenerateResponse {
 
 // SSE streaming types
 export interface StatusData {
-  phase: "generating" | "validating" | "retry";
-  attempt: number;
+  phase: "generating" | "validating" | "retry" | "analyzing";
+  attempt?: number;
   max_attempts?: number;
   reason?: string;
 }
@@ -67,4 +67,10 @@ export type StreamEvent =
   | { event: "status"; data: StatusData }
   | { event: "chunk"; data: ChunkData }
   | { event: "result"; data: ResultData }
+  | { event: "error"; data: ErrorData };
+
+export type AnalyzeStreamEvent =
+  | { event: "status"; data: StatusData }
+  | { event: "chunk"; data: ChunkData }
+  | { event: "result"; data: AnalyzeResponse }
   | { event: "error"; data: ErrorData };

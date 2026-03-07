@@ -106,3 +106,49 @@ async def test_analyze_anthropic_failure_returns_502(client) -> None:
         assert "error" in resp.json()
     finally:
         template_cache.clear()
+
+
+class _MockStreamContext:
+    """Mock for client.messages.stream() async context manager."""
+
+    def __init__(self, text_chunks: list[str]) -> None:
+        self._chunks = text_chunks
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *_):
+        pass
+
+    @property
+    def text_stream(self):
+        return self._aiter_chunks()
+
+    async def _aiter_chunks(self):
+        for chunk in self._chunks:
+            yield chunk
+
+
+async def test_analyze_stream_returns_event_stream(client) -> None:
+    """POST /api/v1/analyze/stream returns text/event-stream content type."""
+    chunks = [json.dumps(VALID_RESPONSE_DATA, ensure_ascii=False)]
+    mock = AsyncMock()
+    mock.messages.stream = MagicMock(return_value=_MockStreamContext(chunks))
+
+    from intake_assistant_api.main import app
+
+    app.state.anthropic = mock
+    template_cache.set_template("test")
+
+    try:
+        resp = await client.post(
+            "/api/v1/analyze/stream",
+            json={"user_input": "할 일 관리 앱을 만들고 싶어요"},
+        )
+        assert resp.status_code == 200
+        assert "text/event-stream" in resp.headers["content-type"]
+        body = resp.text
+        assert "event: status" in body
+        assert "event: result" in body
+    finally:
+        template_cache.clear()

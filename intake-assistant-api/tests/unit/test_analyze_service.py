@@ -5,7 +5,7 @@ import pytest
 from anthropic import APIConnectionError, APIError
 
 from intake_assistant_api.core.exceptions import ExternalServiceError
-from intake_assistant_api.services.analyze_service import analyze
+from intake_assistant_api.services.analyze_service import analyze, analyze_stream
 
 VALID_RESPONSE_DATA = {
     "questions": [
@@ -141,3 +141,106 @@ async def test_analyze_raises_on_missing_fields() -> None:
     # Empty questions list is valid per schema, but missing analysis field should fail
     with pytest.raises(ExternalServiceError, match="Invalid response format"):
         await analyze(client, "테스트 입력")
+
+
+# --- Streaming tests ---
+
+
+class MockStreamContext:
+    """Mock for client.messages.stream() async context manager."""
+
+    def __init__(self, text_chunks: list[str]) -> None:
+        self._chunks = text_chunks
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *_):
+        pass
+
+    @property
+    def text_stream(self):
+        return self._aiter_chunks()
+
+    async def _aiter_chunks(self):
+        for chunk in self._chunks:
+            yield chunk
+
+
+def _make_streaming_client(text_chunks: list[str]) -> AsyncMock:
+    """Create a mock Anthropic client that supports messages.stream()."""
+    client = AsyncMock()
+    client.messages.stream = MagicMock(return_value=MockStreamContext(text_chunks))
+    return client
+
+
+def _parse_sse_events(sse_strings: list[str]) -> list[tuple[str, dict]]:
+    """Parse SSE strings into (event_type, data) tuples."""
+    events = []
+    for sse in sse_strings:
+        event_type = ""
+        data_str = ""
+        for line in sse.strip().split("\n"):
+            if line.startswith("event: "):
+                event_type = line[7:]
+            elif line.startswith("data: "):
+                data_str = line[6:]
+        if event_type and data_str:
+            events.append((event_type, json.loads(data_str)))
+    return events
+
+
+async def test_analyze_stream_success() -> None:
+    """Streaming: status(analyzing) → chunks → result."""
+    response_json = json.dumps(VALID_RESPONSE_DATA, ensure_ascii=False)
+    chunks = [response_json[:50], response_json[50:]]
+    client = _make_streaming_client(chunks)
+
+    sse_list: list[str] = []
+    async for sse in analyze_stream(client, "할 일 관리 앱을 만들고 싶어요"):
+        sse_list.append(sse)
+
+    events = _parse_sse_events(sse_list)
+    event_types = [e[0] for e in events]
+
+    assert event_types[0] == "status"
+    assert events[0][1]["phase"] == "analyzing"
+    assert "chunk" in event_types
+    assert event_types[-1] == "result"
+    assert len(events[-1][1]["questions"]) == 3
+    assert events[-1][1]["questions"][0]["id"] == "q1"
+
+
+async def test_analyze_stream_error_on_api_failure() -> None:
+    """Streaming: Anthropic API fails all retries → error SSE event."""
+    client = AsyncMock()
+    client.messages.stream = MagicMock(
+        side_effect=APIConnectionError(request=MagicMock())
+    )
+
+    sse_list: list[str] = []
+    with patch("intake_assistant_api.services.analyze_service.asyncio.sleep"):
+        async for sse in analyze_stream(client, "테스트 입력"):
+            sse_list.append(sse)
+
+    events = _parse_sse_events(sse_list)
+    event_types = [e[0] for e in events]
+
+    assert event_types[-1] == "error"
+    assert "AI 서비스 호출 실패" in events[-1][1]["message"]
+
+
+async def test_analyze_stream_error_on_parse_failure() -> None:
+    """Streaming: invalid LLM response → error SSE event."""
+    chunks = ["this is not valid json"]
+    client = _make_streaming_client(chunks)
+
+    sse_list: list[str] = []
+    async for sse in analyze_stream(client, "테스트 입력"):
+        sse_list.append(sse)
+
+    events = _parse_sse_events(sse_list)
+    event_types = [e[0] for e in events]
+
+    assert event_types[-1] == "error"
+    assert "응답 형식 오류" in events[-1][1]["message"]

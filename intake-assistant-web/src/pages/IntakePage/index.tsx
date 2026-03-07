@@ -44,7 +44,9 @@ export function IntakePage() {
         {phase === "analyzing" && (
           <div className="flex flex-col items-center gap-3 py-16">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
-            <p className="text-sm text-gray-500">질문을 생성하고 있습니다...</p>
+            <p className="text-sm text-gray-500">
+              {streamStatus ?? "질문을 생성하고 있습니다..."}
+            </p>
           </div>
         )}
 
