@@ -2,12 +2,16 @@ import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
+import httpx
 import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from intake_assistant_api.core.config import settings
 from intake_assistant_api.core.exceptions import AppError, app_error_handler
+from intake_assistant_api.routers.health import router as health_router
+from intake_assistant_api.services import template_cache
+from intake_assistant_api.services.sdwc_client import SDwCClient
 
 logger = structlog.get_logger()
 
@@ -26,7 +30,21 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
         ),
     )
     await logger.ainfo("starting", app=settings.app_name)
+
+    http_client = httpx.AsyncClient()
+    sdwc_client = SDwCClient(http_client, settings.sdwc_api_url)
+    _app.state.sdwc_client = sdwc_client
+
+    template_yaml = await sdwc_client.fetch_template()
+    if template_yaml is not None:
+        template_cache.set_template(template_yaml)
+        await logger.ainfo("sdwc_template_cached")
+    else:
+        await logger.awarning("sdwc_template_unavailable, running in degraded mode")
+
     yield
+
+    await sdwc_client.close()
     await logger.ainfo("shutting down", app=settings.app_name)
 
 
@@ -45,7 +63,4 @@ app.add_middleware(
 
 app.add_exception_handler(AppError, app_error_handler)  # type: ignore[arg-type]
 
-
-@app.get("/api/v1/health")
-async def health() -> dict[str, str]:
-    return {"status": "ok"}
+app.include_router(health_router)
