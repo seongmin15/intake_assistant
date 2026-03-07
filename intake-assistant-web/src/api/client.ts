@@ -1,6 +1,6 @@
 import type { AnalyzeResponse, GenerateResponse, QaAnswer } from "./types";
 
-const API_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? "http://localhost:8000";
+const API_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
 
 async function request<T>(path: string, body: unknown): Promise<T> {
   const resp = await fetch(`${API_URL}${path}`, {

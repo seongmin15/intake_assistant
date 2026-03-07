@@ -22,6 +22,7 @@
 | 2026-03-07 | T011: E2E 통합 테스트 — Playwright 기반 Simple 모드/Advanced 모드/에러 시나리오 | 완료 |
 | 2026-03-07 | T012: 컨테이너화 + CI 파이프라인 — Dockerfile, nginx.conf, GitHub Actions CI | 완료 |
 | 2026-03-07 | T016: .env.example 수정 — SDWC_API_URL 값 보정 + 환경별 주석 | 완료 |
+| 2026-03-07 | T017: Frontend API URL fallback 수정 — k3d에서 ERR_CONNECTION_REFUSED 해결 | 완료 |
 
 <!-- Claude: §5.8 작업 완료, §5.12 작업 중단/취소 시 한 줄 추가.
      작업 내용은 "무엇을 왜" 중심 1줄 요약.
@@ -149,6 +150,13 @@
 - **변경된 파일**: infra/intake-assistant-api/deployment.yaml (신규), infra/intake-assistant-web/deployment.yaml (신규), intake-assistant-api/src/intake_assistant_api/core/config.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: sdwc-platform-infra-guide 지시대로 config.py 기본값을 K8s 내부 DNS로 변경. 로컬 개발은 .env 오버라이드.
 - **미완료/후속**: 없음. T013~T014 완료.
+
+### 2026-03-07 — T017: Frontend API URL fallback 수정
+
+- **작업**: client.ts의 VITE_API_URL fallback을 http://localhost:8000 → ""(빈 문자열)로 변경. k3d에서 브라우저가 상대 경로(/api/v1/...)로 요청하면 nginx가 intake-assistant-api:8000으로 프록시. .env.example에 환경별 안내 주석 추가.
+- **변경된 파일**: src/api/client.ts (수정), .env.example (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: Docker build 시 .env 없이 빌드되므로 fallback이 production 기본값이 됨. 빈 문자열 = 상대 경로 = nginx 프록시 경유.
+- **미완료/후속**: 없음.
 
 ### 2026-03-07 — T016: .env.example 수정
 
