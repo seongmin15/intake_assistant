@@ -9,11 +9,7 @@ VALID_RESPONSE_DATA = {
             "id": "q1",
             "title": "서비스 구성",
             "description": "어떤 종류의 서비스가 필요한가요?",
-            "type": "single",
-            "choices": [
-                {"id": "q1_a", "label": "웹 서비스"},
-                {"id": "q1_b", "label": "백엔드 API만"},
-            ],
+            "placeholder": "예: 웹사이트와 백엔드 API가 필요합니다",
         },
     ],
     "analysis": {

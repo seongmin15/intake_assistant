@@ -60,6 +60,6 @@ def test_generate_request_sanitizes_user_input():
 
     req = GenerateRequest(
         user_input="<script>xss</script>테스트",
-        qa_answers=[{"question_id": "q1", "selected_ids": ["a"]}],
+        qa_answers=[{"question_id": "q1", "answer": "테스트 답변"}],
     )
     assert req.user_input == "xss테스트"

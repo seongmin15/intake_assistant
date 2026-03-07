@@ -1,14 +1,8 @@
-export interface Choice {
-  id: string;
-  label: string;
-}
-
 export interface Question {
   id: string;
   title: string;
   description: string;
-  type: "single" | "multi";
-  choices: Choice[];
+  placeholder?: string;
 }
 
 export interface Analysis {
@@ -23,7 +17,7 @@ export interface AnalyzeResponse {
 
 export interface QaAnswer {
   question_id: string;
-  selected_ids: string[];
+  answer: string;
 }
 
 export interface ArchitectureCard {

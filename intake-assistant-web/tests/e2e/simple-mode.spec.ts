@@ -29,9 +29,10 @@ test.describe("Simple 모드 전체 흐름", () => {
       await expect(page.getByRole("heading", { name: q.title })).toBeVisible();
     }
 
-    // 4. 질문 응답 (각 질문의 첫 번째 선택지 클릭)
-    for (const q of MOCK_ANALYZE_RESPONSE.questions) {
-      await page.getByText(q.choices[0].label).click();
+    // 4. 질문 응답 (각 질문의 textarea에 텍스트 입력)
+    const questionCards = page.locator("textarea");
+    for (let i = 0; i < MOCK_ANALYZE_RESPONSE.questions.length; i++) {
+      await questionCards.nth(i).fill(`테스트 답변 ${i + 1}`);
     }
 
     // 5. 생성하기 클릭
@@ -82,8 +83,9 @@ test.describe("Simple 모드 전체 흐름", () => {
     ).toBeVisible();
 
     // Answer questions
-    for (const q of MOCK_ANALYZE_RESPONSE.questions) {
-      await page.getByText(q.choices[0].label).click();
+    const questionCards = page.locator("textarea");
+    for (let i = 0; i < MOCK_ANALYZE_RESPONSE.questions.length; i++) {
+      await questionCards.nth(i).fill(`테스트 답변 ${i + 1}`);
     }
 
     // Delay generate/stream response to observe status text
@@ -113,8 +115,9 @@ test.describe("Simple 모드 전체 흐름", () => {
     await page.locator("#user-input").fill("할 일 관리 서비스");
     await page.getByRole("button", { name: "분석하기" }).click();
 
-    for (const q of MOCK_ANALYZE_RESPONSE.questions) {
-      await page.getByText(q.choices[0].label).click();
+    const questionCards = page.locator("textarea");
+    for (let i = 0; i < MOCK_ANALYZE_RESPONSE.questions.length; i++) {
+      await questionCards.nth(i).fill(`테스트 답변 ${i + 1}`);
     }
     await page.getByRole("button", { name: "생성하기" }).click();
 
@@ -146,8 +149,9 @@ test.describe("Simple 모드 전체 흐름", () => {
     await page.locator("#user-input").fill("할 일 관리 서비스");
     await page.getByRole("button", { name: "분석하기" }).click();
 
-    for (const q of MOCK_ANALYZE_RESPONSE.questions) {
-      await page.getByText(q.choices[0].label).click();
+    const questionCards = page.locator("textarea");
+    for (let i = 0; i < MOCK_ANALYZE_RESPONSE.questions.length; i++) {
+      await questionCards.nth(i).fill(`테스트 답변 ${i + 1}`);
     }
     await page.getByRole("button", { name: "생성하기" }).click();
     await page.getByRole("button", { name: "이대로 진행" }).click();

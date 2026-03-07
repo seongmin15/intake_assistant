@@ -222,7 +222,7 @@ def build_user_message(
 
     parts.append("\n## Q&A 응답\n")
     for answer in qa_answers:
-        parts.append(f"- {answer['question_id']}: {', '.join(answer['selected_ids'])}")
+        parts.append(f"- {answer['question_id']}: {answer['answer']}")
 
     if revision_request and previous_yaml:
         parts.append(f"\n## 수정 요청\n\n{revision_request}")

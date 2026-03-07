@@ -39,15 +39,15 @@ VALID_LLM_RESPONSE = f"```yaml\n{SAMPLE_YAML}```\n\n```json\n{_META_JSON}\n```"
 DEFAULT_REQUEST = GenerateRequest(
     user_input="할 일 관리 앱을 만들고 싶어요",
     qa_answers=[
-        QaAnswer(question_id="q1", selected_ids=["q1_a"]),
-        QaAnswer(question_id="q2", selected_ids=["q2_a"]),
+        QaAnswer(question_id="q1", answer="웹 서비스가 필요합니다"),
+        QaAnswer(question_id="q2", answer="PostgreSQL로 저장하고 싶습니다"),
     ],
 )
 
 REVISION_REQUEST = GenerateRequest(
     user_input="할 일 관리 앱을 만들고 싶어요",
     qa_answers=[
-        QaAnswer(question_id="q1", selected_ids=["q1_a"]),
+        QaAnswer(question_id="q1", answer="웹 서비스가 필요합니다"),
     ],
     revision_request="인증을 JWT로 변경해주세요",
     previous_yaml=SAMPLE_YAML,

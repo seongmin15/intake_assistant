@@ -91,8 +91,9 @@ test.describe("에러 시나리오", () => {
     await page.locator("#user-input").fill("테스트 입력");
     await page.getByRole("button", { name: "분석하기" }).click();
 
-    for (const q of MOCK_ANALYZE_RESPONSE.questions) {
-      await page.getByText(q.choices[0].label).click();
+    const questionCards = page.locator("textarea");
+    for (let i = 0; i < MOCK_ANALYZE_RESPONSE.questions.length; i++) {
+      await questionCards.nth(i).fill(`테스트 답변 ${i + 1}`);
     }
 
     await page.getByRole("button", { name: "생성하기" }).click();
@@ -120,8 +121,9 @@ test.describe("에러 시나리오", () => {
     await page.locator("#user-input").fill("테스트 입력");
     await page.getByRole("button", { name: "분석하기" }).click();
 
-    for (const q of MOCK_ANALYZE_RESPONSE.questions) {
-      await page.getByText(q.choices[0].label).click();
+    const questionCards = page.locator("textarea");
+    for (let i = 0; i < MOCK_ANALYZE_RESPONSE.questions.length; i++) {
+      await questionCards.nth(i).fill(`테스트 답변 ${i + 1}`);
     }
 
     await page.getByRole("button", { name: "생성하기" }).click();
@@ -194,8 +196,9 @@ test.describe("에러 시나리오", () => {
     await page.locator("#user-input").fill("테스트 입력");
     await page.getByRole("button", { name: "분석하기" }).click();
 
-    for (const q of MOCK_ANALYZE_RESPONSE.questions) {
-      await page.getByText(q.choices[0].label).click();
+    const questionCards = page.locator("textarea");
+    for (let i = 0; i < MOCK_ANALYZE_RESPONSE.questions.length; i++) {
+      await questionCards.nth(i).fill(`테스트 답변 ${i + 1}`);
     }
 
     await page.getByRole("button", { name: "생성하기" }).click();

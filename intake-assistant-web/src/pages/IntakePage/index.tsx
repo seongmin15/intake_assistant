@@ -35,7 +35,7 @@ export function IntakePage() {
   };
 
   const allAnswered =
-    questions.length > 0 && questions.every((q) => (answers[q.id]?.length ?? 0) > 0);
+    questions.length > 0 && questions.every((q) => (answers[q.id]?.trim().length ?? 0) > 0);
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-gray-50 px-4 py-12">
@@ -62,8 +62,8 @@ export function IntakePage() {
               <QuestionCard
                 key={q.id}
                 question={q}
-                selectedIds={answers[q.id] ?? []}
-                onChange={(ids) => setAnswer(q.id, ids)}
+                value={answers[q.id] ?? ""}
+                onChange={(text) => setAnswer(q.id, text)}
               />
             ))}
             <button

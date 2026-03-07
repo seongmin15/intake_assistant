@@ -28,6 +28,7 @@
 | 2026-03-08 | T024: E2E Tests for Streaming — Playwright E2E 테스트를 SSE 스트리밍 API 모킹으로 전환 | 완료 |
 | 2026-03-08 | T025: Error Recovery UX — 에러 시 errorSource별 재시도 버튼 추가 | 완료 |
 | 2026-03-08 | T026: Rate Limiting / Input Sanitization — IP 기반 rate limiter + 입력 텍스트 sanitizer | 완료 |
+| 2026-03-08 | T028: Open-ended Text Q&A — 객관식 질문을 자유 텍스트 질문으로 변경 | 완료 |
 | 2026-03-08 | T027: LLM 응답 파싱 안정화 — inferred_hints 타입 수정 + raw YAML/JSON fallback 추가 | 완료 |
 | 2026-03-07 | T016: .env.example 수정 — SDWC_API_URL 값 보정 + 환경별 주석 | 완료 |
 | 2026-03-07 | T017: Frontend API URL fallback 수정 — k3d에서 ERR_CONNECTION_REFUSED 해결 | 완료 |
@@ -249,6 +250,13 @@
 - **작업**: intakeStore.ts에 errorSource: ErrorSource 상태 추가 + submitAnalyze/submitGenerate/submitRevision/submitFinalize 에러 경로에 errorSource 설정 + retryAnalyze()/retryGenerate() 액션 추가. IntakePage error phase를 errorSource별 재시도 버튼(primary 파란색) + 처음부터 다시 시작(secondary 회색)으로 변경. E2E 테스트: 기존 5개 테스트에 재시도 버튼 검증 추가 + 재시도 성공 테스트 2개 신규(analyze/generate).
 - **변경된 파일**: stores/intakeStore.ts (수정), pages/IntakePage/index.tsx (수정), tests/e2e/error-scenarios.spec.ts (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: finalize 재시도는 별도 retryFinalize 불필요 — submitFinalize() 직접 호출. submitRevision 에러의 errorSource는 "generate"로 설정 (동일한 generate 재시도로 복구 가능).
+- **미완료/후속**: 없음.
+
+### 2026-03-08 — T028: Open-ended Text Q&A (Multiple Choice → Free Text)
+
+- **작업**: 기존 3~4개 객관식 질문(single/multi select with predefined choices)을 5~6개 자유 텍스트 질문으로 변경. Backend schemas에서 Choice 클래스 삭제, Question 단순화(placeholder 추가), QaAnswer.selected_ids→answer로 변경. analyze 프롬프트를 open-ended 질문 생성으로 재작성. generate 프롬프트의 Q&A 포매팅 업데이트. Frontend types/QuestionCard/intakeStore/IntakePage 전면 업데이트. E2E 테스트를 textarea.fill()으로 전환.
+- **변경된 파일**: schemas/analyze.py, schemas/generate.py, services/prompts/analyze.py, services/prompts/generate.py, api/types.ts, QuestionCard.tsx, intakeStore.ts, IntakePage/index.tsx, test_analyze_service.py, test_analyze_api.py, test_generate_service.py, test_generate_api.py, test_sanitizer.py, fixtures.ts, simple-mode.spec.ts, error-scenarios.spec.ts, 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: placeholder를 optional로 유지 — 모든 질문에 힌트가 필요하지는 않음. textarea rows=3으로 설정하여 적절한 입력 공간 제공.
 - **미완료/후속**: 없음.
 
 ### 2026-03-07 — T015: infra/ 매니페스트를 sdwc-platform으로 이관

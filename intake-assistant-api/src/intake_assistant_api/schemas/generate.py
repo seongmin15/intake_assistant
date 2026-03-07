@@ -5,7 +5,7 @@ from intake_assistant_api.core.sanitizer import sanitize_text
 
 class QaAnswer(BaseModel):
     question_id: str
-    selected_ids: list[str]
+    answer: str
 
 
 class GenerateRequest(BaseModel):

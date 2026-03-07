@@ -16,17 +16,11 @@ class AnalyzeRequest(BaseModel):
         return v
 
 
-class Choice(BaseModel):
-    id: str
-    label: str
-
-
 class Question(BaseModel):
     id: str
     title: str
     description: str
-    type: str  # "single" | "multi"
-    choices: list[Choice]
+    placeholder: str | None = None
 
 
 class Analysis(BaseModel):
