@@ -35,13 +35,16 @@ The following top-level sections are REQUIRED and must always be present:
 - scope (in_scope: at least 1, out_of_scope: at least 1)
 - assumptions (at least 1 item with assumption + if_wrong)
 - user_personas (at least 1 item with name, description, primary_goal, pain_points)
-- collaboration (human_developers, review_policy, model_routing,
-  use_subagent, absolute_rules, per_service)
+- collaboration (human_developers, review_policy, model_routing
+  with primary required, use_subagent, absolute_rules, per_service
+  each with decision_authority containing claude_autonomous + requires_approval)
 - architecture (pattern, pattern_rationale, pattern_alternatives)
 - services (at least 1 service)
 - critical_flows (at least 1 flow with flow_name + happy_path)
-- security (requirements: at least 1)
-- risks (technical: at least 1, irreversible_decisions: at least 1)
+- security (requirements: at least 1, each with category + requirement +
+  implementation_approach)
+- risks (technical: at least 1 each with risk + likelihood + impact +
+  mitigation + contingency, irreversible_decisions: at least 1)
 - performance (expected_concurrent_users)
 - process (methodology)
 - testing (approach, levels: at least 1)
@@ -86,9 +89,14 @@ Use ONLY these exact values for enum fields:
 - services[].databases[].engine: postgresql | mysql | mongodb | redis |
   sqlite | dynamodb | elasticsearch | neo4j
 - services[].databases[].role: primary | cache | search | queue | analytics | session
+- services[].approach (mobile_app): native | cross_platform | hybrid
+- services[].framework (mobile_app): react_native | flutter | swift |
+  kotlin | swiftui | jetpack_compose
 - services[].deployment.target: docker_compose | kubernetes | ecs |
   lambda | cloud_run | fly_io | railway | vercel | bare_metal |
   app_store | play_store | both_stores
+- security.requirements[].category: authentication | authorization |
+  encryption | input_validation | audit | transport_security
 - services[].css_strategy (web_ui): tailwind | css_modules |
   styled_components | sass | vanilla_css | emotion
 - services[].state_management (web_ui): zustand | redux | recoil | jotai | context | pinia | mobx
@@ -96,6 +104,8 @@ Use ONLY these exact values for enum fields:
 - process.methodology: scrum | kanban | scrumban | xp
 - testing.approach: tdd | bdd | test_after | test_first
 - testing.levels[].level: unit | integration | e2e | contract | smoke | performance
+- testing.levels[].framework: pytest | jest | vitest | playwright | cypress |
+  junit | go_test | rspec | xctest | espresso | robolectric | flutter_test | detox
 - version_control.branch_strategy: github_flow | gitflow | trunk_based | master_develop_task
 - risks.technical[].likelihood: high | medium | low
 - risks.technical[].impact: high | medium | low
@@ -126,6 +136,26 @@ WRONG — mismatched per_service and services names:
   collaboration:
     per_service:
       - service: "api"     # WRONG, must be "my-api"
+
+WRONG — missing decision_authority in per_service:
+  collaboration:
+    per_service:
+      - service: "my-api"
+        mode: autonomous    # missing decision_authority!
+  # MUST include decision_authority with claude_autonomous + requires_approval
+
+WRONG — mobile_app service missing required fields:
+  services:
+    - name: "my-app"
+      type: mobile_app
+      # MUST also include: responsibility, approach, framework,
+      # min_os_versions, screens (with at least 1), deployment
+
+WRONG — security requirement missing required fields:
+  security:
+    requirements:
+      - requirement: "JWT 인증"
+      # MUST also include: category (from enum), implementation_approach
 
 ## SDwC Template Structure Reference
 
