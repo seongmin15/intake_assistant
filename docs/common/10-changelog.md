@@ -7,6 +7,7 @@
 ## [Unreleased]
 
 ### Fixed
+- intake-assistant-api: generate API YAML/JSON 파싱 강화 — 코드 펜스 없이 반환된 raw YAML/JSON fallback 추가, "No YAML block found" 오류 감소
 - intake-assistant-api: analyze API의 inferred_hints 타입을 dict[str, Any]로 변경 — Haiku가 bool 값을 반환할 때 Pydantic 검증 실패 수정
 
 ### Added

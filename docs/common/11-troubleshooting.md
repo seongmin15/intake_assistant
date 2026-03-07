@@ -20,3 +20,10 @@
 - **해결**: `inferred_hints` 타입을 `dict[str, Any]`로 변경하여 str, bool, int 등 혼합 타입 허용.
 - **예방**: AI 응답 스키마 정의 시 LLM이 다양한 타입을 반환할 수 있는 필드는 `Any` 또는 유니온 타입으로 선언. `analysis` 필드는 내부 참조용이므로 엄격한 타입 불필요.
 - **발견일**: 2026-03-08
+
+### [런타임] generate API — "No YAML block found in response"
+- **증상**: POST /api/v1/generate/stream 호출 시 `응답 형식 오류: No YAML block found in response` 에러 반환.
+- **원인**: `_parse_response()`가 ` ```yaml ` 태그가 있는 코드 블록만 우선 탐색하고, fallback도 untagged 코드 블록(` ``` ` 로 감싼 것)만 처리. Sonnet이 코드 펜스 없이 raw YAML/JSON을 반환하는 경우 감지 불가.
+- **해결**: `_find_raw_yaml()` fallback 추가 — 코드 펜스 밖에서 `project_name:` 또는 `project:`로 시작하는 YAML 텍스트를 탐지. JSON도 `"architecture_card"` 키를 포함하는 raw JSON fallback 추가.
+- **예방**: LLM 응답 파싱 시 코드 펜스 의존도를 낮추고, 내용 기반 휴리스틱 fallback을 항상 포함. T019에서 유사 수정을 했으나 raw content fallback은 누락되어 있었음.
+- **발견일**: 2026-03-08

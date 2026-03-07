@@ -37,25 +37,47 @@ def _extract_block(text: str, language: str) -> str | None:
     return None
 
 
+_YAML_START_KEYS = ("project_name:", "project:")
+
+
+def _find_raw_yaml(text: str) -> str | None:
+    """Find raw YAML content outside code fences by scanning for top-level keys."""
+    for key in _YAML_START_KEYS:
+        idx = text.find(key)
+        if idx == -1:
+            continue
+        # Take everything from this key to end-of-text or next code fence
+        rest = text[idx:]
+        fence_idx = rest.find("```")
+        candidate = rest[:fence_idx].strip() if fence_idx != -1 else rest.strip()
+        if len(candidate) > 50:
+            return candidate
+    return None
+
+
 def _parse_response(text: str) -> tuple[str, dict]:
     """Extract YAML block and JSON metadata block from LLM response."""
     yaml_content = _extract_block(text, "yaml")
 
-    # Fallback: find untagged code blocks and pick the one that looks like YAML
+    # Fallback 1: untagged code blocks that look like YAML
     if not yaml_content:
         untagged = re.findall(r"```\s*\n(.*?)```", text, re.DOTALL)
         for block in untagged:
             stripped = block.strip()
-            if stripped.startswith("project_name:") or stripped.startswith("project:"):
+            if any(stripped.startswith(k) for k in _YAML_START_KEYS):
                 yaml_content = stripped
                 break
+
+    # Fallback 2: raw YAML outside code fences
+    if not yaml_content:
+        yaml_content = _find_raw_yaml(text)
 
     if not yaml_content:
         raise ValueError("No YAML block found in response")
 
     json_content = _extract_block(text, "json")
 
-    # Fallback: find untagged code blocks that look like JSON
+    # Fallback 1: untagged code blocks that look like JSON
     if not json_content:
         untagged = re.findall(r"```\s*\n(.*?)```", text, re.DOTALL)
         for block in untagged:
@@ -63,6 +85,12 @@ def _parse_response(text: str) -> tuple[str, dict]:
             if stripped.startswith("{"):
                 json_content = stripped
                 break
+
+    # Fallback 2: raw JSON outside code fences
+    if not json_content:
+        match = re.search(r"\{[^{}]*\"architecture_card\".*\}", text, re.DOTALL)
+        if match:
+            json_content = match.group(0).strip()
 
     if not json_content:
         raise ValueError("No JSON block found in response")
