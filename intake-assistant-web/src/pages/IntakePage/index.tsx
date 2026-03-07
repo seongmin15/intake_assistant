@@ -1,6 +1,9 @@
 import { useIntakeStore } from "@/stores/intakeStore";
 
+import { ArchitectureCard } from "./components/ArchitectureCard";
+import { FeatureChecklist } from "./components/FeatureChecklist";
 import { QuestionCard } from "./components/QuestionCard";
+import { RevisionInput } from "./components/RevisionInput";
 import { TextInput } from "./components/TextInput";
 
 export function IntakePage() {
@@ -8,11 +11,16 @@ export function IntakePage() {
     phase,
     questions,
     answers,
+    architectureCard,
+    featureChecklist,
     error,
     setUserInput,
     submitAnalyze,
     setAnswer,
     submitGenerate,
+    startRevision,
+    submitRevision,
+    submitFinalize,
     reset,
   } = useIntakeStore();
 
@@ -21,7 +29,8 @@ export function IntakePage() {
     void submitAnalyze();
   };
 
-  const allAnswered = questions.length > 0 && questions.every((q) => (answers[q.id]?.length ?? 0) > 0);
+  const allAnswered =
+    questions.length > 0 && questions.every((q) => (answers[q.id]?.length ?? 0) > 0);
 
   return (
     <main className="flex min-h-screen flex-col items-center bg-gray-50 px-4 py-12">
@@ -65,6 +74,39 @@ export function IntakePage() {
           <div className="flex flex-col items-center gap-3 py-16">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
             <p className="text-sm text-gray-500">프로젝트를 생성하고 있습니다...</p>
+          </div>
+        )}
+
+        {phase === "review" && architectureCard && (
+          <div className="flex flex-col gap-6">
+            <ArchitectureCard card={architectureCard} />
+            <FeatureChecklist items={featureChecklist} />
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={startRevision}
+                className="rounded-lg bg-gray-200 px-6 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-300"
+              >
+                수정 요청
+              </button>
+              <button
+                type="button"
+                onClick={() => void submitFinalize()}
+                className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+              >
+                이대로 진행
+              </button>
+            </div>
+          </div>
+        )}
+
+        {phase === "revising" && (
+          <div className="flex flex-col gap-6">
+            {architectureCard && <ArchitectureCard card={architectureCard} />}
+            <RevisionInput
+              onSubmit={(text) => void submitRevision(text)}
+              onCancel={() => useIntakeStore.setState({ phase: "review" })}
+            />
           </div>
         )}
 

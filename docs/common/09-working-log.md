@@ -17,6 +17,7 @@
 | 2026-03-07 | T006: POST /api/v1/finalize — SDwC ZIP 생성 + 스트림 응답 엔드포인트 | 완료 |
 | 2026-03-07 | T007: ModeSelectorPage — Simple/Advanced 모드 선택 페이지 | 완료 |
 | 2026-03-07 | T008: IntakePage 입력+질문 — TextInput, QuestionCard, Zustand store, API 연동 | 완료 |
+| 2026-03-07 | T009: IntakePage 아키텍처 카드+수정 — ArchitectureCard, FeatureChecklist, RevisionInput | 완료 |
 
 <!-- Claude: §5.8 작업 완료, §5.12 작업 중단/취소 시 한 줄 추가.
      작업 내용은 "무엇을 왜" 중심 1줄 요약.
@@ -99,3 +100,10 @@
 - **변경된 파일**: api/types.ts (신규), api/client.ts (신규), stores/intakeStore.ts (신규), pages/IntakePage/index.tsx (수정), pages/IntakePage/components/TextInput.tsx (신규), pages/IntakePage/components/QuestionCard.tsx (신규), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: Zustand store에 T009/T010 액션(revision, finalize)도 미리 포함 — 중복 작업 방지. API client는 fetch 기반(axios 불필요). allAnswered 체크로 모든 질문 응답 시에만 '생성하기' 활성화.
 - **미완료/후속**: 없음. T009(아키텍처 카드+수정) 진행 시 review/revising phase 컴포넌트만 추가하면 됨.
+
+### 2026-03-07 — T009: IntakePage - 아키텍처 카드 + 수정 반복
+
+- **작업**: ArchitectureCard(5항목 dl/dd, FIELD_ORDER로 순서 보장), FeatureChecklist(체크마크+이름/설명), RevisionInput(textarea+취소/수정반영 버튼). IntakePage에 review phase(카드+체크리스트+'수정 요청'+'이대로 진행'), revising phase(카드+RevisionInput) 추가.
+- **변경된 파일**: components/ArchitectureCard.tsx (신규), components/FeatureChecklist.tsx (신규), components/RevisionInput.tsx (신규), pages/IntakePage/index.tsx (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: revising 취소 시 useIntakeStore.setState로 직접 phase 복원 (별도 액션 불필요)
+- **미완료/후속**: 없음. T010(ZIP 다운로드) 진행 시 finalizing/complete phase만 추가하면 됨.
