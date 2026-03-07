@@ -14,6 +14,7 @@
 - intake-assistant-api: POST /api/v1/generate 엔드포인트 — Sonnet 기반 intake_data.yaml 생성, SDwC validate-retry(최대 3회), 아키텍처 카드 + 기능 체크리스트 추출, 수정 반복 지원 (T005)
 - intake-assistant-api: POST /api/v1/finalize 엔드포인트 — SDwC ZIP 생성 + StreamingResponse 바이너리 응답 (T006)
 - intake-assistant-web: ModeSelectorPage — Simple/Advanced 모드 선택, ModeCard 컴포넌트, 반응형 레이아웃 (T007)
+- intake-assistant-web: IntakePage 입력+질문 — TextInput, QuestionCard, Zustand store, API 클라이언트 (T008)
 
 <!-- Claude: §5.8 작업 완료 시 해당 변경을 [Unreleased]에 기록.
      분류 기준:
