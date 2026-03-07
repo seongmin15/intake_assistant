@@ -453,6 +453,22 @@ Any active status -> Cancelled
 
 ---
 
+### T029: Retry 축소 + field_requirements 기반 프롬프트 개선
+- Status: Done
+- Service: intake-assistant-api
+- Origin: T023
+- Description: Anthropic API 재시도 횟수를 3→2회로 축소. SDwC field_requirements.yaml(287개 필드 명세)를 기반으로 generate 시스템 프롬프트의 Required Sections, Enum Reference, Array Minimums를 보정하여 YAML 검증 통과율을 높인다.
+- Acceptance Criteria:
+  - [x] MAX_RETRIES 3→2 변경 (analyze_service, generate_service)
+  - [x] 누락된 required 필드를 Required Sections Checklist에 추가 (test_case_coverage, web_ui pages, worker workers, data_pipeline pipelines 등)
+  - [x] 잘못된 enum 값 수정 (kotlin→kotlin_mobile, sbt 추가)
+  - [x] 누락된 enum 값 추가 (worker, data_pipeline, deployment 관련)
+  - [x] 누락된 array minimum 추가
+  - [x] 기존 테스트 전체 통과
+- Result: MAX_RETRIES 3→2 + BACKOFF_SECONDS [1,2,4]→[1,2] (analyze_service, generate_service). generate 프롬프트에 Per-Service Type Required Fields 섹션 신설(5개 타입별 필수 필드), Required Sections에 자식 필드 상세화, Array Minimums에 7개 추가, Enum Reference에 30+ enum 추가(worker/data_pipeline/mobile_app/deployment/backend_api), kotlin→kotlin_mobile 수정, sbt 추가, Common Mistakes에 4개 예시 추가. 테스트 2개 업데이트, 전체 69개 통과. ruff lint 통과.
+
+---
+
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
      Claude fills the Tasks section during Init based on docs/common/05-roadmap.md.

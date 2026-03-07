@@ -28,6 +28,7 @@
 | 2026-03-08 | T024: E2E Tests for Streaming — Playwright E2E 테스트를 SSE 스트리밍 API 모킹으로 전환 | 완료 |
 | 2026-03-08 | T025: Error Recovery UX — 에러 시 errorSource별 재시도 버튼 추가 | 완료 |
 | 2026-03-08 | T026: Rate Limiting / Input Sanitization — IP 기반 rate limiter + 입력 텍스트 sanitizer | 완료 |
+| 2026-03-08 | T029: Retry 축소 + field_requirements 기반 프롬프트 개선 | 완료 |
 | 2026-03-08 | T028: Open-ended Text Q&A — 객관식 질문을 자유 텍스트 질문으로 변경 | 완료 |
 | 2026-03-08 | T027: LLM 응답 파싱 안정화 — inferred_hints 타입 수정 + raw YAML/JSON fallback 추가 | 완료 |
 | 2026-03-07 | T016: .env.example 수정 — SDWC_API_URL 값 보정 + 환경별 주석 | 완료 |
@@ -257,6 +258,13 @@
 - **작업**: 기존 3~4개 객관식 질문(single/multi select with predefined choices)을 5~6개 자유 텍스트 질문으로 변경. Backend schemas에서 Choice 클래스 삭제, Question 단순화(placeholder 추가), QaAnswer.selected_ids→answer로 변경. analyze 프롬프트를 open-ended 질문 생성으로 재작성. generate 프롬프트의 Q&A 포매팅 업데이트. Frontend types/QuestionCard/intakeStore/IntakePage 전면 업데이트. E2E 테스트를 textarea.fill()으로 전환.
 - **변경된 파일**: schemas/analyze.py, schemas/generate.py, services/prompts/analyze.py, services/prompts/generate.py, api/types.ts, QuestionCard.tsx, intakeStore.ts, IntakePage/index.tsx, test_analyze_service.py, test_analyze_api.py, test_generate_service.py, test_generate_api.py, test_sanitizer.py, fixtures.ts, simple-mode.spec.ts, error-scenarios.spec.ts, 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: placeholder를 optional로 유지 — 모든 질문에 힌트가 필요하지는 않음. textarea rows=3으로 설정하여 적절한 입력 공간 제공.
+- **미완료/후속**: 없음.
+
+### 2026-03-08 — T029: Retry 축소 + field_requirements 기반 프롬프트 개선
+
+- **작업**: Anthropic API 재시도 횟수 3→2회로 축소(analyze_service, generate_service). SDwC field_requirements.yaml(287개 필드 명세)을 분석하여 generate 시스템 프롬프트 전면 보정 — Required Sections Checklist에 누락된 required 자식 필드 추가, Per-Service Type Required Fields 섹션 신설(5개 서비스 타입별 필수 필드), Array Minimums에 7개 항목 추가, Enum Reference에 worker/data_pipeline/mobile_app/deployment/backend_api 등 30+ enum 추가, kotlin→kotlin_mobile 수정, sbt 추가, Common Mistakes에 4개 예시 추가.
+- **변경된 파일**: services/analyze_service.py (수정), services/generate_service.py (수정), services/prompts/generate.py (수정), tests/unit/test_analyze_service.py (수정), tests/unit/test_generate_service.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: field_requirements.yaml의 optional 필드는 DELETE 원칙으로 처리되므로 프롬프트에 포함하지 않음. required 필드와 enum 값만 집중 보강. 프롬프트 길이 증가분은 prompt caching으로 상쇄.
 - **미완료/후속**: 없음.
 
 ### 2026-03-07 — T015: infra/ 매니페스트를 sdwc-platform으로 이관

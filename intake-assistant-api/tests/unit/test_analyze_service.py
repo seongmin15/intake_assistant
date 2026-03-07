@@ -88,11 +88,11 @@ async def test_analyze_raises_after_max_retries() -> None:
 
     with (
         patch("intake_assistant_api.services.analyze_service.asyncio.sleep"),
-        pytest.raises(ExternalServiceError, match="Failed after 3 retries"),
+        pytest.raises(ExternalServiceError, match="Failed after 2 retries"),
     ):
         await analyze(client, "테스트 입력")
 
-    assert client.messages.create.call_count == 3
+    assert client.messages.create.call_count == 2
 
 
 async def test_analyze_strips_markdown_code_block() -> None:
