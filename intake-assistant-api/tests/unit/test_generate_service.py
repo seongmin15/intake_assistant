@@ -6,7 +6,7 @@ from anthropic import APIConnectionError
 
 from intake_assistant_api.core.exceptions import ExternalServiceError
 from intake_assistant_api.schemas.generate import GenerateRequest, QaAnswer
-from intake_assistant_api.services.generate_service import generate
+from intake_assistant_api.services.generate_service import _parse_response, generate
 
 SAMPLE_YAML = """\
 project:
@@ -140,6 +140,22 @@ async def test_generate_anthropic_failure_retries_exhausted() -> None:
     ):
         tc.get_template.return_value = "mock template"
         await generate(anthropic, sdwc, DEFAULT_REQUEST)
+
+
+def test_parse_response_untagged_yaml_block() -> None:
+    """YAML in untagged code block (``` instead of ```yaml) should be extracted."""
+    response = f"```\n{SAMPLE_YAML}```\n\n```json\n{_META_JSON}\n```"
+    yaml_content, metadata = _parse_response(response)
+    assert "test-project" in yaml_content
+    assert metadata["architecture_card"]["authentication"] == "none"
+
+
+def test_parse_response_untagged_both_blocks() -> None:
+    """Both YAML and JSON in untagged code blocks should be extracted."""
+    response = f"```\n{SAMPLE_YAML}```\n\n```\n{_META_JSON}\n```"
+    yaml_content, metadata = _parse_response(response)
+    assert "test-project" in yaml_content
+    assert len(metadata["feature_checklist"]) == 2
 
 
 async def test_generate_parse_error_no_yaml_block() -> None:

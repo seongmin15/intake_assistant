@@ -24,6 +24,7 @@
 | 2026-03-07 | T016: .env.example 수정 — SDWC_API_URL 값 보정 + 환경별 주석 | 완료 |
 | 2026-03-07 | T017: Frontend API URL fallback 수정 — k3d에서 ERR_CONNECTION_REFUSED 해결 | 완료 |
 | 2026-03-07 | T018: analyze API JSON 파싱 오류 수정 — markdown 코드 블록 스트리핑 누락 | 완료 |
+| 2026-03-07 | T019: generate API YAML 파싱 오류 수정 — 코드 블록 패턴 유연화 | 완료 |
 
 <!-- Claude: §5.8 작업 완료, §5.12 작업 중단/취소 시 한 줄 추가.
      작업 내용은 "무엇을 왜" 중심 1줄 요약.
@@ -151,6 +152,13 @@
 - **변경된 파일**: infra/intake-assistant-api/deployment.yaml (신규), infra/intake-assistant-web/deployment.yaml (신규), intake-assistant-api/src/intake_assistant_api/core/config.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: sdwc-platform-infra-guide 지시대로 config.py 기본값을 K8s 내부 DNS로 변경. 로컬 개발은 .env 오버라이드.
 - **미완료/후속**: 없음. T013~T014 완료.
+
+### 2026-03-07 — T019: generate API YAML 파싱 오류 수정
+
+- **작업**: _parse_response()에 _extract_block() 헬퍼 추출 + untagged 코드 블록 fallback 로직 추가. YAML은 project_name:/project: 시작으로, JSON은 { 시작으로 판별. 단위 테스트 2개 추가.
+- **변경된 파일**: services/generate_service.py (수정), tests/unit/test_generate_service.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: 언어 태그 매칭 우선, fallback은 내용 기반 휴리스틱. 두 블록 모두 없으면 기존대로 ValueError.
+- **미완료/후속**: 없음.
 
 ### 2026-03-07 — T018: analyze API JSON 파싱 오류 수정
 

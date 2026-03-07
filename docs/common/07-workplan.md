@@ -298,6 +298,20 @@ Any active status -> Cancelled
 
 ---
 
+### T019: generate API YAML 파싱 오류 수정
+- Status: Done
+- Service: intake-assistant-api
+- Origin: T005
+- Description: Sonnet이 YAML을 ```yaml 코드 블록 없이 반환하거나, ``` 언어 태그 없이 반환하는 경우 _parse_response()가 "No YAML block found" 에러 발생. 코드 블록 감지 패턴을 유연하게 확장.
+- Acceptance Criteria:
+  - [x] _parse_response()에서 언어 태그 없는 코드 블록도 처리
+  - [x] 코드 블록 없이 YAML/JSON이 반환된 경우 fallback 처리
+  - [x] 단위 테스트 추가
+  - [x] 10-changelog 기록
+- Result: _extract_block() 헬퍼 추가. 언어 태그 우선 매칭 후 untagged 코드 블록 fallback (YAML은 project_name:/project: 시작, JSON은 { 시작으로 판별). 단위 테스트 2개 추가, 전체 9개 통과.
+
+---
+
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
      Claude fills the Tasks section during Init based on docs/common/05-roadmap.md.
