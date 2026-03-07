@@ -175,17 +175,18 @@ async def test_generate_parse_error_no_yaml_block() -> None:
         await generate(anthropic, sdwc, DEFAULT_REQUEST)
 
 
-async def test_generate_parse_error_no_json_block() -> None:
-    """Response without JSON block → ExternalServiceError."""
+async def test_generate_no_json_block_uses_default_metadata() -> None:
+    """Response without JSON block → uses default metadata instead of error."""
     anthropic = _make_mock_anthropic(f"```yaml\n{SAMPLE_YAML}```\nno json here")
     sdwc = _make_mock_sdwc(valid=True)
 
-    with (
-        patch("intake_assistant_api.services.generate_service.template_cache") as tc,
-        pytest.raises(ExternalServiceError, match="Invalid response format"),
-    ):
+    with patch("intake_assistant_api.services.generate_service.template_cache") as tc:
         tc.get_template.return_value = "mock template"
-        await generate(anthropic, sdwc, DEFAULT_REQUEST)
+        result = await generate(anthropic, sdwc, DEFAULT_REQUEST)
+
+    assert result.yaml_content == SAMPLE_YAML.strip()
+    assert result.architecture_card.service_composition == "-"
+    assert result.feature_checklist == []
 
 
 async def test_generate_revision_request() -> None:

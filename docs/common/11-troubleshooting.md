@@ -28,6 +28,13 @@
 - **예방**: LLM 응답 파싱 시 코드 펜스 의존도를 낮추고, 내용 기반 휴리스틱 fallback을 항상 포함. T019에서 유사 수정을 했으나 raw content fallback은 누락되어 있었음.
 - **발견일**: 2026-03-08
 
+### [런타임] generate API — "No JSON block found in response" (재발)
+- **증상**: brace-balancing fallback 적용 후에도 `No JSON block found in response` 에러 재발. LLM이 JSON 메타데이터 블록 자체를 아예 생성하지 않는 케이스.
+- **원인**: 모든 JSON fallback(tagged → untagged → raw brace-balancing)을 통과해도 `"architecture_card"` 키워드가 응답에 없으면 감지 불가. 이 경우 ValueError를 raise하여 전체 생성이 실패.
+- **해결**: JSON 메타데이터를 optional로 변경. JSON 블록이 없거나 파싱 실패 시 `_default_metadata()`로 placeholder 값(`"-"`, 빈 리스트) 반환. YAML만 있으면 생성 성공.
+- **예방**: LLM 응답의 보조 데이터(메타데이터)는 필수가 아닌 optional로 설계. 핵심 출력(YAML)만 필수, 부가 정보는 best-effort.
+- **발견일**: 2026-03-08
+
 ### [런타임] generate API — "No JSON block found in response"
 - **증상**: POST /api/v1/generate/stream 호출 시 `응답 형식 오류: No JSON block found in response` 에러 반환. YAML은 파싱 성공했으나 JSON 메타데이터 블록을 찾지 못함.
 - **원인**: raw JSON fallback의 regex `\{[^{}]*"architecture_card".*\}`가 중첩 brace를 포함한 JSON을 매칭하지 못함. `[^{}]*`가 내부 `{}`를 건너뛸 수 없어 실패.
