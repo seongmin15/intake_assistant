@@ -418,6 +418,21 @@ Any active status -> Cancelled
 
 ---
 
+### T027: LLM 응답 파싱 안정화 (analyze + generate)
+- Status: Done
+- Service: intake-assistant-api
+- Origin: T004, T019
+- Description: 프로덕션 테스트 중 발견된 LLM 응답 파싱 오류 2건 수정. (1) analyze API에서 Haiku가 inferred_hints에 bool 값을 반환할 때 Pydantic 검증 실패. (2) generate API에서 Sonnet이 코드 펜스 없이 raw YAML/JSON을 반환할 때 "No YAML block found" 오류.
+- Acceptance Criteria:
+  - [x] inferred_hints 타입을 dict[str, Any]로 변경하여 혼합 타입 허용
+  - [x] _parse_response()에 raw YAML fallback 추가 (코드 펜스 없는 경우)
+  - [x] _parse_response()에 raw JSON fallback 추가 (코드 펜스 없는 경우)
+  - [x] 기존 테스트 전체 통과
+  - [x] 11-troubleshooting에 원인/해결/예방 기록
+- Result: schemas/analyze.py의 inferred_hints를 dict[str, Any]로 변경. generate_service.py에 _find_raw_yaml() 헬퍼 추가(project_name:/project: 탐지) + raw JSON regex fallback(architecture_card 키 탐지). 11-troubleshooting에 2건 기록. 전체 69개 테스트 통과. ruff lint 통과.
+
+---
+
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
      Claude fills the Tasks section during Init based on docs/common/05-roadmap.md.

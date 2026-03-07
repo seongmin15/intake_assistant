@@ -28,6 +28,7 @@
 | 2026-03-08 | T024: E2E Tests for Streaming — Playwright E2E 테스트를 SSE 스트리밍 API 모킹으로 전환 | 완료 |
 | 2026-03-08 | T025: Error Recovery UX — 에러 시 errorSource별 재시도 버튼 추가 | 완료 |
 | 2026-03-08 | T026: Rate Limiting / Input Sanitization — IP 기반 rate limiter + 입력 텍스트 sanitizer | 완료 |
+| 2026-03-08 | T027: LLM 응답 파싱 안정화 — inferred_hints 타입 수정 + raw YAML/JSON fallback 추가 | 완료 |
 | 2026-03-07 | T016: .env.example 수정 — SDWC_API_URL 값 보정 + 환경별 주석 | 완료 |
 | 2026-03-07 | T017: Frontend API URL fallback 수정 — k3d에서 ERR_CONNECTION_REFUSED 해결 | 완료 |
 | 2026-03-07 | T018: analyze API JSON 파싱 오류 수정 — markdown 코드 블록 스트리핑 누락 | 완료 |
@@ -225,6 +226,13 @@
 - **작업**: fixtures.ts를 SSE 응답 빌더 패턴으로 전면 재작성(formatSseEvent, buildAnalyzeSseBody, buildGenerateSseBody, buildSseErrorBody). setupApiMocks에서 analyze/stream, generate/stream 라우트로 변경. simple-mode.spec.ts에 "스트리밍 중 진행 상태 텍스트 표시" 테스트 추가(300ms 지연 라우트로 UI status text 검증). error-scenarios.spec.ts를 스트리밍 엔드포인트 모킹으로 전환 + SSE error 이벤트 시나리오 추가.
 - **변경된 파일**: tests/e2e/fixtures.ts (재작성), tests/e2e/simple-mode.spec.ts (재작성), tests/e2e/error-scenarios.spec.ts (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: HTTP 에러(500 응답)와 SSE 에러(200 + error 이벤트) 두 시나리오 모두 커버. finalize는 비스트리밍이므로 변경 없음.
+- **미완료/후속**: 없음.
+
+### 2026-03-08 — T027: LLM 응답 파싱 안정화
+
+- **작업**: 프로덕션 테스트 중 발견된 LLM 응답 파싱 오류 2건 수정. (1) analyze: inferred_hints dict[str, str] → dict[str, Any]로 변경. (2) generate: _find_raw_yaml() fallback 추가 + raw JSON regex fallback 추가.
+- **변경된 파일**: schemas/analyze.py (수정), services/generate_service.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md, 11-troubleshooting.md
+- **의사결정**: LLM 출력의 가변성을 고려하여 파싱 로직에 다단계 fallback 적용. inferred_hints는 내부 참조용이므로 Any 타입 허용.
 - **미완료/후속**: 없음.
 
 ### 2026-03-08 — T026: Rate Limiting / Input Sanitization
