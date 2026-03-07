@@ -40,15 +40,15 @@ def _mock_anthropic_client(response_text: str) -> AsyncMock:
     return client
 
 
-def _mock_sdwc_client(success: bool = True) -> AsyncMock:
+def _mock_sdwc_client(valid: bool = True) -> AsyncMock:
     sdwc = AsyncMock()
-    sdwc.validate_yaml = AsyncMock(return_value={"success": success})
+    sdwc.validate_yaml = AsyncMock(return_value={"valid": valid, "errors": [], "warnings": []})
     return sdwc
 
 
 async def test_generate_returns_200(client) -> None:
     mock_anthropic = _mock_anthropic_client(VALID_LLM_RESPONSE)
-    mock_sdwc = _mock_sdwc_client(success=True)
+    mock_sdwc = _mock_sdwc_client(valid=True)
 
     from intake_assistant_api.main import app
 
@@ -100,7 +100,7 @@ async def test_generate_anthropic_failure_returns_502(client) -> None:
     mock_anthropic.messages.create = AsyncMock(
         side_effect=APIConnectionError(request=MagicMock()),
     )
-    mock_sdwc = _mock_sdwc_client(success=True)
+    mock_sdwc = _mock_sdwc_client(valid=True)
 
     from intake_assistant_api.main import app
 

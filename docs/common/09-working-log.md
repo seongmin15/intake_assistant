@@ -132,3 +132,11 @@
 - **변경된 파일**: intake-assistant-api/Dockerfile (신규), intake-assistant-api/.dockerignore (신규), intake-assistant-web/Dockerfile (신규), intake-assistant-web/.dockerignore (신규), intake-assistant-web/nginx.conf (신규), .github/workflows/ci-api.yml (신규), .github/workflows/ci-web.yml (신규), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: SDwC 패턴 그대로 따르되, API healthcheck 경로 /api/v1/health로 변경, .sdwc/ COPY 불필요, mypy 제외 (현재 CI에서 미사용), Web CI에서 typecheck/format:check 별도 스크립트 없이 npm run build(tsc -b 포함)로 대체
 - **미완료/후속**: T001~T012 전체 완료. 초기 로드맵 태스크 모두 Done.
+
+### 2026-03-07 — T013: SDwC API 연동 수정
+
+- **계획**: sdwc-platform 및 SDwC 프로젝트 분석 후 발견된 API 계약 불일치 수정. (1) sdwc_client.py의 validate_yaml/generate_zip을 multipart file upload으로 변경. (2) generate_service.py의 validate 응답 필드명 `success`→`valid`, `error`→`errors`로 변경. (3) 단위 테스트 업데이트.
+- **작업**: sdwc_client.py — json= 파라미터를 files={"file": ("intake_data.yaml", content.encode(), "application/x-yaml")}로 변경 (validate_yaml, generate_zip 두 메서드). generate_service.py — validate_result.get("success")→"valid", validate_result.get("error",{})→"errors",[]. test_sdwc_client.py, test_generate_service.py, test_generate_api.py — mock 응답을 SDwC 실제 ValidationResponse 스키마(valid/errors/warnings)로 변경.
+- **변경된 파일**: services/sdwc_client.py (수정), services/generate_service.py (수정), tests/unit/test_sdwc_client.py (수정), tests/unit/test_generate_service.py (수정), tests/unit/test_generate_api.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: SDwC API 소스(routers/intake.py)에서 UploadFile 파라미터 + ValidationResponse(valid/errors/warnings) 스키마 확인 후 수정
+- **미완료/후속**: T014(인프라 매니페스트 커밋) Ready 상태.

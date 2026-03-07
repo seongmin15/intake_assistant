@@ -105,7 +105,7 @@ async def generate(
 
         validate_result = await sdwc.validate_yaml(yaml_content)
 
-        if validate_result.get("success"):
+        if validate_result.get("valid"):
             await logger.ainfo(
                 "generate_validation_passed",
                 attempt=validation_attempt + 1,
@@ -119,7 +119,7 @@ async def generate(
                 feature_checklist=[FeatureItem.model_validate(f) for f in features_data],
             )
 
-        error_info = validate_result.get("error", {})
+        error_info = validate_result.get("errors", [])
         error_feedback = json.dumps(error_info, ensure_ascii=False)
         await logger.awarning(
             "generate_validation_failed",

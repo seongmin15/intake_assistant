@@ -22,6 +22,9 @@
 - intake-assistant-web: Dockerfile (2-stage, node:20-slim → nginx:alpine) + nginx.conf (SPA fallback, API reverse proxy) + .dockerignore (T012)
 - CI: GitHub Actions 워크플로우 — ci-api.yml (ruff + pytest + GHCR push), ci-web.yml (eslint + build + GHCR push) (T012)
 
+### Fixed
+- intake-assistant-api: SDwC API 연동 — JSON body → multipart file upload으로 변경 (validate, generate 엔드포인트), validate 응답 필드명 `success`→`valid`, `error`→`errors`로 수정 (T013)
+
 <!-- Claude: §5.8 작업 완료 시 해당 변경을 [Unreleased]에 기록.
      분류 기준:
      - Added: 새 기능, 새 엔드포인트, 새 엔티티

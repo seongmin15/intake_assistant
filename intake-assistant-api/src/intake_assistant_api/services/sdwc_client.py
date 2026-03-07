@@ -28,12 +28,12 @@ class SDwCClient:
         try:
             resp = await self._http.post(
                 url,
-                json={"yaml_content": yaml_content},
+                files={"file": ("intake_data.yaml", yaml_content.encode(), "application/x-yaml")},
                 timeout=10.0,
             )
             resp.raise_for_status()
             data: dict = resp.json()
-            await logger.ainfo("sdwc_validate_completed", success=data.get("success"))
+            await logger.ainfo("sdwc_validate_completed", valid=data.get("valid"))
             return data
         except httpx.HTTPError as exc:
             await logger.aerror("sdwc_validate_failed", url=url, error=str(exc))
@@ -47,7 +47,7 @@ class SDwCClient:
         try:
             resp = await self._http.post(
                 url,
-                json={"yaml_content": yaml_content},
+                files={"file": ("intake_data.yaml", yaml_content.encode(), "application/x-yaml")},
                 timeout=30.0,
             )
             resp.raise_for_status()

@@ -60,11 +60,9 @@ def _make_mock_anthropic(response_text: str) -> AsyncMock:
     return client
 
 
-def _make_mock_sdwc(success: bool = True, error: dict | None = None) -> AsyncMock:
+def _make_mock_sdwc(valid: bool = True, errors: list | None = None) -> AsyncMock:
     sdwc = AsyncMock()
-    result = {"success": success}
-    if error:
-        result["error"] = error
+    result = {"valid": valid, "errors": errors or [], "warnings": []}
     sdwc.validate_yaml = AsyncMock(return_value=result)
     return sdwc
 
@@ -72,7 +70,7 @@ def _make_mock_sdwc(success: bool = True, error: dict | None = None) -> AsyncMoc
 async def test_generate_success() -> None:
     """Normal generation + validation pass → GenerateResponse returned."""
     anthropic = _make_mock_anthropic(VALID_LLM_RESPONSE)
-    sdwc = _make_mock_sdwc(success=True)
+    sdwc = _make_mock_sdwc(valid=True)
 
     with patch("intake_assistant_api.services.generate_service.template_cache") as tc:
         tc.get_template.return_value = "mock template"
@@ -92,8 +90,12 @@ async def test_generate_validation_retry_then_pass() -> None:
     sdwc = AsyncMock()
     sdwc.validate_yaml = AsyncMock(
         side_effect=[
-            {"success": False, "error": {"field": "project.name", "message": "empty"}},
-            {"success": True},
+            {
+                "valid": False,
+                "errors": [{"detail": "project.name: empty"}],
+                "warnings": [],
+            },
+            {"valid": True, "errors": [], "warnings": []},
         ]
     )
 
@@ -110,7 +112,9 @@ async def test_generate_validation_retries_exhausted() -> None:
     """Validation fails on all attempts → ExternalServiceError."""
     anthropic = _make_mock_anthropic(VALID_LLM_RESPONSE)
     sdwc = AsyncMock()
-    sdwc.validate_yaml = AsyncMock(return_value={"success": False, "error": {"message": "invalid"}})
+    sdwc.validate_yaml = AsyncMock(
+        return_value={"valid": False, "errors": [{"detail": "invalid"}], "warnings": []}
+    )
 
     with (
         patch("intake_assistant_api.services.generate_service.template_cache") as tc,
@@ -127,7 +131,7 @@ async def test_generate_anthropic_failure_retries_exhausted() -> None:
     """Anthropic API fails all retries → ExternalServiceError."""
     anthropic = AsyncMock()
     anthropic.messages.create = AsyncMock(side_effect=APIConnectionError(request=MagicMock()))
-    sdwc = _make_mock_sdwc(success=True)
+    sdwc = _make_mock_sdwc(valid=True)
 
     with (
         patch("intake_assistant_api.services.generate_service.template_cache") as tc,
@@ -141,7 +145,7 @@ async def test_generate_anthropic_failure_retries_exhausted() -> None:
 async def test_generate_parse_error_no_yaml_block() -> None:
     """Response without YAML block → ExternalServiceError."""
     anthropic = _make_mock_anthropic("no yaml here\n```json\n{}\n```")
-    sdwc = _make_mock_sdwc(success=True)
+    sdwc = _make_mock_sdwc(valid=True)
 
     with (
         patch("intake_assistant_api.services.generate_service.template_cache") as tc,
@@ -154,7 +158,7 @@ async def test_generate_parse_error_no_yaml_block() -> None:
 async def test_generate_parse_error_no_json_block() -> None:
     """Response without JSON block → ExternalServiceError."""
     anthropic = _make_mock_anthropic(f"```yaml\n{SAMPLE_YAML}```\nno json here")
-    sdwc = _make_mock_sdwc(success=True)
+    sdwc = _make_mock_sdwc(valid=True)
 
     with (
         patch("intake_assistant_api.services.generate_service.template_cache") as tc,
@@ -167,7 +171,7 @@ async def test_generate_parse_error_no_json_block() -> None:
 async def test_generate_revision_request() -> None:
     """Revision request with previous_yaml → normal generation."""
     anthropic = _make_mock_anthropic(VALID_LLM_RESPONSE)
-    sdwc = _make_mock_sdwc(success=True)
+    sdwc = _make_mock_sdwc(valid=True)
 
     with patch("intake_assistant_api.services.generate_service.template_cache") as tc:
         tc.get_template.return_value = "mock template"
