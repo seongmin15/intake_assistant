@@ -23,6 +23,7 @@
 | 2026-03-07 | T012: 컨테이너화 + CI 파이프라인 — Dockerfile, nginx.conf, GitHub Actions CI | 완료 |
 | 2026-03-08 | T020: Prompt Caching — generate 시스템 프롬프트에 cache_control 적용 | 완료 |
 | 2026-03-08 | T021: Streaming Generate — SSE 스트리밍 엔드포인트 + 프론트엔드 실시간 진행 상태 | 완료 |
+| 2026-03-08 | T022: Streaming Analyze — SSE 스트리밍 분석 엔드포인트 + 프론트엔드 실시간 진행 상태 | 완료 |
 | 2026-03-07 | T016: .env.example 수정 — SDWC_API_URL 값 보정 + 환경별 주석 | 완료 |
 | 2026-03-07 | T017: Frontend API URL fallback 수정 — k3d에서 ERR_CONNECTION_REFUSED 해결 | 완료 |
 | 2026-03-07 | T018: analyze API JSON 파싱 오류 수정 — markdown 코드 블록 스트리핑 누락 | 완료 |
@@ -196,6 +197,14 @@
 - **작업**: .env.example의 SDWC_API_URL을 http://localhost:8080 → http://sdwc.local:8080으로 수정. K8s cluster / k3d 로컬 / direct 실행 3가지 환경별 URL 가이드 주석 추가. README.md 환경 변수 섹션도 업데이트 (이전 대화에서 완료).
 - **변경된 파일**: intake-assistant-api/.env.example (수정), README.md (수정 — 이전 대화), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: k3d 배포 시 Traefik이 Host 헤더 기반 라우팅을 사용하므로 localhost:8080은 동작하지 않음. sdwc.local:8080이 올바른 값.
+- **미완료/후속**: 없음.
+
+### 2026-03-08 — T022: Streaming Analyze Endpoint
+
+- **계획**: POST /api/v1/analyze/stream SSE 스트리밍 엔드포인트 추가. T021의 generate 스트리밍 패턴을 analyze에 적용. 프론트엔드에서 analyzeStream()으로 분석 중 실시간 진행 상태 표시. 기존 /analyze 하위 호환 유지.
+- **작업**: Backend — analyze_stream() AsyncGenerator(SSE 이벤트: status/chunk/result/error), _sse_event() 헬퍼, _strip_code_block() 리팩토링(기존 analyze()에서도 사용), POST /analyze/stream StreamingResponse 엔드포인트. Frontend — analyzeStream()(fetch + ReadableStream 수동 SSE 파싱 + onEvent 콜백), AnalyzeStreamEvent 타입, intakeStore의 submitAnalyze를 스트리밍 전환, IntakePage analyzing phase에 동적 streamStatus 표시.
+- **변경된 파일**: services/analyze_service.py (수정), routers/analyze.py (수정), api/types.ts (수정), api/client.ts (수정), stores/intakeStore.ts (수정), pages/IntakePage/index.tsx (수정), tests/unit/test_analyze_service.py (수정), tests/unit/test_analyze_api.py (수정), docs/intake-assistant-api/21-api-contract.md (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: analyze는 validate-retry 없이 단일 LLM 호출이므로 generate_stream보다 단순한 구조. StatusData.phase에 "analyzing" 추가, attempt를 optional로 변경.
 - **미완료/후속**: 없음.
 
 ### 2026-03-07 — T015: infra/ 매니페스트를 sdwc-platform으로 이관

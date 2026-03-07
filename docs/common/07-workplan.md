@@ -342,6 +342,26 @@ Any active status -> Cancelled
 
 ---
 
+### T022: Streaming Analyze Endpoint (실시간 진행 상태)
+- Status: Done
+- Service: intake-assistant-api, intake-assistant-web
+- Origin: T021
+- Description: POST /api/v1/analyze/stream SSE 스트리밍 엔드포인트 추가. 프론트엔드에서 analyzeStream() 함수로 분석 중 실시간 진행 상태 표시. 기존 /analyze 엔드포인트는 하위 호환 유지.
+- Acceptance Criteria:
+  - [x] analyze_service.py에 analyze_stream() + _sse_event() 추가
+  - [x] routers/analyze.py에 POST /analyze/stream 엔드포인트 추가
+  - [x] api/types.ts에 AnalyzeStreamEvent 타입 추가
+  - [x] api/client.ts에 analyzeStream() 함수 추가
+  - [x] stores/intakeStore.ts의 submitAnalyze를 스트리밍으로 전환
+  - [x] IntakePage analyzing phase에 동적 상태 텍스트 표시
+  - [x] 스트리밍 단위 테스트 (성공/API에러/파싱에러)
+  - [x] API 테스트 (text/event-stream 응답 확인)
+  - [x] 기존 테스트 전체 통과
+  - [x] 21-api-contract.md에 스트리밍 엔드포인트 사양 추가
+- Result: Backend: analyze_stream() AsyncGenerator + _sse_event() 헬퍼 + POST /analyze/stream StreamingResponse 엔드포인트. Frontend: analyzeStream() (fetch + ReadableStream SSE 파싱) + AnalyzeStreamEvent 타입 + intakeStore 스트리밍 전환 + IntakePage 동적 진행 텍스트. 테스트: 서비스 3개 + API 1개 신규, 전체 50개 통과. ruff + build 통과.
+
+---
+
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
      Claude fills the Tasks section during Init based on docs/common/05-roadmap.md.

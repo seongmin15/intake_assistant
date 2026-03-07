@@ -7,6 +7,8 @@
 ## [Unreleased]
 
 ### Added
+- intake-assistant-api: POST /api/v1/analyze/stream SSE 스트리밍 엔드포인트 — 분석 중 LLM 응답 실시간 전달, 진행 상태(analyzing) SSE 이벤트 (T022)
+- intake-assistant-web: 분석 중 실시간 진행 상태 표시 — SSE 스트리밍으로 동적 상태 텍스트 표시 (T022)
 - intake-assistant-api: POST /api/v1/generate/stream SSE 스트리밍 엔드포인트 — LLM 응답 실시간 전달, 진행 상태(generating/validating/retry) SSE 이벤트 (T021)
 - intake-assistant-api: generate 시스템 프롬프트에 prompt caching 적용 (cache_control: ephemeral) — validate-retry 재시도 및 수정 요청 시 캐시 활용 (T020)
 - intake-assistant-web: 생성 중 실시간 진행 상태 표시 — SSE 스트리밍으로 동적 상태 텍스트 + 재시도 횟수 표시 (T021)

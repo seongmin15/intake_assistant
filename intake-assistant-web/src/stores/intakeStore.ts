@@ -64,18 +64,29 @@ export const useIntakeStore = create<IntakeState>((set, get) => ({
 
   submitAnalyze: async () => {
     const { userInput } = get();
-    set({ phase: "analyzing", error: null });
+    set({ phase: "analyzing", error: null, streamStatus: "질문을 생성하고 있습니다..." });
     try {
-      const result = await api.analyze(userInput);
-      set({
-        phase: "questions",
-        questions: result.questions,
-        analysis: result.analysis,
+      await api.analyzeStream(userInput, (event) => {
+        if (event.event === "status") {
+          if (event.data.phase === "analyzing") {
+            set({ streamStatus: "AI가 질문을 생성하고 있습니다..." });
+          }
+        } else if (event.event === "result") {
+          set({
+            phase: "questions",
+            questions: event.data.questions,
+            analysis: event.data.analysis,
+            streamStatus: null,
+          });
+        } else if (event.event === "error") {
+          set({ phase: "error", error: event.data.message, streamStatus: null });
+        }
       });
     } catch (err) {
       set({
         phase: "error",
         error: err instanceof Error ? err.message : "분석 중 오류가 발생했습니다.",
+        streamStatus: null,
       });
     }
   },

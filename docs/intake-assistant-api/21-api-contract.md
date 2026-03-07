@@ -46,6 +46,35 @@
 
 ---
 
+### POST /api/v1/analyze/stream
+
+> SSE 스트리밍 방식으로 동적 질문 생성 (실시간 진행 상태 표시)
+
+- **인증**: False
+
+**요청**
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| user_input | string | True | 사용자의 자유 텍스트 입력 |
+
+**응답**: `text/event-stream` (Server-Sent Events)
+
+| SSE 이벤트 | data 필드 | 설명 |
+|------------|-----------|------|
+| status | phase | 진행 상태 (analyzing) |
+| chunk | text | LLM 응답 텍스트 조각 (실시간 스트리밍) |
+| result | questions, analysis | 최종 분석 결과 (/analyze 응답과 동일) |
+| error | message | 에러 발생 시 에러 메시지 |
+
+**처리 로직**
+
+1. /api/v1/analyze와 동일한 로직 (Haiku 호출 + 질문 생성)
+2. 차이점: LLM 응답을 실시간 스트리밍 (`client.messages.stream()` 사용)
+3. 진행 상태를 SSE 이벤트로 클라이언트에 실시간 전달
+
+---
+
 ### POST /api/v1/generate
 
 > 사용자 입력 + Q&A 응답을 기반으로 intake_data.yaml 전체 생성
