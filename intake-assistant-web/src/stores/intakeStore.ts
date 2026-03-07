@@ -20,6 +20,8 @@ type IntakePhase =
   | "complete"
   | "error";
 
+type ErrorSource = "analyze" | "generate" | "finalize" | null;
+
 interface IntakeState {
   phase: IntakePhase;
   userInput: string;
@@ -30,6 +32,7 @@ interface IntakeState {
   architectureCard: ArchitectureCard | null;
   featureChecklist: FeatureItem[];
   error: string | null;
+  errorSource: ErrorSource;
   streamStatus: string | null;
   streamAttempt: number;
 
@@ -40,6 +43,8 @@ interface IntakeState {
   startRevision: () => void;
   submitRevision: (revisionRequest: string) => Promise<void>;
   submitFinalize: () => Promise<void>;
+  retryAnalyze: () => Promise<void>;
+  retryGenerate: () => Promise<void>;
   reset: () => void;
 }
 
@@ -53,6 +58,7 @@ const initialState = {
   architectureCard: null as ArchitectureCard | null,
   featureChecklist: [] as FeatureItem[],
   error: null as string | null,
+  errorSource: null as ErrorSource,
   streamStatus: null as string | null,
   streamAttempt: 0,
 };
@@ -79,13 +85,14 @@ export const useIntakeStore = create<IntakeState>((set, get) => ({
             streamStatus: null,
           });
         } else if (event.event === "error") {
-          set({ phase: "error", error: event.data.message, streamStatus: null });
+          set({ phase: "error", error: event.data.message, errorSource: "analyze", streamStatus: null });
         }
       });
     } catch (err) {
       set({
         phase: "error",
         error: err instanceof Error ? err.message : "분석 중 오류가 발생했습니다.",
+        errorSource: "analyze",
         streamStatus: null,
       });
     }
@@ -124,13 +131,14 @@ export const useIntakeStore = create<IntakeState>((set, get) => ({
             streamAttempt: 0,
           });
         } else if (event.event === "error") {
-          set({ phase: "error", error: event.data.message, streamStatus: null, streamAttempt: 0 });
+          set({ phase: "error", error: event.data.message, errorSource: "generate", streamStatus: null, streamAttempt: 0 });
         }
       });
     } catch (err) {
       set({
         phase: "error",
         error: err instanceof Error ? err.message : "생성 중 오류가 발생했습니다.",
+        errorSource: "generate",
         streamStatus: null,
         streamAttempt: 0,
       });
@@ -170,7 +178,7 @@ export const useIntakeStore = create<IntakeState>((set, get) => ({
               streamAttempt: 0,
             });
           } else if (event.event === "error") {
-            set({ phase: "error", error: event.data.message, streamStatus: null, streamAttempt: 0 });
+            set({ phase: "error", error: event.data.message, errorSource: "generate", streamStatus: null, streamAttempt: 0 });
           }
         },
         revisionRequest,
@@ -180,6 +188,7 @@ export const useIntakeStore = create<IntakeState>((set, get) => ({
       set({
         phase: "error",
         error: err instanceof Error ? err.message : "수정 중 오류가 발생했습니다.",
+        errorSource: "generate",
         streamStatus: null,
         streamAttempt: 0,
       });
@@ -203,8 +212,17 @@ export const useIntakeStore = create<IntakeState>((set, get) => ({
       set({
         phase: "error",
         error: err instanceof Error ? err.message : "다운로드 중 오류가 발생했습니다.",
+        errorSource: "finalize",
       });
     }
+  },
+
+  retryAnalyze: async () => {
+    await get().submitAnalyze();
+  },
+
+  retryGenerate: async () => {
+    await get().submitGenerate();
   },
 
   reset: () => set(initialState),

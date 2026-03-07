@@ -392,15 +392,15 @@ Any active status -> Cancelled
 ---
 
 ### T025: Error Recovery UX
-- Status: Ready
+- Status: Done
 - Service: intake-assistant-web
 - Description: generate 에러 발생 시 "처음부터 다시 시작" 대신 "생성 재시도" 옵션을 제공하여, 사용자가 질문 응답을 다시 하지 않고 generate만 재시도할 수 있게 한다. analyze 에러도 동일하게 "분석 재시도" 옵션 제공.
 - Acceptance Criteria:
-  - [ ] generate 에러 시 "생성 재시도" 버튼 추가 (questions phase로 복귀)
-  - [ ] analyze 에러 시 "분석 재시도" 버튼 추가 (input phase로 복귀, 입력 유지)
-  - [ ] "처음부터 다시 시작" 버튼도 유지 (전체 리셋)
-  - [ ] 기존 테스트 통과 + 빌드 성공
-- Result:
+  - [x] generate 에러 시 "생성 재시도" 버튼 추가 (questions phase로 복귀)
+  - [x] analyze 에러 시 "분석 재시도" 버튼 추가 (input phase로 복귀, 입력 유지)
+  - [x] "처음부터 다시 시작" 버튼도 유지 (전체 리셋)
+  - [x] 기존 테스트 통과 + 빌드 성공
+- Result: intakeStore에 errorSource 상태 + retryAnalyze/retryGenerate 액션 추가. IntakePage 에러 phase에 errorSource별 재시도 버튼(분석 재시도/생성 재시도/다시 시도) + 처음부터 다시 시작 버튼 조건부 렌더링. E2E 테스트 7개(기존 5개 업데이트 + 재시도 성공 2개 신규), 총 13개 통과. 빌드 + lint 통과.
 
 ---
 

@@ -14,6 +14,7 @@ export function IntakePage() {
     architectureCard,
     featureChecklist,
     error,
+    errorSource,
     streamStatus,
     streamAttempt,
     setUserInput,
@@ -23,6 +24,8 @@ export function IntakePage() {
     startRevision,
     submitRevision,
     submitFinalize,
+    retryAnalyze,
+    retryGenerate,
     reset,
   } = useIntakeStore();
 
@@ -148,13 +151,42 @@ export function IntakePage() {
         {phase === "error" && (
           <div className="flex flex-col items-center gap-4 py-16">
             <p className="text-sm text-red-600">{error}</p>
-            <button
-              type="button"
-              onClick={reset}
-              className="rounded-lg bg-gray-200 px-6 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-300"
-            >
-              처음부터 다시 시작
-            </button>
+            <div className="flex gap-3">
+              {errorSource === "analyze" && (
+                <button
+                  type="button"
+                  onClick={() => void retryAnalyze()}
+                  className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                >
+                  분석 재시도
+                </button>
+              )}
+              {errorSource === "generate" && (
+                <button
+                  type="button"
+                  onClick={() => void retryGenerate()}
+                  className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                >
+                  생성 재시도
+                </button>
+              )}
+              {errorSource === "finalize" && (
+                <button
+                  type="button"
+                  onClick={() => void submitFinalize()}
+                  className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                >
+                  다시 시도
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={reset}
+                className="rounded-lg bg-gray-200 px-6 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-300"
+              >
+                처음부터 다시 시작
+              </button>
+            </div>
           </div>
         )}
       </div>
