@@ -39,5 +39,23 @@ class SDwCClient:
             await logger.aerror("sdwc_validate_failed", url=url, error=str(exc))
             raise ExternalServiceError("SDwC", f"Validation request failed: {exc}") from exc
 
+    async def generate_zip(self, yaml_content: str) -> bytes:
+        """Send YAML to SDwC /api/v1/generate and return ZIP bytes."""
+        from intake_assistant_api.core.exceptions import ExternalServiceError
+
+        url = f"{self._base_url}/api/v1/generate"
+        try:
+            resp = await self._http.post(
+                url,
+                json={"yaml_content": yaml_content},
+                timeout=30.0,
+            )
+            resp.raise_for_status()
+            await logger.ainfo("sdwc_generate_completed", size=len(resp.content))
+            return resp.content
+        except httpx.HTTPError as exc:
+            await logger.aerror("sdwc_generate_failed", url=url, error=str(exc))
+            raise ExternalServiceError("SDwC", f"ZIP generation failed: {exc}") from exc
+
     async def close(self) -> None:
         await self._http.aclose()

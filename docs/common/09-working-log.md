@@ -14,6 +14,7 @@
 | 2026-03-07 | T002: Frontend 프로젝트 초기화 — React + Vite + Tailwind + Zustand + Router | 완료 |
 | 2026-03-07 | T004: POST /api/v1/analyze — Haiku 기반 동적 질문 생성 엔드포인트 | 완료 |
 | 2026-03-07 | T005: POST /api/v1/generate — Sonnet 기반 YAML 생성 + validate-retry 엔드포인트 | 완료 |
+| 2026-03-07 | T006: POST /api/v1/finalize — SDwC ZIP 생성 + 스트림 응답 엔드포인트 | 완료 |
 
 <!-- Claude: §5.8 작업 완료, §5.12 작업 중단/취소 시 한 줄 추가.
      작업 내용은 "무엇을 왜" 중심 1줄 요약.
@@ -72,3 +73,11 @@
 - **변경된 파일**: schemas/generate.py (신규), services/prompts/generate.py (신규), services/generate_service.py (신규), routers/generate.py (신규), services/sdwc_client.py (수정), main.py (수정), tests/unit/test_generate_service.py (신규), tests/unit/test_generate_api.py (신규), tests/unit/test_sdwc_client.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: YAML/JSON 블록 파싱은 regex로 ```yaml/```json 마커 기반 추출. validate-retry 시 에러 피드백을 JSON 직렬화하여 user message에 포함. 파싱 에러는 즉시 실패(재시도 불가).
 - **미완료/후속**: 없음. T006(finalize) 또는 T007~T008(프론트엔드) 진행 가능.
+
+### 2026-03-07 — T006: POST /api/v1/finalize 구현 (ZIP 생성)
+
+- **계획**: SDwCClient.generate_zip 추가(POST /api/v1/generate, 30초 타임아웃, bytes 반환). schemas/finalize.py(FinalizeRequest), routers/finalize.py(StreamingResponse로 ZIP 반환), main.py에 router 등록, 단위 테스트.
+- **작업**: FinalizeRequest 스키마(yaml_content min_length=1), finalize 라우터(StreamingResponse + application/zip + Content-Disposition), SDwCClient.generate_zip(POST /api/v1/generate, 30초 타임아웃, ExternalServiceError). API 테스트 4개 + SDwC 테스트 3개.
+- **변경된 파일**: schemas/finalize.py (신규), routers/finalize.py (신규), services/sdwc_client.py (수정), main.py (수정), tests/unit/test_finalize_api.py (신규), tests/unit/test_sdwc_client.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: 서비스 레이어 불필요 — 라우터에서 직접 SDwCClient.generate_zip 호출 (비즈니스 로직 없음)
+- **미완료/후속**: 없음. 백엔드 API 3개 엔드포인트(analyze, generate, finalize) 완성. T007~T010 프론트엔드 진행 가능.
