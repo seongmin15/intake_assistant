@@ -285,6 +285,19 @@ Any active status -> Cancelled
 
 ---
 
+### T018: analyze API 응답 JSON 파싱 오류 수정
+- Status: Done
+- Service: intake-assistant-api
+- Origin: T004
+- Description: Anthropic Haiku가 JSON을 markdown 코드 블록(```json ... ```)으로 감싸서 반환하는 경우 json.loads() 파싱 실패 (500 에러). generate_service.py에는 이미 코드 블록 스트리핑 로직이 있으나 analyze_service.py에는 누락.
+- Acceptance Criteria:
+  - [x] analyze_service.py에 markdown 코드 블록 스트리핑 추가
+  - [x] 단위 테스트 추가 (코드 블록 감싸진 응답 케이스)
+  - [x] 10-changelog 기록
+- Result: analyze_service.py에 regex 기반 코드 블록 스트리핑 추가 (```json 및 ``` 모두 처리). 단위 테스트 2개 추가, 전체 7개 통과.
+
+---
+
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
      Claude fills the Tasks section during Init based on docs/common/05-roadmap.md.
