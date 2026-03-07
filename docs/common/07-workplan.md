@@ -70,16 +70,16 @@ Any active status -> Cancelled
 ---
 
 ### T002: Frontend 프로젝트 초기화 (React + Vite + Tailwind)
-- Status: Ready
+- Status: Done
 - Service: intake-assistant-web
 - Description: Vite + React + TypeScript 프로젝트 생성, Tailwind CSS 설정, Zustand 설치, 기본 라우팅(ModeSelectorPage, IntakePage) 구조 설정
 - Acceptance Criteria:
-  - [ ] `npm create vite` + React + TypeScript 템플릿
-  - [ ] Tailwind CSS 설정 완료
-  - [ ] Zustand 설치
-  - [ ] React Router로 `/` (ModeSelectorPage) + `/intake` (IntakePage) 라우팅
-  - [ ] `npm run dev`로 개발 서버 기동 확인
-- Result:
+  - [x] `npm create vite` + React + TypeScript 템플릿
+  - [x] Tailwind CSS 설정 완료
+  - [x] Zustand 설치
+  - [x] React Router로 `/` (ModeSelectorPage) + `/intake` (IntakePage) 라우팅
+  - [x] `npm run dev`로 개발 서버 기동 확인
+- Result: Vite + React 19 + TypeScript 프로젝트 생성 완료. Tailwind CSS v4 (@tailwindcss/vite), Zustand v5, React Router v7 설정. App/router/providers 구조, ModeSelectorPage·IntakePage 플레이스홀더, ESLint + Prettier + Vitest 설정. 빌드·lint 통과.
 
 ---
 

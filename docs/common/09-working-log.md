@@ -11,6 +11,7 @@
 |------|------|------|
 | 2026-03-07 | 프로젝트 Init — README.md, .gitignore 생성, git init, remote push, 07-workplan 초기 태스크 작성 | 완료 |
 | 2026-03-07 | T001: Backend 프로젝트 초기화 — Poetry + FastAPI 스켈레톤, 환경변수, 프로젝트 구조 | 완료 |
+| 2026-03-07 | T002: Frontend 프로젝트 초기화 — React + Vite + Tailwind + Zustand + Router | 완료 |
 
 <!-- Claude: §5.8 작업 완료, §5.12 작업 중단/취소 시 한 줄 추가.
      작업 내용은 "무엇을 왜" 중심 1줄 요약.
@@ -38,3 +39,10 @@
 - **변경된 파일**: intake-assistant-api/ 전체 (신규), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: src/ layout 사용 (패키지 설치 시 import 경로 명확), structlog의 filtering bound logger에 logging.INFO 사용
 - **미완료/후속**: 없음. T002 (Frontend 초기화) 또는 T003 (헬스체크 + SDwC 템플릿 동기화) 진행 가능.
+
+### 2026-03-07 — T002: Frontend 프로젝트 초기화
+
+- **작업**: Vite + React 19 + TypeScript 프로젝트 생성. Tailwind CSS v4, Zustand v5, React Router v7 설정. App/router/providers 구조, ModeSelectorPage·IntakePage 플레이스홀더 페이지, ESLint + Prettier + Vitest 환경 구성.
+- **변경된 파일**: intake-assistant-web/ 전체 (신규), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: Tailwind v4 (@tailwindcss/vite 플러그인), path alias `@/` 사용, `src/app/` 하위에 App·router·providers 분리
+- **미완료/후속**: 없음. T003~T007 중 선택하여 진행 가능.
