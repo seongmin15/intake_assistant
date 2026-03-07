@@ -155,6 +155,21 @@ def _build_per_service_fields(phases: dict) -> str:
                     base_name = field_name.rstrip("s") if field_name.endswith("s") else field_name
                     sub_notes.append(f"  - each {base_name}: {', '.join(child_req)}")
 
+                # Recurse one more level for grandchildren (e.g., screens.components)
+                for cn, ci in children.items():
+                    if not isinstance(ci, dict):
+                        continue
+                    gc = ci.get("children", {})
+                    if not gc:
+                        continue
+                    gc_req = [
+                        gcn for gcn, gci in gc.items()
+                        if isinstance(gci, dict) and gci.get("requirement") == "required"
+                    ]
+                    if gc_req:
+                        gc_base = cn.rstrip("s") if cn.endswith("s") else cn
+                        sub_notes.append(f"  - each {gc_base}: {', '.join(gc_req)}")
+
         if specific_required:
             lines.append("- " + ", ".join(specific_required))
         for note in sub_notes:

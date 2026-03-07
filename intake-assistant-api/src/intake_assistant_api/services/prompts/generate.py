@@ -87,6 +87,7 @@ All service types share: name, type, responsibility, build_tool, deployment.targ
 - language, framework, approach, min_os_versions
 - screens[≥1] (each: name, purpose, key_interactions, connected_endpoints,
   states, components[])
+  - each component: name, purpose
 
 ### data_pipeline
 - language, framework
@@ -275,6 +276,7 @@ WRONG — mobile_app service missing required fields:
       # MUST include: responsibility, approach, framework,
       # min_os_versions, screens (at least 1 with name, purpose,
       # key_interactions, connected_endpoints, states, components)
+      # Each component MUST have: name, purpose
 
 WRONG — security requirement missing required fields:
   security:
