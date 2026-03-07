@@ -272,6 +272,19 @@ Any active status -> Cancelled
 
 ---
 
+### T017: Frontend API URL fallback 수정 (k3d 환경 대응)
+- Status: Done
+- Service: intake-assistant-web
+- Origin: T016
+- Description: client.ts의 VITE_API_URL fallback이 http://localhost:8000이라 k3d 환경에서 브라우저가 직접 localhost:8000에 요청하여 ERR_CONNECTION_REFUSED 발생. fallback을 빈 문자열("")로 변경하여 상대 경로로 요청하면 nginx가 /api/를 backend로 프록시.
+- Acceptance Criteria:
+  - [x] client.ts의 API_URL fallback → "" (빈 문자열)
+  - [x] .env.example 주석으로 로컬 개발 시 설정 안내
+  - [x] 10-changelog 기록
+- Result: client.ts fallback을 ""로 변경. k3d에서는 상대 경로(/api/v1/...)로 요청하여 nginx 프록시 경유. 로컬 dev는 .env에서 VITE_API_URL=http://localhost:8000 설정.
+
+---
+
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
      Claude fills the Tasks section during Init based on docs/common/05-roadmap.md.

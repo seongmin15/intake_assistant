@@ -28,6 +28,7 @@
 
 ### Fixed
 - intake-assistant-api: SDwC API 연동 — JSON body → multipart file upload으로 변경 (validate, generate 엔드포인트), validate 응답 필드명 `success`→`valid`, `error`→`errors`로 수정 (T013)
+- intake-assistant-web: API URL fallback을 빈 문자열로 변경 — k3d 환경에서 ERR_CONNECTION_REFUSED 해결 (T017)
 
 ### Removed
 - infra/ 디렉토리 삭제 — K8s 매니페스트를 sdwc-platform 레포(manifests/intake/)로 이관하여 중앙 관리 (T015)
