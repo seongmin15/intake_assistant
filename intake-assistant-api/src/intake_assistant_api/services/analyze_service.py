@@ -1,5 +1,6 @@
 import asyncio
 import json
+import re
 
 import structlog
 from anthropic import APIConnectionError, APIError, AsyncAnthropic
@@ -30,6 +31,10 @@ async def analyze(client: AsyncAnthropic, user_input: str) -> AnalyzeResponse:
             )
 
             text = response.content[0].text  # type: ignore[union-attr]
+            # Strip markdown code block wrapper if present
+            block_match = re.search(r"```(?:json)?\s*\n(.*?)```", text, re.DOTALL)
+            if block_match:
+                text = block_match.group(1)
             data = json.loads(text)
             return AnalyzeResponse.model_validate(data)
 

@@ -109,6 +109,25 @@ async def test_analyze_raises_after_max_retries() -> None:
     assert client.messages.create.call_count == 3
 
 
+async def test_analyze_strips_markdown_code_block() -> None:
+    wrapped = f"```json\n{json.dumps(VALID_RESPONSE_DATA)}\n```"
+    client = _make_mock_client(wrapped)
+
+    result = await analyze(client, "할 일 관리 앱을 만들고 싶어요")
+
+    assert len(result.questions) == 3
+    assert result.questions[0].id == "q1"
+
+
+async def test_analyze_strips_code_block_without_language_tag() -> None:
+    wrapped = f"```\n{json.dumps(VALID_RESPONSE_DATA)}\n```"
+    client = _make_mock_client(wrapped)
+
+    result = await analyze(client, "할 일 관리 앱을 만들고 싶어요")
+
+    assert len(result.questions) == 3
+
+
 async def test_analyze_raises_on_invalid_json_response() -> None:
     client = _make_mock_client("this is not json")
 
