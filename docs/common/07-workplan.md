@@ -97,16 +97,16 @@ Any active status -> Cancelled
 ---
 
 ### T004: POST /api/v1/analyze 구현 (동적 질문 생성)
-- Status: Ready
+- Status: Done
 - Service: intake-assistant-api
 - Description: 사용자 자유 텍스트를 받아 Haiku를 호출하여 Q1~Q4 동적 질문 + 분석 결과를 반환하는 엔드포인트 구현.
 - Acceptance Criteria:
-  - [ ] POST /api/v1/analyze → questions + analysis 응답
-  - [ ] Anthropic Haiku 호출 + 시스템 프롬프트 작성
-  - [ ] 입력 텍스트 길이 제한 (Pydantic validation)
-  - [ ] Anthropic API 실패 시 재시도 로직 (3회)
-  - [ ] 단위 테스트 (mock Anthropic 응답)
-- Result:
+  - [x] POST /api/v1/analyze → questions + analysis 응답
+  - [x] Anthropic Haiku 호출 + 시스템 프롬프트 작성
+  - [x] 입력 텍스트 길이 제한 (Pydantic validation)
+  - [x] Anthropic API 실패 시 재시도 로직 (3회)
+  - [x] 단위 테스트 (mock Anthropic 응답)
+- Result: schemas/analyze.py, services/prompts/analyze.py, services/analyze_service.py, routers/analyze.py 신규 생성. main.py에 AsyncAnthropic client lifecycle + analyze router 추가. Haiku 호출 + exponential backoff 재시도(3회). Pydantic validation(1~5000자). 단위 테스트 10개(서비스 5 + API 5) 전체 통과. ruff lint/format 통과.
 
 ---
 
