@@ -57,15 +57,15 @@ Any active status -> Cancelled
 ## Tasks
 
 ### T001: Backend 프로젝트 초기화 (FastAPI + Poetry)
-- Status: Ready
+- Status: Done
 - Service: intake-assistant-api
 - Description: Poetry 프로젝트 생성, FastAPI 앱 스켈레톤, 환경 변수 설정(ANTHROPIC_API_KEY, SDWC_API_URL), 기본 프로젝트 구조(app/main.py, app/config.py 등) 구성
 - Acceptance Criteria:
-  - [ ] poetry init + pyproject.toml에 핵심 의존성(fastapi, uvicorn, anthropic, httpx, pyyaml, pydantic) 추가
-  - [ ] `uvicorn app.main:app --reload`로 서버 기동 확인
-  - [ ] 환경 변수 로딩 구조 (pydantic Settings)
-  - [ ] 프로젝트 디렉토리 구조 생성
-- Result:
+  - [x] poetry init + pyproject.toml에 핵심 의존성(fastapi, uvicorn, anthropic, httpx, pyyaml, pydantic) 추가
+  - [x] `uvicorn app.main:app --reload`로 서버 기동 확인
+  - [x] 환경 변수 로딩 구조 (pydantic Settings)
+  - [x] 프로젝트 디렉토리 구조 생성
+- Result: Poetry 프로젝트 생성 완료. FastAPI 앱 스켈레톤 (lifespan, CORS, 글로벌 예외 핸들러), pydantic-settings 기반 config, structlog 설정, /api/v1/health 엔드포인트, 도메인 예외 체계, 테스트 conftest. ruff 린트 통과.
 
 ---
 
