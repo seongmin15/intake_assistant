@@ -12,6 +12,7 @@
 | 2026-03-07 | 프로젝트 Init — README.md, .gitignore 생성, git init, remote push, 07-workplan 초기 태스크 작성 | 완료 |
 | 2026-03-07 | T001: Backend 프로젝트 초기화 — Poetry + FastAPI 스켈레톤, 환경변수, 프로젝트 구조 | 완료 |
 | 2026-03-07 | T002: Frontend 프로젝트 초기화 — React + Vite + Tailwind + Zustand + Router | 완료 |
+| 2026-03-07 | T004: POST /api/v1/analyze — Haiku 기반 동적 질문 생성 엔드포인트 | 완료 |
 
 <!-- Claude: §5.8 작업 완료, §5.12 작업 중단/취소 시 한 줄 추가.
      작업 내용은 "무엇을 왜" 중심 1줄 요약.
@@ -54,3 +55,11 @@
 - **변경된 파일**: schemas/health.py, services/sdwc_client.py, services/template_cache.py, routers/health.py (신규), main.py (수정), tests/unit/test_health.py, tests/unit/test_sdwc_client.py (신규), pyproject.toml (respx 추가), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: template_cache를 모듈 변수로 단순 관리 (stateless 서버), respx로 httpx mock
 - **미완료/후속**: 없음. T004~T007 중 선택하여 진행 가능.
+
+### 2026-03-07 — T004: POST /api/v1/analyze 구현 (동적 질문 생성)
+
+- **계획**: 사용자 자유 텍스트를 받아 Haiku 호출로 Q1~Q4 동적 질문 + 분석 결과를 반환하는 엔드포인트 구현. schemas/analyze.py, services/prompts/analyze.py, services/analyze_service.py, routers/analyze.py 신규 생성. main.py에 Anthropic client + router 추가. 단위 테스트 작성.
+- **작업**: AnalyzeRequest/Response 스키마, 시스템 프롬프트(Korean, JSON output), analyze_service(Haiku 호출 + 3회 exponential backoff), 얇은 라우터, main.py에 AsyncAnthropic lifecycle + router 등록. 서비스 테스트 5개 + API 테스트 5개.
+- **변경된 파일**: schemas/analyze.py (신규), services/prompts/__init__.py (신규), services/prompts/analyze.py (신규), services/analyze_service.py (신규), routers/analyze.py (신규), main.py (수정), tests/unit/test_analyze_service.py (신규), tests/unit/test_analyze_api.py (신규), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: PydanticValidationError도 파싱 에러로 캐치하여 ExternalServiceError로 변환 (Anthropic이 잘못된 구조 반환 시)
+- **미완료/후속**: 없음. T005(generate) 또는 T007~T008(프론트엔드) 진행 가능.
