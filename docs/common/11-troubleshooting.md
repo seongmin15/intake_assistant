@@ -27,3 +27,10 @@
 - **해결**: `_find_raw_yaml()` fallback 추가 — 코드 펜스 밖에서 `project_name:` 또는 `project:`로 시작하는 YAML 텍스트를 탐지. JSON도 `"architecture_card"` 키를 포함하는 raw JSON fallback 추가.
 - **예방**: LLM 응답 파싱 시 코드 펜스 의존도를 낮추고, 내용 기반 휴리스틱 fallback을 항상 포함. T019에서 유사 수정을 했으나 raw content fallback은 누락되어 있었음.
 - **발견일**: 2026-03-08
+
+### [런타임] generate API — "No JSON block found in response"
+- **증상**: POST /api/v1/generate/stream 호출 시 `응답 형식 오류: No JSON block found in response` 에러 반환. YAML은 파싱 성공했으나 JSON 메타데이터 블록을 찾지 못함.
+- **원인**: raw JSON fallback의 regex `\{[^{}]*"architecture_card".*\}`가 중첩 brace를 포함한 JSON을 매칭하지 못함. `[^{}]*`가 내부 `{}`를 건너뛸 수 없어 실패.
+- **해결**: regex 대신 `_find_raw_json()` 헬퍼 추가 — `"architecture_card"` 키워드를 찾고 역방향으로 `{` 탐색 후 brace-balancing으로 정확한 JSON 범위 추출.
+- **예방**: 중첩 구조가 있는 JSON/YAML 파싱에 regex 대신 brace-balancing 또는 구조적 파서 사용.
+- **발견일**: 2026-03-08

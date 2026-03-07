@@ -40,6 +40,30 @@ def _extract_block(text: str, language: str) -> str | None:
 _YAML_START_KEYS = ("project_name:", "project:")
 
 
+def _find_raw_json(text: str) -> str | None:
+    """Find a raw JSON object containing 'architecture_card' using brace balancing."""
+    keyword = '"architecture_card"'
+    idx = text.find(keyword)
+    if idx == -1:
+        return None
+
+    # Walk backwards to find the opening brace
+    start = text.rfind("{", 0, idx)
+    if start == -1:
+        return None
+
+    # Walk forward with brace balancing to find the matching close
+    depth = 0
+    for i in range(start, len(text)):
+        if text[i] == "{":
+            depth += 1
+        elif text[i] == "}":
+            depth -= 1
+            if depth == 0:
+                return text[start : i + 1]
+    return None
+
+
 def _find_raw_yaml(text: str) -> str | None:
     """Find raw YAML content outside code fences by scanning for top-level keys."""
     for key in _YAML_START_KEYS:
@@ -88,9 +112,7 @@ def _parse_response(text: str) -> tuple[str, dict]:
 
     # Fallback 2: raw JSON outside code fences
     if not json_content:
-        match = re.search(r"\{[^{}]*\"architecture_card\".*\}", text, re.DOTALL)
-        if match:
-            json_content = match.group(0).strip()
+        json_content = _find_raw_json(text)
 
     if not json_content:
         raise ValueError("No JSON block found in response")
