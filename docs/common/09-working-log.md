@@ -148,3 +148,10 @@
 - **변경된 파일**: infra/intake-assistant-api/deployment.yaml (신규), infra/intake-assistant-web/deployment.yaml (신규), intake-assistant-api/src/intake_assistant_api/core/config.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: sdwc-platform-infra-guide 지시대로 config.py 기본값을 K8s 내부 DNS로 변경. 로컬 개발은 .env 오버라이드.
 - **미완료/후속**: 없음. T013~T014 완료.
+
+### 2026-03-07 — T015: infra/ 매니페스트를 sdwc-platform으로 이관
+
+- **작업**: intake-assistant의 infra/ 매니페스트를 sdwc-platform/manifests/intake/로 이동. sdwc-platform의 deploy-all.sh 경로 변경($INTAKE_DIR/infra/ → $PLATFORM_ROOT/manifests/intake/), ArgoCD intake-app.yaml source를 sdwc-platform 레포로 변경. intake-assistant에서 infra/ 삭제.
+- **변경된 파일**: [sdwc-platform] manifests/intake/intake-assistant-api/deployment.yaml (신규), manifests/intake/intake-assistant-web/deployment.yaml (신규), scripts/deploy-all.sh (수정), argocd/intake-app.yaml (수정). [intake-assistant] infra/ (삭제), README.md (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: SDwC 매니페스트가 sdwc-platform/manifests/sdwc/에 있는 패턴과 통일. 각 서비스 레포는 소스코드+Dockerfile만 관리, 배포 매니페스트는 sdwc-platform에서 중앙 관리.
+- **미완료/후속**: 없음.

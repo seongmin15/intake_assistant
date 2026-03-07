@@ -112,9 +112,6 @@ intake-assistant/
 │   └── intake-assistant-web/          # Web 코딩/배포/테스트 규칙
 ├── intake-assistant-api/              # Backend 소스 (FastAPI + Poetry)
 ├── intake-assistant-web/              # Frontend 소스 (React + Vite)
-├── infra/                             # K8s Deployment + Service 매니페스트
-│   ├── intake-assistant-api/
-│   └── intake-assistant-web/
 └── .github/workflows/                 # CI 파이프라인 (lint, test, GHCR push)
 ```
 

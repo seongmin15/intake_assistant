@@ -28,9 +28,12 @@
 ### Fixed
 - intake-assistant-api: SDwC API 연동 — JSON body → multipart file upload으로 변경 (validate, generate 엔드포인트), validate 응답 필드명 `success`→`valid`, `error`→`errors`로 수정 (T013)
 
+### Removed
+- infra/ 디렉토리 삭제 — K8s 매니페스트를 sdwc-platform 레포(manifests/intake/)로 이관하여 중앙 관리 (T015)
+
 ### Infrastructure
-- intake-assistant-api: K8s Deployment + ClusterIP Service 매니페스트 추가 (SDWC_API_URL env, ANTHROPIC_API_KEY secret, liveness/readiness probes) (T014)
-- intake-assistant-web: K8s Deployment + ClusterIP Service 매니페스트 추가 (T014)
+- intake-assistant-api: K8s Deployment + ClusterIP Service 매니페스트 추가 (SDWC_API_URL env, ANTHROPIC_API_KEY secret, liveness/readiness probes) (T014) → sdwc-platform으로 이관 (T015)
+- intake-assistant-web: K8s Deployment + ClusterIP Service 매니페스트 추가 (T014) → sdwc-platform으로 이관 (T015)
 
 <!-- Claude: §5.8 작업 완료 시 해당 변경을 [Unreleased]에 기록.
      분류 기준:

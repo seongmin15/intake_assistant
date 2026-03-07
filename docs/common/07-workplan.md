@@ -244,6 +244,22 @@ Any active status -> Cancelled
 
 ---
 
+### T015: infra/ 매니페스트를 sdwc-platform으로 이관
+- Status: Done
+- Service: intake-assistant-api, intake-assistant-web
+- Origin: T014
+- Description: intake-assistant의 infra/ K8s 매니페스트를 sdwc-platform/manifests/intake/로 이관. 모든 인프라/배포 설정은 sdwc-platform 레포에서 중앙 관리하는 패턴 통일. intake-assistant에서 infra/ 삭제. sdwc-platform의 deploy-all.sh, ArgoCD 설정 업데이트.
+- Acceptance Criteria:
+  - [x] sdwc-platform/manifests/intake/ 에 매니페스트 이동
+  - [x] sdwc-platform deploy-all.sh — intake 매니페스트 경로 변경
+  - [x] sdwc-platform argocd/intake-app.yaml — source를 sdwc-platform 레포로 변경
+  - [x] intake-assistant infra/ 삭제
+  - [x] intake-assistant README.md에서 infra/ 제거
+  - [x] intake-assistant 10-changelog 기록
+- Result: sdwc-platform에 manifests/intake/ 생성 및 매니페스트 이동, deploy-all.sh 경로 변경, ArgoCD intake-app.yaml source를 sdwc-platform 레포로 변경, sdwc-platform 커밋+푸시 완료. intake-assistant에서 infra/ 삭제, README/changelog 업데이트.
+
+---
+
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
      Claude fills the Tasks section during Init based on docs/common/05-roadmap.md.
