@@ -6,6 +6,9 @@
 
 ## [Unreleased]
 
+### Changed
+- intake-assistant-api: generate 시스템 프롬프트 강화 — enum 값 치트시트, 필수 섹션 체크리스트, 배열 최소 요건, 교차 참조 규칙, 흔한 실수 예시 추가로 SDwC validation 첫 시도 통과율 향상 (T023)
+
 ### Added
 - intake-assistant-api: POST /api/v1/analyze/stream SSE 스트리밍 엔드포인트 — 분석 중 LLM 응답 실시간 전달, 진행 상태(analyzing) SSE 이벤트 (T022)
 - intake-assistant-web: 분석 중 실시간 진행 상태 표시 — SSE 스트리밍으로 동적 상태 텍스트 표시 (T022)

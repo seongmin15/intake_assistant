@@ -24,6 +24,7 @@
 | 2026-03-08 | T020: Prompt Caching — generate 시스템 프롬프트에 cache_control 적용 | 완료 |
 | 2026-03-08 | T021: Streaming Generate — SSE 스트리밍 엔드포인트 + 프론트엔드 실시간 진행 상태 | 완료 |
 | 2026-03-08 | T022: Streaming Analyze — SSE 스트리밍 분석 엔드포인트 + 프론트엔드 실시간 진행 상태 | 완료 |
+| 2026-03-08 | T023: Prompt Quality Tuning — generate 프롬프트 강화로 validation 첫 시도 통과율 향상 | 완료 |
 | 2026-03-07 | T016: .env.example 수정 — SDWC_API_URL 값 보정 + 환경별 주석 | 완료 |
 | 2026-03-07 | T017: Frontend API URL fallback 수정 — k3d에서 ERR_CONNECTION_REFUSED 해결 | 완료 |
 | 2026-03-07 | T018: analyze API JSON 파싱 오류 수정 — markdown 코드 블록 스트리핑 누락 | 완료 |
@@ -197,6 +198,14 @@
 - **작업**: .env.example의 SDWC_API_URL을 http://localhost:8080 → http://sdwc.local:8080으로 수정. K8s cluster / k3d 로컬 / direct 실행 3가지 환경별 URL 가이드 주석 추가. README.md 환경 변수 섹션도 업데이트 (이전 대화에서 완료).
 - **변경된 파일**: intake-assistant-api/.env.example (수정), README.md (수정 — 이전 대화), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: k3d 배포 시 Traefik이 Host 헤더 기반 라우팅을 사용하므로 localhost:8080은 동작하지 않음. sdwc.local:8080이 올바른 값.
+- **미완료/후속**: 없음.
+
+### 2026-03-08 — T023: Prompt Quality Tuning
+
+- **계획**: generate 시스템 프롬프트에 SDwC intake_template.yaml 스키마에서 추출한 enum 값 치트시트, 필수 섹션 체크리스트, 배열 최소 요건, 교차 참조 규칙, 흔한 실수 예시를 추가하여 validation 첫 시도 통과율을 높인다.
+- **작업**: GENERATE_SYSTEM_PROMPT에 5개 섹션 추가 — (1) Required Sections Checklist: 19개 필수 top-level 섹션과 필수 sub-field 나열, (2) Array Minimum Requirements: 16개 "at least 1" 배열 필드, (3) Enum Value Reference: 35+ enum 필드의 허용값 목록 (intake_template.yaml 주석에서 추출), (4) Cross-reference rule: collaboration.per_service↔services 1:1 매칭 규칙, (5) Common Mistakes to Avoid: 빈 문자열/빈 배열/enum 위반/빈 optional 블록/이름 불일치 5개 안티패턴 예시.
+- **변경된 파일**: services/prompts/generate.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: intake_template.yaml 전체 스키마를 분석하여 모든 enum 값, required 필드, 배열 최소 요건을 수동 추출. 프롬프트 길이 증가(~2000 토큰 추가)는 prompt caching으로 상쇄. analyze 프롬프트는 변경 불필요(JSON 출력만 생성하며 YAML 스키마 무관).
 - **미완료/후속**: 없음.
 
 ### 2026-03-08 — T022: Streaming Analyze Endpoint
