@@ -27,18 +27,46 @@ MAX_VALIDATION_RETRIES = 2
 MODEL = "claude-sonnet-4-6"
 
 
+def _extract_block(text: str, language: str) -> str | None:
+    """Extract a fenced code block by language tag, falling back to untagged blocks."""
+    # Try with explicit language tag first
+    match = re.search(rf"```{language}\s*\n(.*?)```", text, re.DOTALL)
+    if match:
+        return match.group(1).strip()
+    return None
+
+
 def _parse_response(text: str) -> tuple[str, dict]:
     """Extract YAML block and JSON metadata block from LLM response."""
-    yaml_match = re.search(r"```yaml\s*\n(.*?)```", text, re.DOTALL)
-    if not yaml_match:
+    yaml_content = _extract_block(text, "yaml")
+
+    # Fallback: find untagged code blocks and pick the one that looks like YAML
+    if not yaml_content:
+        untagged = re.findall(r"```\s*\n(.*?)```", text, re.DOTALL)
+        for block in untagged:
+            stripped = block.strip()
+            if stripped.startswith("project_name:") or stripped.startswith("project:"):
+                yaml_content = stripped
+                break
+
+    if not yaml_content:
         raise ValueError("No YAML block found in response")
 
-    json_match = re.search(r"```json\s*\n(.*?)```", text, re.DOTALL)
-    if not json_match:
+    json_content = _extract_block(text, "json")
+
+    # Fallback: find untagged code blocks that look like JSON
+    if not json_content:
+        untagged = re.findall(r"```\s*\n(.*?)```", text, re.DOTALL)
+        for block in untagged:
+            stripped = block.strip()
+            if stripped.startswith("{"):
+                json_content = stripped
+                break
+
+    if not json_content:
         raise ValueError("No JSON block found in response")
 
-    yaml_content = yaml_match.group(1).strip()
-    metadata: dict = json.loads(json_match.group(1).strip())
+    metadata: dict = json.loads(json_content)
     return yaml_content, metadata
 
 
