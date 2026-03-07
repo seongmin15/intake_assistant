@@ -29,6 +29,7 @@
 | 2026-03-08 | T025: Error Recovery UX — 에러 시 errorSource별 재시도 버튼 추가 | 완료 |
 | 2026-03-08 | T026: Rate Limiting / Input Sanitization — IP 기반 rate limiter + 입력 텍스트 sanitizer | 완료 |
 | 2026-03-08 | T029: Retry 축소 + field_requirements 기반 프롬프트 개선 | 완료 |
+| 2026-03-08 | T030: Dynamic Generate Prompt from field_requirements.yaml | 완료 |
 | 2026-03-08 | T028: Open-ended Text Q&A — 객관식 질문을 자유 텍스트 질문으로 변경 | 완료 |
 | 2026-03-08 | T027: LLM 응답 파싱 안정화 — inferred_hints 타입 수정 + raw YAML/JSON fallback 추가 | 완료 |
 | 2026-03-07 | T016: .env.example 수정 — SDWC_API_URL 값 보정 + 환경별 주석 | 완료 |
@@ -266,6 +267,13 @@
 - **변경된 파일**: services/analyze_service.py (수정), services/generate_service.py (수정), services/prompts/generate.py (수정), tests/unit/test_analyze_service.py (수정), tests/unit/test_generate_service.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: field_requirements.yaml의 optional 필드는 DELETE 원칙으로 처리되므로 프롬프트에 포함하지 않음. required 필드와 enum 값만 집중 보강. 프롬프트 길이 증가분은 prompt caching으로 상쇄.
 - **미완료/후속**: 없음.
+
+### 2026-03-08 — T030: Dynamic Generate Prompt from field_requirements.yaml
+
+- **작업**: generate 시스템 프롬프트의 하드코딩된 스키마 섹션(Required Sections, Per-Service Fields, Array Minimums, Enum Reference)을 SDwC field_requirements.yaml에서 동적 생성하도록 변경. SDwCClient.fetch_field_requirements() 추가, template_cache 확장, prompt_builder.py 신규 모듈(재귀적 YAML walk로 4개 섹션 생성), generate.py를 static header/dynamic/fallback/footer로 분리, generate_service.py에서 field_requirements 전달.
+- **변경된 파일**: services/sdwc_client.py (수정), services/template_cache.py (수정), main.py (수정), services/prompts/prompt_builder.py (신규), services/prompts/generate.py (수정), services/generate_service.py (수정), tests/unit/test_prompt_builder.py (신규), tests/unit/test_sdwc_client.py (수정), tests/unit/test_generate_service.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: fallback 전략 — SDwC 미접속/invalid YAML/phases 키 누락 → None → 기존 하드코딩 텍스트 사용. 최악의 경우 = 기존 동작과 동일. yaml 라이브러리는 이미 의존성에 포함(pyyaml).
+- **미완료/후속**: SDwC 측에 GET /api/v1/field-requirements 엔드포인트 추가 필요 (사용자가 구현).
 
 ### 2026-03-07 — T015: infra/ 매니페스트를 sdwc-platform으로 이관
 

@@ -78,6 +78,7 @@ async def test_generate_success() -> None:
 
     with patch("intake_assistant_api.services.generate_service.template_cache") as tc:
         tc.get_template.return_value = "mock template"
+        tc.get_field_requirements.return_value = None
         result = await generate(anthropic, sdwc, DEFAULT_REQUEST)
 
     assert result.yaml_content == SAMPLE_YAML.strip()
@@ -105,6 +106,7 @@ async def test_generate_validation_retry_then_pass() -> None:
 
     with patch("intake_assistant_api.services.generate_service.template_cache") as tc:
         tc.get_template.return_value = "mock template"
+        tc.get_field_requirements.return_value = None
         result = await generate(anthropic, sdwc, DEFAULT_REQUEST)
 
     assert result.yaml_content == SAMPLE_YAML.strip()
@@ -125,6 +127,7 @@ async def test_generate_validation_retries_exhausted() -> None:
         pytest.raises(ExternalServiceError, match="YAML validation failed after 3 attempts"),
     ):
         tc.get_template.return_value = "mock template"
+        tc.get_field_requirements.return_value = None
         await generate(anthropic, sdwc, DEFAULT_REQUEST)
 
     assert sdwc.validate_yaml.call_count == 3
@@ -143,6 +146,7 @@ async def test_generate_anthropic_failure_retries_exhausted() -> None:
         pytest.raises(ExternalServiceError, match="Failed after 2 retries"),
     ):
         tc.get_template.return_value = "mock template"
+        tc.get_field_requirements.return_value = None
         await generate(anthropic, sdwc, DEFAULT_REQUEST)
 
 
@@ -172,6 +176,7 @@ async def test_generate_parse_error_no_yaml_block() -> None:
         pytest.raises(ExternalServiceError, match="Invalid response format"),
     ):
         tc.get_template.return_value = "mock template"
+        tc.get_field_requirements.return_value = None
         await generate(anthropic, sdwc, DEFAULT_REQUEST)
 
 
@@ -182,6 +187,7 @@ async def test_generate_no_json_block_uses_default_metadata() -> None:
 
     with patch("intake_assistant_api.services.generate_service.template_cache") as tc:
         tc.get_template.return_value = "mock template"
+        tc.get_field_requirements.return_value = None
         result = await generate(anthropic, sdwc, DEFAULT_REQUEST)
 
     assert result.yaml_content == SAMPLE_YAML.strip()
@@ -196,6 +202,7 @@ async def test_generate_revision_request() -> None:
 
     with patch("intake_assistant_api.services.generate_service.template_cache") as tc:
         tc.get_template.return_value = "mock template"
+        tc.get_field_requirements.return_value = None
         result = await generate(anthropic, sdwc, REVISION_REQUEST)
 
     assert result.yaml_content == SAMPLE_YAML.strip()
@@ -213,6 +220,7 @@ async def test_generate_uses_prompt_caching() -> None:
 
     with patch("intake_assistant_api.services.generate_service.template_cache") as tc:
         tc.get_template.return_value = "mock template"
+        tc.get_field_requirements.return_value = None
         await generate(anthropic, sdwc, DEFAULT_REQUEST)
 
     call_args = anthropic.messages.create.call_args
@@ -221,6 +229,23 @@ async def test_generate_uses_prompt_caching() -> None:
     assert len(system_arg) == 1
     assert system_arg[0]["type"] == "text"
     assert system_arg[0]["cache_control"] == {"type": "ephemeral"}
+
+
+async def test_generate_passes_field_requirements_to_prompt() -> None:
+    """field_requirements from cache is passed to build_system_prompt."""
+    anthropic = _make_mock_anthropic(VALID_LLM_RESPONSE)
+    sdwc = _make_mock_sdwc(valid=True)
+
+    with (
+        patch("intake_assistant_api.services.generate_service.template_cache") as tc,
+        patch("intake_assistant_api.services.generate_service.build_system_prompt") as bsp,
+    ):
+        tc.get_template.return_value = "mock template"
+        tc.get_field_requirements.return_value = "mock field requirements"
+        bsp.return_value = "mocked system prompt"
+        await generate(anthropic, sdwc, DEFAULT_REQUEST)
+
+    bsp.assert_called_once_with("mock template", "mock field requirements")
 
 
 # --- Streaming tests ---
@@ -279,6 +304,7 @@ async def test_stream_success_event_sequence() -> None:
     sse_list: list[str] = []
     with patch("intake_assistant_api.services.generate_service.template_cache") as tc:
         tc.get_template.return_value = "mock template"
+        tc.get_field_requirements.return_value = None
         async for sse in generate_stream(anthropic, sdwc, DEFAULT_REQUEST):
             sse_list.append(sse)
 
@@ -315,6 +341,7 @@ async def test_stream_validation_retry_then_pass() -> None:
     sse_list: list[str] = []
     with patch("intake_assistant_api.services.generate_service.template_cache") as tc:
         tc.get_template.return_value = "mock template"
+        tc.get_field_requirements.return_value = None
         async for sse in generate_stream(anthropic, sdwc, DEFAULT_REQUEST):
             sse_list.append(sse)
 
@@ -337,6 +364,7 @@ async def test_stream_error_on_parse_failure() -> None:
     sse_list: list[str] = []
     with patch("intake_assistant_api.services.generate_service.template_cache") as tc:
         tc.get_template.return_value = "mock template"
+        tc.get_field_requirements.return_value = None
         async for sse in generate_stream(anthropic, sdwc, DEFAULT_REQUEST):
             sse_list.append(sse)
 
@@ -361,6 +389,7 @@ async def test_stream_error_on_api_failure() -> None:
         patch("intake_assistant_api.services.generate_service.asyncio.sleep"),
     ):
         tc.get_template.return_value = "mock template"
+        tc.get_field_requirements.return_value = None
         async for sse in generate_stream(client, sdwc, DEFAULT_REQUEST):
             sse_list.append(sse)
 

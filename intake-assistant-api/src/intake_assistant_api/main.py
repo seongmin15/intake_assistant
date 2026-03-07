@@ -76,6 +76,13 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     else:
         await logger.awarning("sdwc_template_unavailable, running in degraded mode")
 
+    field_req_yaml = await sdwc_client.fetch_field_requirements()
+    if field_req_yaml is not None:
+        template_cache.set_field_requirements(field_req_yaml)
+        await logger.ainfo("sdwc_field_requirements_cached")
+    else:
+        await logger.awarning("sdwc_field_requirements_unavailable, using static fallback")
+
     yield
 
     await anthropic_client.close()

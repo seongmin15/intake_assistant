@@ -1,4 +1,6 @@
-GENERATE_SYSTEM_PROMPT = """\
+from intake_assistant_api.services.prompts.prompt_builder import build_dynamic_sections
+
+_STATIC_HEADER = """\
 You are an expert at generating SDwC intake_data.yaml files.
 Your job is to convert a user's project description and Q&A answers
 into a complete, valid intake_data.yaml.
@@ -22,6 +24,9 @@ into a complete, valid intake_data.yaml.
 5. **Cross-reference rule**: Each entry in `collaboration.per_service[].service`
    must exactly match a `services[].name`. They must be 1:1 — same count, same names.
 
+"""
+
+_STATIC_FALLBACK = """\
 ## Required Sections Checklist
 
 The following top-level sections are REQUIRED and must always be present.
@@ -130,12 +135,12 @@ Use ONLY these exact values for enum fields:
 
 ### Services (shared)
 - services[].type: backend_api | web_ui | worker | mobile_app | data_pipeline
-- services[].build_tool: poetry | pip | npm | pnpm | yarn | gradle |
+- services[].build_tool: poetry | pip | npm | pnpm | yarn | gradle | \
   maven | cargo | go_mod | vite | webpack | turbopack | bundler | sbt
-- services[].deployment.target: docker_compose | kubernetes | ecs |
-  lambda | cloud_run | fly_io | railway | vercel | bare_metal |
+- services[].deployment.target: docker_compose | kubernetes | ecs | \
+  lambda | cloud_run | fly_io | railway | vercel | bare_metal | \
   app_store | play_store | both_stores
-- services[].databases[].engine: postgresql | mysql | mongodb | redis |
+- services[].databases[].engine: postgresql | mysql | mongodb | redis | \
   sqlite | dynamodb | elasticsearch | neo4j
 - services[].databases[].role: primary | cache | search | queue | analytics | session
 - services[].communication_with[].protocol: http | grpc | amqp | kafka | websocket
@@ -188,7 +193,7 @@ Use ONLY these exact values for enum fields:
 - pipelines[].schema_change_handling: auto_detect | fail | alert
 
 ### Security / Risks
-- security.requirements[].category: authentication | authorization |
+- security.requirements[].category: authentication | authorization | \
   encryption | input_validation | audit | transport_security
 - risks.technical[].likelihood: high | medium | low
 - risks.technical[].impact: high | medium | low
@@ -198,7 +203,7 @@ Use ONLY these exact values for enum fields:
 - process.methodology: scrum | kanban | scrumban | xp
 - testing.approach: tdd | bdd | test_after | test_first
 - testing.levels[].level: unit | integration | e2e | contract | smoke | performance
-- testing.levels[].framework: pytest | jest | vitest | playwright | cypress |
+- testing.levels[].framework: pytest | jest | vitest | playwright | cypress | \
   junit | go_test | rspec | xctest | espresso | robolectric | flutter_test | detox
 - testing.test_data_strategy: fixtures | factories | snapshots | seed_scripts
 - version_control.branch_strategy: github_flow | gitflow | trunk_based | master_develop_task
@@ -206,14 +211,16 @@ Use ONLY these exact values for enum fields:
 
 ### Deployment (optional section — include only when relevant)
 - deployment.environments[].name: dev | staging | production
-- deployment.ci.tool: github_actions | gitlab_ci | jenkins | circleci |
+- deployment.ci.tool: github_actions | gitlab_ci | jenkins | circleci | \
   bitbucket_pipelines | xcode_cloud | bitrise | codemagic
 - deployment.cd.tool: argocd | fluxcd | spinnaker | none | fastlane | app_center
 - deployment.cd.strategy: gitops | push | manual
 - deployment.infrastructure_as_code.tool: terraform | pulumi | cdk | cloudformation | ansible
 - deployment.container_registry: dockerhub | ecr | gcr | ghcr | acr
 - deployment.secrets_management: env_file | vault | aws_ssm | doppler | infisical
+"""
 
+_STATIC_FOOTER = """\
 ## Common Mistakes to Avoid
 
 WRONG — empty string for required field:
@@ -363,7 +370,17 @@ def build_user_message(
     return "\n".join(parts)
 
 
-def build_system_prompt(template: str | None) -> str:
-    """Build the system prompt with template structure included."""
+def build_system_prompt(
+    template: str | None,
+    field_requirements: str | None = None,
+) -> str:
+    """Build the system prompt with template structure and dynamic field sections."""
+    # Dynamic sections from field_requirements, or static fallback
+    dynamic = build_dynamic_sections(field_requirements) if field_requirements is not None else None
+
+    schema_sections = dynamic if dynamic is not None else _STATIC_FALLBACK
+
     template_section = template if template else "(템플릿 없음 — 기본 구조를 사용하세요)"
-    return GENERATE_SYSTEM_PROMPT.format(template_structure=template_section)
+    footer = _STATIC_FOOTER.format(template_structure=template_section)
+
+    return _STATIC_HEADER + schema_sections + "\n" + footer
