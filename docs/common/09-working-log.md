@@ -15,6 +15,7 @@
 | 2026-03-07 | T004: POST /api/v1/analyze — Haiku 기반 동적 질문 생성 엔드포인트 | 완료 |
 | 2026-03-07 | T005: POST /api/v1/generate — Sonnet 기반 YAML 생성 + validate-retry 엔드포인트 | 완료 |
 | 2026-03-07 | T006: POST /api/v1/finalize — SDwC ZIP 생성 + 스트림 응답 엔드포인트 | 완료 |
+| 2026-03-07 | T007: ModeSelectorPage — Simple/Advanced 모드 선택 페이지 | 완료 |
 
 <!-- Claude: §5.8 작업 완료, §5.12 작업 중단/취소 시 한 줄 추가.
      작업 내용은 "무엇을 왜" 중심 1줄 요약.
@@ -81,3 +82,11 @@
 - **변경된 파일**: schemas/finalize.py (신규), routers/finalize.py (신규), services/sdwc_client.py (수정), main.py (수정), tests/unit/test_finalize_api.py (신규), tests/unit/test_sdwc_client.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: 서비스 레이어 불필요 — 라우터에서 직접 SDwCClient.generate_zip 호출 (비즈니스 로직 없음)
 - **미완료/후속**: 없음. 백엔드 API 3개 엔드포인트(analyze, generate, finalize) 완성. T007~T010 프론트엔드 진행 가능.
+
+### 2026-03-07 — T007: ModeSelectorPage 구현
+
+- **계획**: ModeCard 컴포넌트 신규, ModeSelectorPage 구현. Simple → /intake 라우팅, Advanced → VITE_SDWC_WEB_URL 리다이렉트. 반응형 레이아웃. .env.example에 VITE_SDWC_WEB_URL 추가.
+- **작업**: ModeCard(title/description/target/details + hover효과 + button), ModeSelectorPage(useNavigate + window.location.href), sm:flex-row 반응형 배치. .env.example에 VITE_SDWC_WEB_URL 추가.
+- **변경된 파일**: pages/ModeSelectorPage/index.tsx (수정), pages/ModeSelectorPage/ModeCard.tsx (신규), .env.example (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: ModeCard를 button 요소로 구현(접근성), SDWC_WEB_URL 미설정 시 Advanced 클릭해도 아무 동작 안 함(graceful)
+- **미완료/후속**: 없음. T008~T010 프론트엔드 태스크 진행 가능.

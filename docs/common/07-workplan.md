@@ -140,15 +140,15 @@ Any active status -> Cancelled
 ---
 
 ### T007: ModeSelectorPage 구현
-- Status: Ready
+- Status: Done
 - Service: intake-assistant-web
 - Description: Simple/Advanced 모드 선택 페이지. ModeCard 컴포넌트로 각 모드 설명 표시. Simple → /intake, Advanced → sdwc-web 리다이렉트.
 - Acceptance Criteria:
-  - [ ] ModeCard 컴포넌트 (모드 설명, 대상, 차이점)
-  - [ ] Simple 선택 → /intake 라우팅
-  - [ ] Advanced 선택 → sdwc-web URL 리다이렉트 (환경 변수)
-  - [ ] 반응형 레이아웃
-- Result:
+  - [x] ModeCard 컴포넌트 (모드 설명, 대상, 차이점)
+  - [x] Simple 선택 → /intake 라우팅
+  - [x] Advanced 선택 → sdwc-web URL 리다이렉트 (환경 변수)
+  - [x] 반응형 레이아웃
+- Result: ModeCard 컴포넌트 신규(title, description, target, details props + hover 효과). ModeSelectorPage에서 Simple→navigate("/intake"), Advanced→VITE_SDWC_WEB_URL 리다이렉트. sm: breakpoint에서 가로 배치. .env.example에 VITE_SDWC_WEB_URL 추가. ESLint + TypeScript 빌드 통과.
 
 ---
 
