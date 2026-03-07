@@ -110,6 +110,30 @@ export function IntakePage() {
           </div>
         )}
 
+        {phase === "finalizing" && (
+          <div className="flex flex-col items-center gap-3 py-16">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+            <p className="text-sm text-gray-500">ZIP 파일을 생성하고 있습니다...</p>
+          </div>
+        )}
+
+        {phase === "complete" && (
+          <div className="flex flex-col items-center gap-4 py-16">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+              <span className="text-3xl text-green-600">✓</span>
+            </div>
+            <h2 className="text-lg font-bold text-gray-900">프로젝트 생성 완료!</h2>
+            <p className="text-sm text-gray-500">ZIP 파일이 다운로드되었습니다.</p>
+            <button
+              type="button"
+              onClick={reset}
+              className="mt-4 rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+            >
+              새 프로젝트 시작
+            </button>
+          </div>
+        )}
+
         {phase === "error" && (
           <div className="flex flex-col items-center gap-4 py-16">
             <p className="text-sm text-red-600">{error}</p>

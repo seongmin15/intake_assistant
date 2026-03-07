@@ -16,6 +16,7 @@
 - intake-assistant-web: ModeSelectorPage — Simple/Advanced 모드 선택, ModeCard 컴포넌트, 반응형 레이아웃 (T007)
 - intake-assistant-web: IntakePage 입력+질문 — TextInput, QuestionCard, Zustand store, API 클라이언트 (T008)
 - intake-assistant-web: IntakePage 아키텍처 카드+수정 — ArchitectureCard, FeatureChecklist, RevisionInput (T009)
+- intake-assistant-web: IntakePage ZIP 다운로드 — finalizing/complete phase UI (T010)
 
 <!-- Claude: §5.8 작업 완료 시 해당 변경을 [Unreleased]에 기록.
      분류 기준:

@@ -18,6 +18,7 @@
 | 2026-03-07 | T007: ModeSelectorPage — Simple/Advanced 모드 선택 페이지 | 완료 |
 | 2026-03-07 | T008: IntakePage 입력+질문 — TextInput, QuestionCard, Zustand store, API 연동 | 완료 |
 | 2026-03-07 | T009: IntakePage 아키텍처 카드+수정 — ArchitectureCard, FeatureChecklist, RevisionInput | 완료 |
+| 2026-03-07 | T010: IntakePage ZIP 다운로드 — finalizing/complete phase UI | 완료 |
 
 <!-- Claude: §5.8 작업 완료, §5.12 작업 중단/취소 시 한 줄 추가.
      작업 내용은 "무엇을 왜" 중심 1줄 요약.
@@ -107,3 +108,10 @@
 - **변경된 파일**: components/ArchitectureCard.tsx (신규), components/FeatureChecklist.tsx (신규), components/RevisionInput.tsx (신규), pages/IntakePage/index.tsx (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: revising 취소 시 useIntakeStore.setState로 직접 phase 복원 (별도 액션 불필요)
 - **미완료/후속**: 없음. T010(ZIP 다운로드) 진행 시 finalizing/complete phase만 추가하면 됨.
+
+### 2026-03-07 — T010: IntakePage - ZIP 다운로드 (finalize 연동)
+
+- **작업**: IntakePage에 finalizing phase(스피너+'ZIP 파일을 생성하고 있습니다'), complete phase(체크 아이콘+완료 메시지+'새 프로젝트 시작' 버튼으로 reset) UI 추가. submitFinalize(Blob 다운로드)와 '이대로 진행' 버튼은 이미 구현 완료.
+- **변경된 파일**: pages/IntakePage/index.tsx (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: complete 상태에서 '새 프로젝트 시작' 버튼으로 store reset → input phase로 복귀
+- **미완료/후속**: T001~T010 전체 완료. T011(E2E 테스트), T012(컨테이너화+CI) Backlog 상태.
