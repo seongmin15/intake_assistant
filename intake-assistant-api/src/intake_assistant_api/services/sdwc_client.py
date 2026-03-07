@@ -20,5 +20,24 @@ class SDwCClient:
             await logger.awarning("sdwc_template_fetch_failed", url=url, error=str(exc))
             return None
 
+    async def validate_yaml(self, yaml_content: str) -> dict:
+        """Validate YAML content via SDwC /api/v1/validate endpoint."""
+        from intake_assistant_api.core.exceptions import ExternalServiceError
+
+        url = f"{self._base_url}/api/v1/validate"
+        try:
+            resp = await self._http.post(
+                url,
+                json={"yaml_content": yaml_content},
+                timeout=10.0,
+            )
+            resp.raise_for_status()
+            data: dict = resp.json()
+            await logger.ainfo("sdwc_validate_completed", success=data.get("success"))
+            return data
+        except httpx.HTTPError as exc:
+            await logger.aerror("sdwc_validate_failed", url=url, error=str(exc))
+            raise ExternalServiceError("SDwC", f"Validation request failed: {exc}") from exc
+
     async def close(self) -> None:
         await self._http.aclose()

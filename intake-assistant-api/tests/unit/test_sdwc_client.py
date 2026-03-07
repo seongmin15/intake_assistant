@@ -1,6 +1,7 @@
 import httpx
 import pytest
 
+from intake_assistant_api.core.exceptions import ExternalServiceError
 from intake_assistant_api.services.sdwc_client import SDwCClient
 
 SAMPLE_YAML = "project:\n  name: test\n"
@@ -30,3 +31,23 @@ async def test_fetch_template_timeout(sdwc_client, respx_mock):
     )
     result = await sdwc_client.fetch_template()
     assert result is None
+
+
+async def test_validate_yaml_success(sdwc_client, respx_mock):
+    respx_mock.post("http://sdwc-test:8080/api/v1/validate").respond(200, json={"success": True})
+    result = await sdwc_client.validate_yaml("project:\n  name: test\n")
+    assert result == {"success": True}
+
+
+async def test_validate_yaml_validation_failure(sdwc_client, respx_mock):
+    error_response = {"success": False, "error": {"field": "project.name", "message": "empty"}}
+    respx_mock.post("http://sdwc-test:8080/api/v1/validate").respond(200, json=error_response)
+    result = await sdwc_client.validate_yaml("project:\n  name: \n")
+    assert result["success"] is False
+    assert "error" in result
+
+
+async def test_validate_yaml_server_error(sdwc_client, respx_mock):
+    respx_mock.post("http://sdwc-test:8080/api/v1/validate").respond(500)
+    with pytest.raises(ExternalServiceError, match="SDwC"):
+        await sdwc_client.validate_yaml("project:\n  name: test\n")

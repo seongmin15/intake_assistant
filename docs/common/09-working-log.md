@@ -13,6 +13,7 @@
 | 2026-03-07 | T001: Backend 프로젝트 초기화 — Poetry + FastAPI 스켈레톤, 환경변수, 프로젝트 구조 | 완료 |
 | 2026-03-07 | T002: Frontend 프로젝트 초기화 — React + Vite + Tailwind + Zustand + Router | 완료 |
 | 2026-03-07 | T004: POST /api/v1/analyze — Haiku 기반 동적 질문 생성 엔드포인트 | 완료 |
+| 2026-03-07 | T005: POST /api/v1/generate — Sonnet 기반 YAML 생성 + validate-retry 엔드포인트 | 완료 |
 
 <!-- Claude: §5.8 작업 완료, §5.12 작업 중단/취소 시 한 줄 추가.
      작업 내용은 "무엇을 왜" 중심 1줄 요약.
@@ -63,3 +64,11 @@
 - **변경된 파일**: schemas/analyze.py (신규), services/prompts/__init__.py (신규), services/prompts/analyze.py (신규), services/analyze_service.py (신규), routers/analyze.py (신규), main.py (수정), tests/unit/test_analyze_service.py (신규), tests/unit/test_analyze_api.py (신규), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: PydanticValidationError도 파싱 에러로 캐치하여 ExternalServiceError로 변환 (Anthropic이 잘못된 구조 반환 시)
 - **미완료/후속**: 없음. T005(generate) 또는 T007~T008(프론트엔드) 진행 가능.
+
+### 2026-03-07 — T005: POST /api/v1/generate 구현 (YAML 생성 + validate-retry)
+
+- **계획**: 사용자 입력 + Q&A 응답을 기반으로 Sonnet 호출하여 intake_data.yaml 생성. SDwC /api/v1/validate로 검증 + 실패 시 에러 피드백 재생성(최대 2회). 아키텍처 카드 5항목 + 기능 체크리스트 추출. 수정 반복(revision_request + previous_yaml) 지원. SDwCClient.validate_yaml 추가, schemas/generate.py, services/prompts/generate.py, services/generate_service.py, routers/generate.py 신규, main.py 수정, 단위 테스트 작성.
+- **작업**: GenerateRequest/Response + ArchitectureCard + FeatureItem 스키마, 시스템 프롬프트(DELETE 원칙, 템플릿 구조 참조, Korean output), generate_service(Sonnet 호출 + 3회 exponential backoff + SDwC validate-retry 최대 3회 시도 + YAML/JSON 블록 파싱), 얇은 라우터, SDwCClient.validate_yaml 추가(POST /api/v1/validate, 10초 타임아웃, ExternalServiceError). 서비스 테스트 7개 + API 테스트 4개 + SDwC 테스트 3개 신규 추가.
+- **변경된 파일**: schemas/generate.py (신규), services/prompts/generate.py (신규), services/generate_service.py (신규), routers/generate.py (신규), services/sdwc_client.py (수정), main.py (수정), tests/unit/test_generate_service.py (신규), tests/unit/test_generate_api.py (신규), tests/unit/test_sdwc_client.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: YAML/JSON 블록 파싱은 regex로 ```yaml/```json 마커 기반 추출. validate-retry 시 에러 피드백을 JSON 직렬화하여 user message에 포함. 파싱 에러는 즉시 실패(재시도 불가).
+- **미완료/후속**: 없음. T006(finalize) 또는 T007~T008(프론트엔드) 진행 가능.

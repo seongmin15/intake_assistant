@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from intake_assistant_api.core.config import settings
 from intake_assistant_api.core.exceptions import AppError, app_error_handler
 from intake_assistant_api.routers.analyze import router as analyze_router
+from intake_assistant_api.routers.generate import router as generate_router
 from intake_assistant_api.routers.health import router as health_router
 from intake_assistant_api.services import template_cache
 from intake_assistant_api.services.sdwc_client import SDwCClient
@@ -71,3 +72,4 @@ app.add_exception_handler(AppError, app_error_handler)  # type: ignore[arg-type]
 
 app.include_router(health_router)
 app.include_router(analyze_router)
+app.include_router(generate_router)
