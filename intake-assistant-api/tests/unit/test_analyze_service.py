@@ -13,31 +13,18 @@ VALID_RESPONSE_DATA = {
             "id": "q1",
             "title": "서비스 구성",
             "description": "어떤 종류의 서비스가 필요한가요?",
-            "type": "single",
-            "choices": [
-                {"id": "q1_a", "label": "웹 서비스 (백엔드 + 프론트엔드)"},
-                {"id": "q1_b", "label": "백엔드 API만"},
-            ],
+            "placeholder": "예: 웹사이트와 백엔드 API가 필요합니다",
         },
         {
             "id": "q2",
             "title": "데이터 저장",
-            "description": "데이터를 어떻게 저장하나요?",
-            "type": "single",
-            "choices": [
-                {"id": "q2_a", "label": "관계형 데이터베이스 (PostgreSQL 등)"},
-                {"id": "q2_b", "label": "파일 기반 저장"},
-            ],
+            "description": "어떤 데이터를 저장해야 하나요?",
         },
         {
             "id": "q3",
             "title": "사용자 인증",
-            "description": "사용자 로그인이 필요한가요?",
-            "type": "single",
-            "choices": [
-                {"id": "q3_a", "label": "네, 로그인 필요"},
-                {"id": "q3_b", "label": "아니요, 누구나 사용 가능"},
-            ],
+            "description": "누가 이 서비스를 사용하나요? 로그인이 필요한가요?",
+            "placeholder": "예: 내부 직원만 사용하고 로그인이 필요합니다",
         },
     ],
     "analysis": {
@@ -65,7 +52,6 @@ async def test_analyze_returns_valid_response() -> None:
 
     assert len(result.questions) == 3
     assert result.questions[0].id == "q1"
-    assert result.questions[0].choices[0].id == "q1_a"
     assert "todo" in result.analysis.detected_keywords
     assert result.analysis.inferred_hints["has_db"] == "yes"
 

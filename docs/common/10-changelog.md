@@ -6,6 +6,10 @@
 
 ## [Unreleased]
 
+### Changed
+- intake-assistant-api: 객관식 질문(3~4개, single/multi select)을 자유 텍스트 질문(5~6개, open-ended)으로 변경 — Choice 클래스 삭제, Question 단순화(placeholder 추가), QaAnswer.selected_ids→answer, analyze/generate 프롬프트 재작성 (T028)
+- intake-assistant-web: QuestionCard를 radio/checkbox에서 textarea 기반으로 전환, intakeStore answers 타입을 Record<string, string>으로 변경, E2E 테스트를 textarea.fill()로 전환 (T028)
+
 ### Fixed
 - intake-assistant-api: generate API JSON 메타데이터 블록을 optional로 변경 — JSON 블록 누락/파싱 실패 시 기본 메타데이터 fallback 적용, "No JSON block found" 오류 완전 해소
 - intake-assistant-api: generate API JSON 파싱 강화 — brace-balancing 기반 _find_raw_json() fallback으로 raw JSON 감지 개선

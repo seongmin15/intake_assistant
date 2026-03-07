@@ -27,7 +27,7 @@ interface IntakeState {
   userInput: string;
   questions: Question[];
   analysis: AnalyzeResponse["analysis"] | null;
-  answers: Record<string, string[]>;
+  answers: Record<string, string>;
   yamlContent: string | null;
   architectureCard: ArchitectureCard | null;
   featureChecklist: FeatureItem[];
@@ -38,7 +38,7 @@ interface IntakeState {
 
   setUserInput: (input: string) => void;
   submitAnalyze: () => Promise<void>;
-  setAnswer: (questionId: string, selectedIds: string[]) => void;
+  setAnswer: (questionId: string, answer: string) => void;
   submitGenerate: () => Promise<void>;
   startRevision: () => void;
   submitRevision: (revisionRequest: string) => Promise<void>;
@@ -53,7 +53,7 @@ const initialState = {
   userInput: "",
   questions: [] as Question[],
   analysis: null as AnalyzeResponse["analysis"] | null,
-  answers: {} as Record<string, string[]>,
+  answers: {} as Record<string, string>,
   yamlContent: null as string | null,
   architectureCard: null as ArchitectureCard | null,
   featureChecklist: [] as FeatureItem[],
@@ -98,16 +98,16 @@ export const useIntakeStore = create<IntakeState>((set, get) => ({
     }
   },
 
-  setAnswer: (questionId, selectedIds) => {
+  setAnswer: (questionId, answer) => {
     const { answers } = get();
-    set({ answers: { ...answers, [questionId]: selectedIds } });
+    set({ answers: { ...answers, [questionId]: answer } });
   },
 
   submitGenerate: async () => {
     const { userInput, answers } = get();
-    const qaAnswers: QaAnswer[] = Object.entries(answers).map(([questionId, selectedIds]) => ({
+    const qaAnswers: QaAnswer[] = Object.entries(answers).map(([questionId, answer]) => ({
       question_id: questionId,
-      selected_ids: selectedIds,
+      answer,
     }));
     set({ phase: "generating", error: null, streamStatus: "프로젝트를 생성하고 있습니다...", streamAttempt: 1 });
     try {
@@ -149,9 +149,9 @@ export const useIntakeStore = create<IntakeState>((set, get) => ({
 
   submitRevision: async (revisionRequest) => {
     const { userInput, answers, yamlContent } = get();
-    const qaAnswers: QaAnswer[] = Object.entries(answers).map(([questionId, selectedIds]) => ({
+    const qaAnswers: QaAnswer[] = Object.entries(answers).map(([questionId, answer]) => ({
       question_id: questionId,
-      selected_ids: selectedIds,
+      answer,
     }));
     set({ phase: "generating", error: null, streamStatus: "수정 사항을 반영하고 있습니다...", streamAttempt: 1 });
     try {

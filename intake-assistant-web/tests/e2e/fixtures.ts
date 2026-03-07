@@ -5,33 +5,19 @@ export const MOCK_ANALYZE_RESPONSE = {
     {
       id: "q1",
       title: "서비스 구성",
-      description: "서비스 구성을 선택해 주세요.",
-      type: "single" as const,
-      choices: [
-        { id: "q1_a", label: "모놀리식" },
-        { id: "q1_b", label: "마이크로서비스" },
-      ],
+      description: "어떤 종류의 서비스가 필요한가요?",
+      placeholder: "예: 웹사이트와 백엔드 API가 필요합니다",
     },
     {
       id: "q2",
       title: "데이터 저장",
-      description: "데이터 저장 방식을 선택해 주세요.",
-      type: "single" as const,
-      choices: [
-        { id: "q2_a", label: "PostgreSQL" },
-        { id: "q2_b", label: "MongoDB" },
-      ],
+      description: "어떤 데이터를 저장해야 하나요?",
     },
     {
       id: "q3",
       title: "추가 기능",
-      description: "필요한 기능을 모두 선택해 주세요.",
-      type: "multi" as const,
-      choices: [
-        { id: "q3_a", label: "인증" },
-        { id: "q3_b", label: "파일 업로드" },
-        { id: "q3_c", label: "알림" },
-      ],
+      description: "필요한 추가 기능이 있나요?",
+      placeholder: "예: 인증, 파일 업로드, 알림 등",
     },
   ],
   analysis: {

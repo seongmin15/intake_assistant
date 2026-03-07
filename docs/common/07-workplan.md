@@ -433,6 +433,26 @@ Any active status -> Cancelled
 
 ---
 
+### T028: Open-ended Text Q&A (Multiple Choice → Free Text)
+- Status: Done
+- Service: intake-assistant-api, intake-assistant-web
+- Description: 기존 3~4개 객관식 질문(single/multi select)을 5~6개 자유 텍스트 질문으로 변경. 비개발자가 자연어로 답변할 수 있도록 textarea 기반 UI로 전환. generate 프롬프트에 풍부한 컨텍스트 전달.
+- Acceptance Criteria:
+  - [x] Backend: Choice 클래스 삭제, Question에서 type/choices 제거, placeholder 추가
+  - [x] Backend: QaAnswer.selected_ids → answer (단일 문자열)
+  - [x] Backend: analyze 프롬프트를 5~6개 open-ended 질문으로 변경
+  - [x] Backend: generate 프롬프트의 Q&A 포매팅을 자유 텍스트 형식으로 변경
+  - [x] Frontend: Choice 인터페이스 삭제, Question/QaAnswer 타입 업데이트
+  - [x] Frontend: QuestionCard를 textarea 기반으로 재작성
+  - [x] Frontend: intakeStore의 answers 타입을 Record<string, string>으로 변경
+  - [x] Frontend: IntakePage 유효성 검사 및 props 업데이트
+  - [x] Backend 테스트 전체 통과 (69개)
+  - [x] Frontend 빌드 + ESLint 통과
+  - [x] E2E 테스트 전체 통과 (13개)
+- Result: Backend schemas/analyze.py에서 Choice 삭제, Question 단순화(placeholder 추가), schemas/generate.py QaAnswer.answer로 변경. analyze 프롬프트 5~6개 open-ended 질문으로 재작성. generate 프롬프트 Q&A 포매팅 업데이트. Frontend types.ts/QuestionCard.tsx/intakeStore.ts/IntakePage 전면 업데이트. E2E fixtures/simple-mode/error-scenarios를 textarea.fill()로 전환. Backend 69개 + E2E 13개 테스트 전체 통과.
+
+---
+
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
      Claude fills the Tasks section during Init based on docs/common/05-roadmap.md.

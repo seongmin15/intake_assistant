@@ -24,8 +24,8 @@ VALID_LLM_RESPONSE = f"```yaml\n{SAMPLE_YAML}```\n\n```json\n{_META_JSON}\n```"
 VALID_REQUEST = {
     "user_input": "할 일 관리 앱을 만들고 싶어요",
     "qa_answers": [
-        {"question_id": "q1", "selected_ids": ["q1_a"]},
-        {"question_id": "q2", "selected_ids": ["q2_a"]},
+        {"question_id": "q1", "answer": "웹 서비스가 필요합니다"},
+        {"question_id": "q2", "answer": "PostgreSQL로 저장하고 싶습니다"},
     ],
 }
 
@@ -76,7 +76,7 @@ async def test_generate_empty_user_input_returns_422(client) -> None:
         "/api/v1/generate",
         json={
             "user_input": "",
-            "qa_answers": [{"question_id": "q1", "selected_ids": ["q1_a"]}],
+            "qa_answers": [{"question_id": "q1", "answer": "웹 서비스"}],
         },
     )
     assert resp.status_code == 422
