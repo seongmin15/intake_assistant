@@ -181,15 +181,15 @@ Any active status -> Cancelled
 ---
 
 ### T010: IntakePage - ZIP 다운로드 (finalize 연동)
-- Status: Ready
+- Status: Done
 - Service: intake-assistant-web
 - Description: '이대로 진행' 버튼 클릭 시 /api/v1/finalize 호출 → ZIP 파일 브라우저 다운로드. complete 상태 표시.
 - Acceptance Criteria:
-  - [ ] '이대로 진행' 버튼 + /api/v1/finalize API 호출
-  - [ ] ZIP 바이너리 다운로드 처리 (Blob + download)
-  - [ ] finalizing 로딩 상태 + complete 상태
-  - [ ] 에러 시 재시도 안내
-- Result:
+  - [x] '이대로 진행' 버튼 + /api/v1/finalize API 호출
+  - [x] ZIP 바이너리 다운로드 처리 (Blob + download)
+  - [x] finalizing 로딩 상태 + complete 상태
+  - [x] 에러 시 재시도 안내
+- Result: IntakePage에 finalizing(스피너) + complete(체크 아이콘+완료 메시지+'새 프로젝트 시작' 버튼) phase UI 추가. '이대로 진행' 버튼은 T009에서 이미 submitFinalize 연결 완료. Blob 다운로드는 T008 store에서 구현 완료. ESLint + 빌드 통과.
 
 ---
 
