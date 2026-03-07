@@ -20,6 +20,18 @@ class SDwCClient:
             await logger.awarning("sdwc_template_fetch_failed", url=url, error=str(exc))
             return None
 
+    async def fetch_field_requirements(self) -> str | None:
+        """Fetch field_requirements.yaml from SDwC. Returns raw YAML text or None on failure."""
+        url = f"{self._base_url}/api/v1/field-requirements"
+        try:
+            resp = await self._http.get(url, timeout=10.0)
+            resp.raise_for_status()
+            await logger.ainfo("sdwc_field_requirements_fetched", url=url)
+            return resp.text
+        except httpx.HTTPError as exc:
+            await logger.awarning("sdwc_field_requirements_fetch_failed", url=url, error=str(exc))
+            return None
+
     async def validate_yaml(self, yaml_content: str) -> dict:
         """Validate YAML content via SDwC /api/v1/validate endpoint."""
         from intake_assistant_api.core.exceptions import ExternalServiceError

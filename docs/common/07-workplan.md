@@ -469,6 +469,25 @@ Any active status -> Cancelled
 
 ---
 
+### T030: Dynamic Generate Prompt from field_requirements.yaml
+- Status: Done
+- Service: intake-assistant-api
+- Origin: T029
+- Description: field_requirements.yaml을 SDwC에서 동적으로 fetch하여 generate 시스템 프롬프트의 Required Sections, Per-Service Fields, Array Minimums, Enum Reference를 자동 생성. SDwC 모델 변경 시 intake-assistant가 자동 동기화.
+- Acceptance Criteria:
+  - [x] SDwCClient.fetch_field_requirements() 추가 (GET /api/v1/field-requirements)
+  - [x] template_cache에 field_requirements 캐시 추가
+  - [x] main.py lifespan에서 startup 시 fetch + 캐시
+  - [x] prompt_builder.py 모듈 — YAML 파싱 + 4개 동적 섹션 생성
+  - [x] generate.py를 static header/dynamic/fallback/footer로 분리
+  - [x] generate_service.py에서 field_requirements를 build_system_prompt에 전달
+  - [x] SDwC 미접속 시 기존 하드코딩된 static fallback 사용 (동작 동일)
+  - [x] 단위 테스트 (prompt_builder 11개 + sdwc_client 3개 + generate_service 1개)
+  - [x] 전체 테스트 통과 (84개) + ruff lint 통과
+- Result: prompt_builder.py 신규 — build_dynamic_sections()가 field_requirements.yaml을 재귀적으로 walk하여 4개 섹션 동적 생성. generate.py를 _STATIC_HEADER/_STATIC_FALLBACK/_STATIC_FOOTER로 분리, build_system_prompt(template, field_requirements) 시그니처 변경. SDwCClient.fetch_field_requirements(), template_cache.get/set_field_requirements() 추가. fallback 전략: SDwC 미접속 → None → static fallback = 기존 동작 동일. 테스트 15개 신규(prompt_builder 11 + sdwc_client 3 + generate_service 1), 전체 84개 통과.
+
+---
+
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
      Claude fills the Tasks section during Init based on docs/common/05-roadmap.md.

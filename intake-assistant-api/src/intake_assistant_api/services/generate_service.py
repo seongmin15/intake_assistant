@@ -189,7 +189,8 @@ async def generate_stream(
 ) -> AsyncGenerator[str, None]:
     """Generate intake_data.yaml with SSE streaming for real-time progress."""
     template = template_cache.get_template()
-    system_prompt = build_system_prompt(template)
+    field_requirements = template_cache.get_field_requirements()
+    system_prompt = build_system_prompt(template, field_requirements)
     system_block = [
         {
             "type": "text",
@@ -320,7 +321,8 @@ async def generate(
 ) -> GenerateResponse:
     """Generate intake_data.yaml from user input and Q&A answers."""
     template = template_cache.get_template()
-    system_prompt = build_system_prompt(template)
+    field_requirements = template_cache.get_field_requirements()
+    system_prompt = build_system_prompt(template, field_requirements)
 
     qa_dicts = [a.model_dump() for a in request.qa_answers]
     error_feedback: str | None = None

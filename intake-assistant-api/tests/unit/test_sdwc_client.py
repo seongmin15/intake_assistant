@@ -33,6 +33,27 @@ async def test_fetch_template_timeout(sdwc_client, respx_mock):
     assert result is None
 
 
+async def test_fetch_field_requirements_success(sdwc_client, respx_mock):
+    yaml_text = "version: '1.0'\nphases: {}\n"
+    respx_mock.get("http://sdwc-test:8080/api/v1/field-requirements").respond(200, text=yaml_text)
+    result = await sdwc_client.fetch_field_requirements()
+    assert result == yaml_text
+
+
+async def test_fetch_field_requirements_server_error(sdwc_client, respx_mock):
+    respx_mock.get("http://sdwc-test:8080/api/v1/field-requirements").respond(500)
+    result = await sdwc_client.fetch_field_requirements()
+    assert result is None
+
+
+async def test_fetch_field_requirements_timeout(sdwc_client, respx_mock):
+    respx_mock.get("http://sdwc-test:8080/api/v1/field-requirements").side_effect = (
+        httpx.ConnectTimeout("timed out")
+    )
+    result = await sdwc_client.fetch_field_requirements()
+    assert result is None
+
+
 async def test_validate_yaml_success(sdwc_client, respx_mock):
     respx_mock.post("http://sdwc-test:8080/api/v1/validate").respond(
         200, json={"valid": True, "errors": [], "warnings": []}
