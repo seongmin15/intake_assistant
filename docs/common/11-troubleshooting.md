@@ -14,11 +14,9 @@
      단순 오타, 1회성 실수는 기록 불필요.
      카테고리 예시: [환경] [빌드] [런타임] [데이터] [배포] [외부서비스] -->
 
-<!--
-### [카테고리] 이슈 제목
-- **증상**: 어떤 현상이 발생하는가
-- **원인**: 왜 발생하는가
-- **해결**: 어떻게 해결하는가
-- **예방**: 재발 방지를 위해 무엇을 했는가
-- **발견일**: YYYY-MM-DD
--->
+### [런타임] analyze API — inferred_hints Pydantic 검증 실패
+- **증상**: POST /api/v1/analyze 호출 시 `AnalyzeResponse` 검증 오류 발생. `inferred_hints` 필드에 `Input should be a valid string` 에러 다수 (location_based, filtering_required 등).
+- **원인**: `Analysis.inferred_hints` 타입이 `dict[str, str]`로 정의되어 있었으나, Haiku가 `"location_based": true` 같은 bool 값을 반환. Pydantic이 str이 아닌 bool을 거부.
+- **해결**: `inferred_hints` 타입을 `dict[str, Any]`로 변경하여 str, bool, int 등 혼합 타입 허용.
+- **예방**: AI 응답 스키마 정의 시 LLM이 다양한 타입을 반환할 수 있는 필드는 `Any` 또는 유니온 타입으로 선언. `analysis` 필드는 내부 참조용이므로 엄격한 타입 불필요.
+- **발견일**: 2026-03-08
