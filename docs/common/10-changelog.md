@@ -6,6 +6,9 @@
 
 ## [Unreleased]
 
+### Added
+- intake-assistant-api: Poetry 프로젝트 초기화 + FastAPI 앱 스켈레톤 (T001)
+
 <!-- Claude: §5.8 작업 완료 시 해당 변경을 [Unreleased]에 기록.
      분류 기준:
      - Added: 새 기능, 새 엔드포인트, 새 엔티티
