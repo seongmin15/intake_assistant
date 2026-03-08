@@ -9,6 +9,7 @@
 ### Fixed
 - intake-assistant-web: Advanced 모드 폼 입력 불가 수정 — FormField/ArrayItemCard가 Zustand store의 getField 함수 참조만 구독하여 formData 변경 시 re-render되지 않던 문제 해결
 - intake-assistant-web: AI 추천 실패 시 에러 피드백 추가 — 기존 silent catch에서 "추천 실패" 메시지 + console.error로 변경
+- intake-assistant-web: ZIP 다운로드 파일명을 프로젝트 이름으로 변경 — Simple 모드(YAML에서 project_name 추출) + Advanced 모드(formData.project.name 사용), fallback "project.zip"
 
 ### Added
 - intake-assistant-web: Simple 모드에 "모드 선택으로 돌아가기" 버튼 추가 — Advanced 모드와 동일한 위치/스타일
