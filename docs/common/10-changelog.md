@@ -6,6 +6,9 @@
 
 ## [Unreleased]
 
+### Changed
+- intake-assistant-web: AI 추천 필드를 12개에서 46개로 확장 — phaseSchema 28개 + serviceSchema 6개 필드에 aiRecommend: true 추가, 전 Phase 및 serviceSchema에 AI 추천 커버리지 확보 (T041)
+
 ### Fixed
 - intake-assistant-web: Advanced 모드 폼 입력 불가 수정 — FormField/ArrayItemCard가 Zustand store의 getField 함수 참조만 구독하여 formData 변경 시 re-render되지 않던 문제 해결
 - intake-assistant-web: AI 추천 실패 시 에러 피드백 추가 — 기존 silent catch에서 "추천 실패" 메시지 + console.error로 변경

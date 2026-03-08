@@ -11,7 +11,7 @@ export const SERVICE_TYPES = [
 /** Common fields shared by all service types */
 const commonFields: FieldDef[] = [
   { path: "name", label: "서비스 이름", type: "text", required: true, placeholder: "예: my-backend-api" },
-  { path: "responsibility", label: "책임", type: "textarea", required: true, placeholder: "이 서비스의 역할" },
+  { path: "responsibility", label: "책임", type: "textarea", required: true, placeholder: "이 서비스의 역할", aiRecommend: true },
   {
     path: "communication_with", label: "통신 대상", type: "array", required: false,
     arrayItemFields: [
@@ -52,7 +52,7 @@ const deploymentFields: FieldDef[] = [
 const backendApiFields: FieldDef[] = [
   { path: "language", label: "언어", type: "enum", required: true, enumValues: ["python", "typescript", "java", "go", "rust", "ruby", "csharp", "kotlin"] },
   { path: "framework", label: "프레임워크", type: "enum", required: true, enumValues: ["fastapi", "django", "express", "nestjs", "spring", "gin", "actix", "rails", "aspnet"] },
-  { path: "framework_rationale", label: "프레임워크 선택 근거", type: "text", required: false },
+  { path: "framework_rationale", label: "프레임워크 선택 근거", type: "text", required: false, aiRecommend: true },
   { path: "build_tool", label: "빌드 도구", type: "enum", required: true, enumValues: ["poetry", "pip", "npm", "pnpm", "yarn", "gradle", "maven", "cargo", "go_mod"] },
   {
     path: "key_libraries", label: "핵심 라이브러리", type: "array", required: false,
@@ -82,7 +82,7 @@ const backendApiFields: FieldDef[] = [
 const webUiFields: FieldDef[] = [
   { path: "language", label: "언어", type: "enum", required: true, enumValues: ["typescript", "javascript"] },
   { path: "framework", label: "프레임워크", type: "enum", required: true, enumValues: ["react", "vue", "svelte", "next", "nuxt", "angular", "solid", "astro"] },
-  { path: "framework_rationale", label: "프레임워크 선택 근거", type: "text", required: false },
+  { path: "framework_rationale", label: "프레임워크 선택 근거", type: "text", required: false, aiRecommend: true },
   { path: "build_tool", label: "빌드 도구", type: "enum", required: true, enumValues: ["vite", "webpack", "turbopack", "pnpm", "npm", "yarn"] },
   { path: "rendering_strategy", label: "렌더링 전략", type: "enum", required: false, enumValues: ["spa", "ssr", "ssg", "isr"] },
   { path: "css_strategy", label: "CSS 전략", type: "enum", required: false, enumValues: ["tailwind", "css_modules", "styled_components", "sass", "vanilla_css", "emotion"] },
@@ -105,7 +105,7 @@ const webUiFields: FieldDef[] = [
 const workerFields: FieldDef[] = [
   { path: "language", label: "언어", type: "enum", required: true, enumValues: ["python", "typescript", "java", "kotlin", "ruby", "go"] },
   { path: "framework", label: "프레임워크", type: "enum", required: true, enumValues: ["celery", "bullmq", "sidekiq", "spring_batch", "temporal"] },
-  { path: "framework_rationale", label: "프레임워크 선택 근거", type: "text", required: false },
+  { path: "framework_rationale", label: "프레임워크 선택 근거", type: "text", required: false, aiRecommend: true },
   { path: "build_tool", label: "빌드 도구", type: "enum", required: true, enumValues: ["poetry", "pip", "npm", "pnpm", "yarn", "gradle", "maven", "go_mod", "bundler"] },
   {
     path: "workers", label: "워커 목록", type: "array", required: true,
@@ -124,7 +124,7 @@ const workerFields: FieldDef[] = [
 const mobileAppFields: FieldDef[] = [
   { path: "approach", label: "접근법", type: "enum", required: true, enumValues: ["native", "cross_platform", "hybrid"] },
   { path: "framework", label: "프레임워크", type: "enum", required: true, enumValues: ["react_native", "flutter", "swift", "kotlin", "swiftui", "jetpack_compose"] },
-  { path: "framework_rationale", label: "프레임워크 선택 근거", type: "text", required: false },
+  { path: "framework_rationale", label: "프레임워크 선택 근거", type: "text", required: false, aiRecommend: true },
   { path: "min_os_versions", label: "최소 OS 버전", type: "text", required: true, placeholder: "예: iOS 15+ / Android 12+" },
   { path: "navigation_pattern", label: "네비게이션 패턴", type: "enum", required: false, enumValues: ["tab", "drawer", "stack", "bottom_nav"] },
   {
@@ -144,7 +144,7 @@ const mobileAppFields: FieldDef[] = [
 const dataPipelineFields: FieldDef[] = [
   { path: "language", label: "언어", type: "enum", required: true, enumValues: ["python", "java", "scala", "sql"] },
   { path: "framework", label: "프레임워크", type: "enum", required: true, enumValues: ["airflow", "dagster", "prefect", "spark", "dbt", "flink"] },
-  { path: "framework_rationale", label: "프레임워크 선택 근거", type: "text", required: false },
+  { path: "framework_rationale", label: "프레임워크 선택 근거", type: "text", required: false, aiRecommend: true },
   { path: "build_tool", label: "빌드 도구", type: "enum", required: true, enumValues: ["poetry", "pip", "gradle", "maven", "sbt"] },
   {
     path: "pipelines", label: "파이프라인 목록", type: "array", required: true,

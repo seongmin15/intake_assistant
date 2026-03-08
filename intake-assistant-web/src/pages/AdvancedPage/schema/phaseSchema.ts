@@ -25,10 +25,10 @@ export const phases: PhaseDef[] = [
         title: "해결할 문제",
         fields: [
           { path: "problem.statement", label: "핵심 문제", type: "textarea", required: true, placeholder: "해결하려는 핵심 문제", aiRecommend: true },
-          { path: "problem.who_has_this_problem", label: "누가 겪는 문제인가", type: "text", required: true, placeholder: "이 문제를 겪는 사람/그룹" },
+          { path: "problem.who_has_this_problem", label: "누가 겪는 문제인가", type: "text", required: true, placeholder: "이 문제를 겪는 사람/그룹", aiRecommend: true },
           { path: "problem.severity", label: "심각도", type: "enum", required: true, enumValues: ["high", "medium", "low"], aiRecommend: true },
-          { path: "problem.frequency", label: "발생 빈도", type: "enum", required: true, enumValues: ["daily", "weekly", "monthly", "occasional"] },
-          { path: "problem.current_workaround", label: "현재 해결 방법", type: "textarea", required: true, placeholder: "현재 어떻게 이 문제를 해결하고 있는지" },
+          { path: "problem.frequency", label: "발생 빈도", type: "enum", required: true, enumValues: ["daily", "weekly", "monthly", "occasional"], aiRecommend: true },
+          { path: "problem.current_workaround", label: "현재 해결 방법", type: "textarea", required: true, placeholder: "현재 어떻게 이 문제를 해결하고 있는지", aiRecommend: true },
           {
             path: "problem.workaround_pain_points", label: "현재 방법의 문제점", type: "array", required: true,
             arrayItemFields: [{ path: "", label: "문제점", type: "text", required: true, placeholder: "현재 방법의 불편한 점" }],
@@ -55,7 +55,7 @@ export const phases: PhaseDef[] = [
         title: "가치 제안",
         fields: [
           { path: "value_proposition.core_value", label: "핵심 가치", type: "text", required: true, placeholder: "한 문장으로 핵심 가치", aiRecommend: true },
-          { path: "value_proposition.unique_differentiator", label: "차별점", type: "textarea", required: true, placeholder: "경쟁 제품 대비 차별점" },
+          { path: "value_proposition.unique_differentiator", label: "차별점", type: "textarea", required: true, placeholder: "경쟁 제품 대비 차별점", aiRecommend: true },
           { path: "value_proposition.value_hypothesis", label: "가치 가설", type: "textarea", required: false, placeholder: "검증할 가설" },
         ],
       },
@@ -93,7 +93,7 @@ export const phases: PhaseDef[] = [
             path: "goals.primary", label: "핵심 목표", type: "array", required: true,
             arrayItemFields: [
               { path: "goal", label: "목표", type: "textarea", required: true, placeholder: "달성할 목표", aiRecommend: true },
-              { path: "measurable_criterion", label: "측정 기준", type: "text", required: true, placeholder: "어떻게 달성 여부를 측정할지" },
+              { path: "measurable_criterion", label: "측정 기준", type: "text", required: true, placeholder: "어떻게 달성 여부를 측정할지", aiRecommend: true },
               { path: "priority", label: "우선순위", type: "enum", required: true, enumValues: ["P0", "P1", "P2"] },
             ],
           },
@@ -116,7 +116,7 @@ export const phases: PhaseDef[] = [
           {
             path: "non_goals", label: "비목표 목록", type: "array", required: true,
             arrayItemFields: [
-              { path: "statement", label: "비목표", type: "textarea", required: true, placeholder: "하지 않을 것" },
+              { path: "statement", label: "비목표", type: "textarea", required: true, placeholder: "하지 않을 것", aiRecommend: true },
               { path: "rationale", label: "근거", type: "textarea", required: true, placeholder: "왜 비목표인지" },
               { path: "reconsider_when", label: "재검토 시점", type: "text", required: false, placeholder: "언제 재검토할지" },
             ],
@@ -130,8 +130,8 @@ export const phases: PhaseDef[] = [
           {
             path: "scope.in_scope", label: "포함 기능", type: "array", required: true,
             arrayItemFields: [
-              { path: "feature", label: "기능", type: "text", required: true },
-              { path: "user_story", label: "사용자 스토리", type: "textarea", required: true, placeholder: "사용자가 ~한다" },
+              { path: "feature", label: "기능", type: "text", required: true, aiRecommend: true },
+              { path: "user_story", label: "사용자 스토리", type: "textarea", required: true, placeholder: "사용자가 ~한다", aiRecommend: true },
               { path: "priority", label: "우선순위", type: "enum", required: true, enumValues: ["must", "should", "could"] },
               { path: "complexity_estimate", label: "복잡도", type: "enum", required: false, enumValues: ["S", "M", "L", "XL"] },
             ],
@@ -153,7 +153,7 @@ export const phases: PhaseDef[] = [
           {
             path: "assumptions", label: "가정 목록", type: "array", required: true,
             arrayItemFields: [
-              { path: "assumption", label: "가정", type: "textarea", required: true },
+              { path: "assumption", label: "가정", type: "textarea", required: true, aiRecommend: true },
               { path: "if_wrong", label: "틀리면?", type: "textarea", required: true },
               { path: "validation_plan", label: "검증 계획", type: "text", required: false },
             ],
@@ -230,8 +230,8 @@ export const phases: PhaseDef[] = [
             path: "user_personas", label: "페르소나 목록", type: "array", required: true,
             arrayItemFields: [
               { path: "name", label: "이름", type: "text", required: true, placeholder: "예: 비개발자 기획자" },
-              { path: "description", label: "설명", type: "textarea", required: true },
-              { path: "primary_goal", label: "주요 목표", type: "text", required: true },
+              { path: "description", label: "설명", type: "textarea", required: true, aiRecommend: true },
+              { path: "primary_goal", label: "주요 목표", type: "text", required: true, aiRecommend: true },
               {
                 path: "pain_points", label: "불편 사항", type: "array", required: true,
                 arrayItemFields: [{ path: "", label: "항목", type: "text", required: true }],
@@ -333,7 +333,7 @@ export const phases: PhaseDef[] = [
         title: "아키텍처",
         fields: [
           { path: "architecture.pattern", label: "아키텍처 패턴", type: "enum", required: true, enumValues: ["monolith", "microservices", "modular_monolith"], aiRecommend: true },
-          { path: "architecture.pattern_rationale", label: "선택 근거", type: "textarea", required: true },
+          { path: "architecture.pattern_rationale", label: "선택 근거", type: "textarea", required: true, aiRecommend: true },
           {
             path: "architecture.pattern_alternatives", label: "검토한 대안", type: "array", required: true,
             arrayItemFields: [
@@ -395,7 +395,7 @@ export const phases: PhaseDef[] = [
             path: "critical_flows", label: "핵심 흐름 목록", type: "array", required: true,
             arrayItemFields: [
               { path: "flow_name", label: "흐름 이름", type: "text", required: true, aiRecommend: true },
-              { path: "happy_path", label: "정상 경로", type: "textarea", required: true },
+              { path: "happy_path", label: "정상 경로", type: "textarea", required: true, aiRecommend: true },
               {
                 path: "failure_scenarios", label: "실패 시나리오", type: "array", required: false,
                 arrayItemFields: [
@@ -434,8 +434,8 @@ export const phases: PhaseDef[] = [
             path: "security.requirements", label: "보안 요구사항", type: "array", required: true,
             arrayItemFields: [
               { path: "category", label: "카테고리", type: "enum", required: true, enumValues: ["authentication", "authorization", "encryption", "input_validation", "audit", "transport_security"] },
-              { path: "requirement", label: "요구사항", type: "textarea", required: true },
-              { path: "implementation_approach", label: "구현 방법", type: "textarea", required: true },
+              { path: "requirement", label: "요구사항", type: "textarea", required: true, aiRecommend: true },
+              { path: "implementation_approach", label: "구현 방법", type: "textarea", required: true, aiRecommend: true },
             ],
           },
           { path: "security.input_validation_strategy", label: "입력 검증 전략", type: "text", required: false },
@@ -478,8 +478,8 @@ export const phases: PhaseDef[] = [
               { path: "risk", label: "리스크", type: "textarea", required: true, aiRecommend: true },
               { path: "likelihood", label: "가능성", type: "enum", required: true, enumValues: ["high", "medium", "low"] },
               { path: "impact", label: "영향", type: "enum", required: true, enumValues: ["high", "medium", "low"] },
-              { path: "mitigation", label: "완화 방법", type: "textarea", required: true },
-              { path: "contingency", label: "대안(Plan B)", type: "textarea", required: true },
+              { path: "mitigation", label: "완화 방법", type: "textarea", required: true, aiRecommend: true },
+              { path: "contingency", label: "대안(Plan B)", type: "textarea", required: true, aiRecommend: true },
             ],
           },
           {
@@ -530,7 +530,7 @@ export const phases: PhaseDef[] = [
           { path: "performance.data_volume.initial", label: "초기 데이터 규모", type: "text", required: false },
           { path: "performance.data_volume.one_year", label: "1년 후 규모", type: "text", required: false },
           { path: "performance.data_volume.growth_rate", label: "성장률", type: "text", required: false },
-          { path: "performance.caching_strategy", label: "캐싱 전략", type: "text", required: false },
+          { path: "performance.caching_strategy", label: "캐싱 전략", type: "text", required: false, aiRecommend: true },
           {
             path: "performance.long_running_operations", label: "장시간 작업", type: "array", required: false,
             arrayItemFields: [
@@ -547,7 +547,7 @@ export const phases: PhaseDef[] = [
         id: "availability",
         title: "가용성",
         fields: [
-          { path: "availability.target", label: "가용성 목표", type: "text", required: false, placeholder: "예: 99.9%" },
+          { path: "availability.target", label: "가용성 목표", type: "text", required: false, placeholder: "예: 99.9%", aiRecommend: true },
           { path: "availability.acceptable_downtime", label: "허용 다운타임", type: "text", required: false },
           { path: "availability.disaster_recovery.rpo", label: "RPO", type: "text", required: false },
           { path: "availability.disaster_recovery.rto", label: "RTO", type: "text", required: false },
@@ -592,7 +592,7 @@ export const phases: PhaseDef[] = [
         id: "scalability",
         title: "확장성",
         fields: [
-          { path: "scalability.strategy", label: "확장 전략", type: "enum", required: false, enumValues: ["vertical", "horizontal", "auto"] },
+          { path: "scalability.strategy", label: "확장 전략", type: "enum", required: false, enumValues: ["vertical", "horizontal", "auto"], aiRecommend: true },
           {
             path: "scalability.bottlenecks", label: "예상 병목", type: "array", required: false,
             arrayItemFields: [{ path: "", label: "병목", type: "text", required: false }],
@@ -616,7 +616,7 @@ export const phases: PhaseDef[] = [
         id: "process",
         title: "프로세스",
         fields: [
-          { path: "process.methodology", label: "방법론", type: "enum", required: true, enumValues: ["scrum", "kanban", "scrumban", "xp"] },
+          { path: "process.methodology", label: "방법론", type: "enum", required: true, enumValues: ["scrum", "kanban", "scrumban", "xp"], aiRecommend: true },
           { path: "process.sprint_length", label: "스프린트 길이(주)", type: "text", required: false },
           { path: "process.wip_limit", label: "WIP 제한", type: "text", required: false },
           { path: "process.task_review_minutes", label: "태스크 리뷰 시간(분)", type: "text", required: false },
@@ -651,7 +651,7 @@ export const phases: PhaseDef[] = [
         id: "testing",
         title: "테스트",
         fields: [
-          { path: "testing.approach", label: "테스트 접근법", type: "enum", required: true, enumValues: ["tdd", "bdd", "test_after", "test_first"] },
+          { path: "testing.approach", label: "테스트 접근법", type: "enum", required: true, enumValues: ["tdd", "bdd", "test_after", "test_first"], aiRecommend: true },
           {
             path: "testing.levels", label: "테스트 레벨", type: "array", required: true,
             arrayItemFields: [
@@ -661,7 +661,7 @@ export const phases: PhaseDef[] = [
               { path: "approach", label: "접근법", type: "text", required: false },
             ],
           },
-          { path: "testing.test_data_strategy", label: "테스트 데이터 전략", type: "enum", required: false, enumValues: ["fixtures", "factories", "snapshots", "seed_scripts"] },
+          { path: "testing.test_data_strategy", label: "테스트 데이터 전략", type: "enum", required: false, enumValues: ["fixtures", "factories", "snapshots", "seed_scripts"], aiRecommend: true },
           { path: "testing.test_environment.db_strategy", label: "DB 전략", type: "enum", required: false, enumValues: ["in_memory", "testcontainers", "shared_test_db", "docker_compose"] },
           { path: "testing.test_environment.external_service_strategy", label: "외부 서비스 전략", type: "enum", required: false, enumValues: ["mocks", "stubs", "sandbox", "wiremock"] },
         ],
@@ -670,9 +670,9 @@ export const phases: PhaseDef[] = [
         id: "version_control",
         title: "버전 관리",
         fields: [
-          { path: "version_control.branch_strategy", label: "브랜치 전략", type: "enum", required: true, enumValues: ["github_flow", "gitflow", "trunk_based", "master_develop_task"] },
+          { path: "version_control.branch_strategy", label: "브랜치 전략", type: "enum", required: true, enumValues: ["github_flow", "gitflow", "trunk_based", "master_develop_task"], aiRecommend: true },
           { path: "version_control.branch_strategy_description", label: "브랜치 전략 설명", type: "textarea", required: false },
-          { path: "version_control.commit_convention", label: "커밋 컨벤션", type: "enum", required: false, enumValues: ["conventional", "gitmoji", "angular", "free"] },
+          { path: "version_control.commit_convention", label: "커밋 컨벤션", type: "enum", required: false, enumValues: ["conventional", "gitmoji", "angular", "free"], aiRecommend: true },
           { path: "version_control.monorepo_or_polyrepo", label: "모노레포/폴리레포", type: "enum", required: false, enumValues: ["monorepo", "polyrepo"] },
           { path: "version_control.pr_policy.created_by", label: "PR 생성자", type: "enum", required: false, enumValues: ["human", "claude", "both"] },
           { path: "version_control.pr_policy.template_required", label: "PR 템플릿 필수", type: "boolean", required: false, defaultValue: true },
@@ -698,7 +698,7 @@ export const phases: PhaseDef[] = [
           {
             path: "evolution.future_features", label: "미래 기능", type: "array", required: false,
             arrayItemFields: [
-              { path: "feature", label: "기능", type: "text", required: true },
+              { path: "feature", label: "기능", type: "text", required: true, aiRecommend: true },
               { path: "planned_phase", label: "예정 단계", type: "enum", required: true, enumValues: ["v2", "v3", "post_launch", "backlog"] },
               { path: "architectural_impact", label: "아키텍처 영향", type: "textarea", required: true },
               { path: "preparation_needed", label: "사전 준비", type: "textarea", required: true },
@@ -712,7 +712,7 @@ export const phases: PhaseDef[] = [
         id: "rollout",
         title: "롤아웃",
         fields: [
-          { path: "rollout.strategy", label: "롤아웃 전략", type: "enum", required: false, enumValues: ["big_bang", "canary", "blue_green", "rolling", "feature_flag"] },
+          { path: "rollout.strategy", label: "롤아웃 전략", type: "enum", required: false, enumValues: ["big_bang", "canary", "blue_green", "rolling", "feature_flag"], aiRecommend: true },
           {
             path: "rollout.phases", label: "롤아웃 단계", type: "array", required: false,
             arrayItemFields: [
@@ -721,7 +721,7 @@ export const phases: PhaseDef[] = [
               { path: "success_criteria", label: "성공 기준", type: "text", required: true },
             ],
           },
-          { path: "rollout.rollback_plan", label: "롤백 계획", type: "textarea", required: false },
+          { path: "rollout.rollback_plan", label: "롤백 계획", type: "textarea", required: false, aiRecommend: true },
           { path: "rollout.db_migration_strategy", label: "DB 마이그레이션 전략", type: "text", required: false },
         ],
       },

@@ -41,6 +41,7 @@
 | 2026-03-08 | T036: AI 추천 백엔드 — POST /api/v1/recommend Haiku 엔드포인트 + 단위 테스트 11개 | 완료 |
 | 2026-03-08 | T037: AI 추천 UI 연동 — AiRecommendButton, FormField 통합, advancedStore.requestRecommendation | 완료 |
 | 2026-03-08 | T038-T040: 스키마 드리프트 감지 — schema-meta 엔드포인트, 드리프트 배너, 동적 enum 보강 | 완료 |
+| 2026-03-08 | T041: AI 추천 필드 확장 — phaseSchema 28개 + serviceSchema 6개 필드에 aiRecommend: true 추가 (12→46) | 완료 |
 
 <!-- Claude: §5.8 작업 완료, §5.12 작업 중단/취소 시 한 줄 추가.
      작업 내용은 "무엇을 왜" 중심 1줄 요약.
@@ -299,6 +300,13 @@
 - **작업**: SDwC 템플릿 변경에 대한 Advanced 모드 복원력 확보. (T038) 백엔드 GET /api/v1/schema-meta 엔드포인트 — field_requirements.yaml 파싱하여 template_hash, service_types, enum_fields, required_fields 반환. (T039) 프론트엔드 스키마 드리프트 감지 — 백엔드 메타데이터를 정적 phaseSchema/serviceSchema와 비교, 드리프트 시 yellow/red 경고 배너 표시. (T040) 동적 enum 보강 — 템플릿에 새 enum 값이 있으면 "(new)" 접미사로 드롭다운에 자동 추가.
 - **변경된 파일**: [API] services/template_parser.py (신규), schemas/schema_meta.py (신규), routers/schema_meta.py (신규), main.py (수정), tests/unit/test_template_parser.py (신규, 7), tests/unit/test_schema_meta_api.py (신규, 3). [Web] api/types.ts (수정), api/client.ts (수정), stores/advancedStore.ts (수정), schema/schemaDrift.ts (신규), schema/dynamicEnums.ts (신규), components/SchemaDriftBanner.tsx (신규), components/EnumSelect.tsx (수정), components/FormField.tsx (수정), components/ServiceEditor.tsx (수정), pages/AdvancedPage/index.tsx (수정). [Docs] 07-workplan.md, 09-working-log.md, 10-changelog.md, 21-api-contract.md.
 - **의사결정**: KNOWN_OMITTED_PATHS로 의도적 생략 필드(~50개)를 드리프트에서 제외. schema-meta를 rate limit skip 대상에 추가(GET 엔드포인트). 템플릿 미로드 시 빈 fallback(드리프트 감지 불가, 정상 작동).
+- **미완료/후속**: 없음.
+
+### 2026-03-08 — T041: AI 추천 필드 확장
+
+- **작업**: phaseSchema.ts에 28개 필드, serviceSchema.ts에 6개 필드에 aiRecommend: true 추가. Phase 0에 4개(who_has_this_problem, current_workaround, frequency, unique_differentiator), Phase 1에 5개(measurable_criterion, feature, user_story, statement, assumption), Phase 2에 2개(description, primary_goal), Phase 3에 1개(pattern_rationale), Phase 4에 5개(happy_path, mitigation, contingency, requirement, implementation_approach), Phase 5에 3개(caching_strategy, scalability.strategy, availability.target), Phase 6에 5개(methodology, testing.approach, branch_strategy, test_data_strategy, commit_convention), Phase 7에 3개(evolution feature, rollout.strategy, rollback_plan). serviceSchema에 responsibility(common) + 5개 framework_rationale(backend_api, web_ui, worker, mobile_app, data_pipeline).
+- **변경된 파일**: phaseSchema.ts (수정), serviceSchema.ts (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md, README.md
+- **의사결정**: 컴포넌트/백엔드 변경 불필요 — 기존 AI 추천 인프라(AiRecommendButton, FormField, advancedStore.requestRecommendation, POST /api/v1/recommend)가 완전 동작 중이므로 스키마 플래그 추가만으로 충분.
 - **미완료/후속**: 없음.
 
 ### 2026-03-07 — T015: infra/ 매니페스트를 sdwc-platform으로 이관
