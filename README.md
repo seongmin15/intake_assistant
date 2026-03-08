@@ -1,25 +1,30 @@
 # intake-assistant
 
-> 대화형 AI를 통해 SDwC용 intake_data.yaml을 자동 생성하는 서비스
+> SDwC용 intake_data.yaml을 생성하는 서비스 — AI 대화(Simple) 또는 직접 편집(Advanced)
 
-비개발자가 자유 텍스트로 만들고 싶은 서비스를 설명하면, AI가 3~4개의 핵심 질문을 통해 의도를 파악하고 SDwC가 처리할 수 있는 `intake_data.yaml`을 자동 생성합니다. 사용자는 기술 결정 없이 아키텍처 카드로 결과를 확인하고, ZIP 프로젝트를 받습니다.
+## 모드
 
-## 핵심 흐름
+### Simple 모드 (AI 대화)
 
-1. **모드 선택** — Simple(AI 대화) / Advanced(sdwc-web 리다이렉트)
-2. **자유 텍스트 입력** — 만들고 싶은 서비스를 자연어로 설명
-3. **동적 질문(Q1~Q4)** — 플랫폼, 데이터 영속성, 멀티유저, 외부 의존성
-4. **YAML 생성** — AI가 SDwC 호환 `intake_data.yaml` 전체 생성 + 자동 검증
-5. **아키텍처 카드** — 5항목 요약 + 기능 체크리스트로 결과 확인
-6. **수정 반복** — 자유 텍스트로 수정 요청 → 전체 재생성
-7. **ZIP 다운로드** — SDwC `/generate`를 통해 프로젝트 스캐폴딩 ZIP 수신
+비개발자가 자유 텍스트로 만들고 싶은 서비스를 설명하면, AI가 몇 가지 질문을 통해 의도를 파악하고 SDwC 호환 `intake_data.yaml`을 자동 생성합니다.
+
+1. **자유 텍스트 입력** — 만들고 싶은 서비스를 자연어로 설명
+2. **동적 질문** — AI가 생성한 5~6개 질문에 자유 텍스트로 답변
+3. **YAML 생성** — SSE 스트리밍으로 실시간 진행 상태를 표시하며 `intake_data.yaml` 생성 + SDwC 자동 검증
+4. **아키텍처 카드** — 5항목 요약 + 기능 체크리스트로 결과 확인
+5. **수정 반복** — 자유 텍스트로 수정 요청 → 전체 재생성
+6. **ZIP 다운로드** — SDwC `/generate`를 통해 프로젝트 스캐폴딩 ZIP 수신
+
+### Advanced 모드 (직접 편집)
+
+sdwc-web으로 리다이렉트하여 `intake_data.yaml`을 직접 편집합니다.
 
 ## 서비스 구성
 
 | 서비스 | 타입 | 기술 스택 | 역할 |
 |--------|------|----------|------|
 | `intake-assistant-api` | Backend API | Python + FastAPI | AI 대화 처리, 동적 질문 생성, YAML 생성, SDwC 연동 |
-| `intake-assistant-web` | Web UI | TypeScript + React + Vite | 자유 텍스트 입력, 동적 질문, 아키텍처 카드, ZIP 다운로드 |
+| `intake-assistant-web` | Web UI | TypeScript + React + Vite | 모드 선택, 자유 텍스트 입력, 동적 질문, 아키텍처 카드, ZIP 다운로드 |
 
 ## 아키텍처
 
@@ -28,19 +33,29 @@
 - **인증**: 없음 (내부 도구 수준)
 - **배포**: Kubernetes (k3s), GitHub Actions + ArgoCD
 
+### 주요 기능
+
+- **SSE 스트리밍**: analyze/generate 중 실시간 진행 상태 전달
+- **Prompt Caching**: generate 시스템 프롬프트에 `cache_control: ephemeral` 적용
+- **동적 프롬프트**: SDwC `field_requirements.yaml`에서 스키마 규칙을 동적 생성 (fallback: 하드코딩)
+- **Rate Limiting**: IP 기반 sliding window (20req/60s)
+- **Input Sanitization**: HTML 태그 제거, 과도한 공백/개행 축소
+
 ## 외부 의존성
 
 | 시스템 | 용도 |
 |--------|------|
 | Anthropic API | Haiku(질문 생성), Sonnet(YAML 생성/수정) |
-| SDwC API | 템플릿 수신, YAML validation, ZIP 생성 |
+| SDwC API | 템플릿 수신, field_requirements 수신, YAML validation, ZIP 생성 |
 
 ## API 엔드포인트
 
 | 메서드 | 경로 | 설명 |
 |--------|------|------|
 | POST | `/api/v1/analyze` | 자유 텍스트 분석 → 동적 질문 생성 |
+| POST | `/api/v1/analyze/stream` | analyze SSE 스트리밍 (실시간 진행 상태) |
 | POST | `/api/v1/generate` | 사용자 응답 기반 YAML 생성 + 자동 검증 |
+| POST | `/api/v1/generate/stream` | generate SSE 스트리밍 (실시간 진행 상태) |
 | POST | `/api/v1/finalize` | 확정된 YAML → SDwC ZIP 생성 |
 | GET | `/api/v1/health` | 헬스체크 (SDwC 연결 상태 포함) |
 
