@@ -90,3 +90,11 @@ export interface RecommendResponse {
   suggestion: string;
   rationale: string;
 }
+
+// Schema metadata for drift detection
+export interface SchemaMetaResponse {
+  template_hash: string;
+  service_types: string[];
+  enum_fields: Record<string, string[]>;
+  required_fields: string[];
+}

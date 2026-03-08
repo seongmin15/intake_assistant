@@ -7,6 +7,7 @@ import { EnumSelect } from "./EnumSelect";
 import { BooleanToggle } from "./BooleanToggle";
 import { NumberField } from "./NumberField";
 import { AiRecommendButton } from "./AiRecommendButton";
+import { getDynamicEnumOptions } from "../schema/dynamicEnums";
 
 interface FormFieldProps {
   field: FieldDef;
@@ -18,6 +19,7 @@ export function FormField({ field, basePath }: FormFieldProps) {
   const setField = useAdvancedStore((s) => s.setField);
   const fullPath = basePath ? `${basePath}.${field.path}` : field.path;
   const value = useAdvancedStore((s) => getByPath(s.formData, fullPath));
+  const schemaMeta = useAdvancedStore((s) => s.schemaMeta);
 
   // Skip array/object/service_list types — handled by ArrayField/ServiceEditor
   if (field.type === "array" || field.type === "object" || field.type === "service_list") {
@@ -27,6 +29,10 @@ export function FormField({ field, basePath }: FormFieldProps) {
   const handleChange = (newValue: unknown) => {
     setField(fullPath, newValue);
   };
+
+  const dynamicOptions = field.type === "enum"
+    ? getDynamicEnumOptions(fullPath, field.enumValues ?? [], schemaMeta)
+    : undefined;
 
   return (
     <div className="flex flex-col gap-1">
@@ -47,7 +53,7 @@ export function FormField({ field, basePath }: FormFieldProps) {
       {field.description && (
         <p className="text-xs text-gray-400">{field.description}</p>
       )}
-      {renderInput(field, value, handleChange)}
+      {renderInput(field, value, handleChange, dynamicOptions)}
     </div>
   );
 }
@@ -56,6 +62,7 @@ function renderInput(
   field: FieldDef,
   value: unknown,
   onChange: (value: unknown) => void,
+  dynamicOptions?: string[],
 ) {
   switch (field.type) {
     case "text":
@@ -80,6 +87,7 @@ function renderInput(
           value={(value as string) ?? ""}
           onChange={onChange}
           options={field.enumValues ?? []}
+          dynamicOptions={dynamicOptions}
         />
       );
     case "boolean":

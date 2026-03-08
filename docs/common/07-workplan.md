@@ -597,6 +597,51 @@ Any active status -> Cancelled
 
 ---
 
+### T038: Backend — GET /api/v1/schema-meta 엔드포인트
+- Status: Done
+- Service: intake-assistant-api
+- Description: 템플릿 메타데이터(hash, service_types, enum_fields, required_fields) 반환 엔드포인트. template_parser.py(field_requirements.yaml 파싱), schema_meta.py(응답 모델), schema_meta 라우터 추가.
+- Acceptance Criteria:
+  - [x] template_parser.py — compute_template_hash, extract_enum_fields, extract_required_fields, extract_service_types
+  - [x] schemas/schema_meta.py — SchemaMetaResponse 모델
+  - [x] routers/schema_meta.py — GET /api/v1/schema-meta
+  - [x] main.py에 라우터 등록 + rate limit skip
+  - [x] test_template_parser.py (7 tests) + test_schema_meta_api.py (3 tests) 통과
+  - [x] ruff check 통과
+- Result: 10개 신규 테스트 포함 전체 105 테스트 통과. field_requirements.yaml 기반 파싱으로 enum/required 메타데이터 추출. 템플릿 미로드 시 빈 fallback 반환.
+
+---
+
+### T039: Frontend — 스키마 드리프트 감지 + 경고 배너
+- Status: Done
+- Service: intake-assistant-web
+- Description: fetchSchemaMeta() API 함수, SchemaMetaResponse 타입, schemaDrift.ts 감지 로직, SchemaDriftBanner.tsx, advancedStore 통합, AdvancedPage 마운트.
+- Acceptance Criteria:
+  - [x] api/types.ts에 SchemaMetaResponse 타입
+  - [x] api/client.ts에 fetchSchemaMeta() 함수
+  - [x] schemaDrift.ts — detectSchemaDrift() + KNOWN_OMITTED_PATHS
+  - [x] SchemaDriftBanner.tsx — yellow(minor)/red(major) 경고 배너
+  - [x] advancedStore에 schemaMeta/schemaDrift 상태 + fetchSchemaMeta 액션
+  - [x] AdvancedPage에서 마운트 시 fetchSchemaMeta 호출 + 배너 렌더링
+  - [x] npm run build + lint 통과
+- Result: AdvancedPage 진입 시 백엔드 schema-meta API 호출 → 정적 스키마와 비교 → 드리프트 감지 시 경고 배너 표시. KNOWN_OMITTED_PATHS로 의도적 생략 필드 필터링.
+
+---
+
+### T040: Frontend — 동적 enum 값 보강
+- Status: Done
+- Service: intake-assistant-web
+- Description: EnumSelect에 dynamicOptions prop 추가, dynamicEnums.ts 유틸리티, FormField/ServiceEditor에서 schemaMeta 기반 동적 옵션 전달.
+- Acceptance Criteria:
+  - [x] EnumSelect.tsx — dynamicOptions prop, "(new)" 접미사로 표시
+  - [x] dynamicEnums.ts — getDynamicEnumOptions, getServiceDynamicEnumOptions
+  - [x] FormField.tsx — schemaMeta에서 동적 옵션 계산 후 EnumSelect에 전달
+  - [x] ServiceEditor.tsx — 서비스 타입별 동적 옵션 전달
+  - [x] npm run build + lint 통과
+- Result: SDwC 템플릿에 새 enum 값 추가 시 코드 변경 없이 드롭다운에 "(new)" 접미사와 함께 자동 표시. 전체 build + lint 통과.
+
+---
+
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
      Claude fills the Tasks section during Init based on docs/common/05-roadmap.md.

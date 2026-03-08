@@ -1,9 +1,11 @@
 import { create } from "zustand";
 
 import * as api from "@/api/client";
+import type { SchemaMetaResponse } from "@/api/types";
 import { getByPath, setByPath, deleteByPath } from "@/utils/pathUtils";
 import { phases } from "@/pages/AdvancedPage/schema/phaseSchema";
 import { serializeToYaml } from "@/pages/AdvancedPage/schema/yamlSerializer";
+import { type SchemaDrift, detectSchemaDrift } from "@/pages/AdvancedPage/schema/schemaDrift";
 
 export interface ServiceFormData {
   id: string;
@@ -24,6 +26,11 @@ interface AdvancedState {
   submitPhase: SubmitPhase;
   yamlContent: string | null;
   error: string | null;
+
+  // Schema metadata for drift detection
+  schemaMeta: SchemaMetaResponse | null;
+  schemaDrift: SchemaDrift | null;
+  schemaMetaLoading: boolean;
 
   // Navigation
   nextPhase: () => void;
@@ -50,6 +57,9 @@ interface AdvancedState {
     fieldInfo: { description?: string; enum_values?: string[]; field_type?: string },
   ) => Promise<void>;
 
+  // Schema metadata
+  fetchSchemaMeta: () => Promise<void>;
+
   // Submit
   submitAdvanced: () => Promise<void>;
   setSubmitPhase: (phase: SubmitPhase) => void;
@@ -73,6 +83,9 @@ const initialState = {
   submitPhase: "idle" as SubmitPhase,
   yamlContent: null as string | null,
   error: null as string | null,
+  schemaMeta: null as SchemaMetaResponse | null,
+  schemaDrift: null as SchemaDrift | null,
+  schemaMetaLoading: false,
 };
 
 export const useAdvancedStore = create<AdvancedState>((set, get) => ({
@@ -174,6 +187,19 @@ export const useAdvancedStore = create<AdvancedState>((set, get) => ({
       set({ recommendError: message });
     } finally {
       set({ recommendLoading: null });
+    }
+  },
+
+  fetchSchemaMeta: async () => {
+    set({ schemaMetaLoading: true });
+    try {
+      const meta = await api.fetchSchemaMeta();
+      const drift = detectSchemaDrift(meta);
+      set({ schemaMeta: meta, schemaDrift: drift });
+    } catch (err) {
+      console.error("[스키마 메타 로드 실패]", err);
+    } finally {
+      set({ schemaMetaLoading: false });
     }
   },
 

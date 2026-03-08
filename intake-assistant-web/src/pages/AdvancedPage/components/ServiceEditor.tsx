@@ -4,6 +4,7 @@ import type { ServiceFormData } from "@/stores/advancedStore";
 import { useAdvancedStore } from "@/stores/advancedStore";
 import { getServiceFields, SERVICE_TYPES } from "../schema/serviceSchema";
 import type { FieldDef } from "../schema/fieldTypes";
+import { getServiceDynamicEnumOptions } from "../schema/dynamicEnums";
 import { TextField } from "./TextField";
 import { TextAreaField } from "./TextAreaField";
 import { EnumSelect } from "./EnumSelect";
@@ -19,6 +20,7 @@ interface ServiceEditorProps {
 export function ServiceEditor({ service, index }: ServiceEditorProps) {
   const removeService = useAdvancedStore((s) => s.removeService);
   const setServiceField = useAdvancedStore((s) => s.setServiceField);
+  const schemaMeta = useAdvancedStore((s) => s.schemaMeta);
   const [collapsed, setCollapsed] = useState(false);
 
   const typeLabel = SERVICE_TYPES.find((t) => t.value === service.type)?.label ?? service.type;
@@ -60,6 +62,8 @@ export function ServiceEditor({ service, index }: ServiceEditorProps) {
               service={service}
               index={index}
               setServiceField={setServiceField}
+              serviceType={service.type}
+              schemaMeta={schemaMeta}
             />
           ))}
         </div>
@@ -73,9 +77,11 @@ interface ServiceFieldRendererProps {
   service: ServiceFormData;
   index: number;
   setServiceField: (index: number, field: string, value: unknown) => void;
+  serviceType: string;
+  schemaMeta: import("@/api/types").SchemaMetaResponse | null;
 }
 
-function ServiceFieldRenderer({ field, service, index, setServiceField }: ServiceFieldRendererProps) {
+function ServiceFieldRenderer({ field, service, index, setServiceField, serviceType, schemaMeta }: ServiceFieldRendererProps) {
   if (field.type === "array") {
     return (
       <ServiceArrayField
@@ -93,6 +99,10 @@ function ServiceFieldRenderer({ field, service, index, setServiceField }: Servic
     setServiceField(index, field.path, newValue);
   };
 
+  const dynamicOptions = field.type === "enum"
+    ? getServiceDynamicEnumOptions(serviceType, field.path, field.enumValues ?? [], schemaMeta)
+    : undefined;
+
   return (
     <div className="flex flex-col gap-1">
       <label className="flex items-center gap-1 text-sm font-medium text-gray-700">
@@ -102,7 +112,7 @@ function ServiceFieldRenderer({ field, service, index, setServiceField }: Servic
       {field.description && (
         <p className="text-xs text-gray-400">{field.description}</p>
       )}
-      {renderServiceInput(field, value, handleChange)}
+      {renderServiceInput(field, value, handleChange, dynamicOptions)}
     </div>
   );
 }
@@ -121,6 +131,7 @@ function renderServiceInput(
   field: FieldDef,
   value: unknown,
   onChange: (value: unknown) => void,
+  dynamicOptions?: string[],
 ) {
   switch (field.type) {
     case "text":
@@ -128,7 +139,7 @@ function renderServiceInput(
     case "textarea":
       return <TextAreaField value={(value as string) ?? ""} onChange={onChange} placeholder={field.placeholder} />;
     case "enum":
-      return <EnumSelect value={(value as string) ?? ""} onChange={onChange} options={field.enumValues ?? []} />;
+      return <EnumSelect value={(value as string) ?? ""} onChange={onChange} options={field.enumValues ?? []} dynamicOptions={dynamicOptions} />;
     case "boolean":
       return <BooleanToggle value={(value as boolean) ?? field.defaultValue ?? false} onChange={onChange} />;
     case "number":

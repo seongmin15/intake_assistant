@@ -244,4 +244,33 @@
 
 ---
 
+### 4.9. GET /api/v1/schema-meta
+
+> 템플릿 메타데이터 반환 — 프론트엔드 스키마 드리프트 감지용
+
+**요청**: 없음 (GET)
+
+**응답**
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| template_hash | string | 템플릿 YAML의 SHA-256 해시 (sha256:...) |
+| service_types | string[] | 사용 가능한 서비스 타입 목록 |
+| enum_fields | Record<string, string[]> | enum 필드별 허용값 (dot-notation path → values) |
+| required_fields | string[] | 필수 필드 경로 목록 (dot-notation) |
+
+**처리 로직**
+
+1. template_cache에서 field_requirements.yaml 로드
+2. 재귀 파싱으로 enum 필드, required 필드, service_types 추출
+3. template YAML 원본 텍스트의 SHA-256 해시 계산
+4. field_requirements 미로드 시 빈 fallback 반환 (template_hash만 포함)
+
+**상태**
+
+- Rate limit 제외 (GET 엔드포인트)
+- 템플릿 미로드 시 200 + 빈 메타데이터 반환
+
+---
+
 <!-- Claude: 수정/추가 시 기존 섹션 구조와 형식을 유지. -->
