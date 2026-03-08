@@ -642,6 +642,19 @@ Any active status -> Cancelled
 
 ---
 
+### T041: AI 추천 필드 확장 (12 → 46 fields)
+- Status: Done
+- Service: intake-assistant-web
+- Description: phaseSchema.ts에 28개 필드, serviceSchema.ts에 6개 필드에 aiRecommend: true 추가. 모든 Phase와 serviceSchema에 AI 추천 커버리지 확보.
+- Acceptance Criteria:
+  - [x] phaseSchema.ts — 28개 필드에 aiRecommend: true 추가
+  - [x] serviceSchema.ts — 6개 필드에 aiRecommend: true 추가 (responsibility + 5개 framework_rationale)
+  - [x] 모든 Phase(0~7)에 최소 1개 AI 추천 필드 보유
+  - [x] npm run build + lint 통과
+- Result: phaseSchema.ts 40개(기존 12 + 신규 28), serviceSchema.ts 6개(신규), 총 46개 필드에 AI 추천 활성화. TypeScript + Vite build 통과.
+
+---
+
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
      Claude fills the Tasks section during Init based on docs/common/05-roadmap.md.
