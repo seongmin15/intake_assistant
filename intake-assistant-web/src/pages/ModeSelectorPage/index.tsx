@@ -14,6 +14,10 @@ export function ModeSelectorPage() {
   const handleAdvanced = () => {
     if (SDWC_WEB_URL) {
       window.location.href = SDWC_WEB_URL;
+    } else {
+      alert(
+        "SDwC 웹 에디터 URL이 설정되지 않았습니다.\n관리자에게 VITE_SDWC_WEB_URL 환경 변수 설정을 요청하세요.",
+      );
     }
   };
 
@@ -31,7 +35,7 @@ export function ModeSelectorPage() {
           target="비개발자, 빠른 프로토타이핑"
           details={[
             "자유 텍스트로 설명",
-            "3~4개 핵심 질문에 답변",
+            "몇 가지 질문에 자유롭게 답변",
             "아키텍처 카드로 결과 확인",
             "ZIP 프로젝트 다운로드",
           ]}

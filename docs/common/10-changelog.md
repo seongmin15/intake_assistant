@@ -20,6 +20,8 @@
 - intake-assistant-web: QuestionCard를 radio/checkbox에서 textarea 기반으로 전환, intakeStore answers 타입을 Record<string, string>으로 변경, E2E 테스트를 textarea.fill()로 전환 (T028)
 
 ### Fixed
+- intake-assistant-web: Simple 모드 설명 "3~4개 핵심 질문에 답변" → "몇 가지 질문에 자유롭게 답변"으로 수정 — T028 자유 텍스트 전환 반영
+- intake-assistant-web: Advanced 모드 버튼 클릭 시 VITE_SDWC_WEB_URL 미설정이면 안내 alert 표시 — 기존에는 무반응
 - intake-assistant-api: generate API JSON 메타데이터 블록을 optional로 변경 — JSON 블록 누락/파싱 실패 시 기본 메타데이터 fallback 적용, "No JSON block found" 오류 완전 해소
 - intake-assistant-api: generate API JSON 파싱 강화 — brace-balancing 기반 _find_raw_json() fallback으로 raw JSON 감지 개선
 - intake-assistant-api: generate API YAML/JSON 파싱 강화 — 코드 펜스 없이 반환된 raw YAML/JSON fallback 추가, "No YAML block found" 오류 감소
