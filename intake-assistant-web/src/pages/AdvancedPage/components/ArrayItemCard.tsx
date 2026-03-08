@@ -1,5 +1,6 @@
 import type { FieldDef } from "../schema/fieldTypes";
 import { useAdvancedStore } from "@/stores/advancedStore";
+import { getByPath } from "@/utils/pathUtils";
 import { TextField } from "./TextField";
 import { FormField } from "./FormField";
 import { ArrayField } from "./ArrayField";
@@ -13,13 +14,13 @@ interface ArrayItemCardProps {
 }
 
 export function ArrayItemCard({ index, arrayPath, itemFields, isSimple, onRemove }: ArrayItemCardProps) {
-  const getField = useAdvancedStore((s) => s.getField);
   const setField = useAdvancedStore((s) => s.setField);
-
   const itemPath = `${arrayPath}.${index}`;
+  const value = useAdvancedStore((s) =>
+    isSimple ? ((getByPath(s.formData, itemPath) as string) ?? "") : "",
+  );
 
   if (isSimple) {
-    const value = (getField(itemPath) as string) ?? "";
     return (
       <div className="flex items-center gap-2">
         <span className="text-xs text-gray-400">{index + 1}.</span>
