@@ -1,5 +1,6 @@
 import type { FieldDef } from "../schema/fieldTypes";
 import { useAdvancedStore } from "@/stores/advancedStore";
+import { getByPath } from "@/utils/pathUtils";
 import { TextField } from "./TextField";
 import { TextAreaField } from "./TextAreaField";
 import { EnumSelect } from "./EnumSelect";
@@ -14,11 +15,9 @@ interface FormFieldProps {
 }
 
 export function FormField({ field, basePath }: FormFieldProps) {
-  const getField = useAdvancedStore((s) => s.getField);
   const setField = useAdvancedStore((s) => s.setField);
-
   const fullPath = basePath ? `${basePath}.${field.path}` : field.path;
-  const value = getField(fullPath);
+  const value = useAdvancedStore((s) => getByPath(s.formData, fullPath));
 
   // Skip array/object/service_list types — handled by ArrayField/ServiceEditor
   if (field.type === "array" || field.type === "object" || field.type === "service_list") {

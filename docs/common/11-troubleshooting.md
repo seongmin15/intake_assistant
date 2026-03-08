@@ -14,6 +14,13 @@
      단순 오타, 1회성 실수는 기록 불필요.
      카테고리 예시: [환경] [빌드] [런타임] [데이터] [배포] [외부서비스] -->
 
+### [런타임] Advanced 모드 — 폼 입력(타이핑) 불가
+- **증상**: Advanced 모드에서 텍스트 필드에 타이핑해도 입력값이 표시되지 않음. 키 입력이 완전히 무시되는 것처럼 보임.
+- **원인**: `FormField`와 `ArrayItemCard` 컴포넌트가 `useAdvancedStore((s) => s.getField)`로 Zustand store를 구독. `getField`는 store 생성 시 한 번 만들어진 안정적인 함수 참조이므로, `formData`가 변경되어도 참조가 동일하여 컴포넌트가 re-render되지 않음. `setField`로 값이 저장되지만 화면에 반영되지 않아 입력 불가로 보임.
+- **해결**: `getField` 함수 구독 대신 `useAdvancedStore((s) => getByPath(s.formData, fullPath))`로 변경하여 `formData` 객체 변경 시 해당 경로의 값이 변하면 re-render되도록 수정.
+- **예방**: Zustand에서 store 내부 메서드(함수)를 selector로 구독하면 참조가 변하지 않아 re-render가 발생하지 않음. 파생 데이터가 필요한 경우 selector 내에서 직접 계산해야 함.
+- **발견일**: 2026-03-08
+
 ### [런타임] analyze API — inferred_hints Pydantic 검증 실패
 - **증상**: POST /api/v1/analyze 호출 시 `AnalyzeResponse` 검증 오류 발생. `inferred_hints` 필드에 `Input should be a valid string` 에러 다수 (location_based, filtering_required 등).
 - **원인**: `Analysis.inferred_hints` 타입이 `dict[str, str]`로 정의되어 있었으나, Haiku가 `"location_based": true` 같은 bool 값을 반환. Pydantic이 str이 아닌 bool을 거부.
