@@ -8,6 +8,10 @@
 
 ### Fixed
 - intake-assistant-web: Advanced 모드 폼 입력 불가 수정 — FormField/ArrayItemCard가 Zustand store의 getField 함수 참조만 구독하여 formData 변경 시 re-render되지 않던 문제 해결
+- intake-assistant-web: AI 추천 실패 시 에러 피드백 추가 — 기존 silent catch에서 "추천 실패" 메시지 + console.error로 변경
+
+### Added
+- intake-assistant-web: Simple 모드에 "모드 선택으로 돌아가기" 버튼 추가 — Advanced 모드와 동일한 위치/스타일
 
 ### Added
 - intake-assistant-api: POST /api/v1/recommend 엔드포인트 — Haiku 기반 개별 필드 AI 추천 (context + field_path → suggestion + rationale), 2회 재시도, 단위 테스트 11개 (T036)

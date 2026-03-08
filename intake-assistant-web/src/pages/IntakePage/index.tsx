@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import { useIntakeStore } from "@/stores/intakeStore";
 
 import { ArchitectureCard } from "./components/ArchitectureCard";
@@ -7,6 +9,7 @@ import { RevisionInput } from "./components/RevisionInput";
 import { TextInput } from "./components/TextInput";
 
 export function IntakePage() {
+  const navigate = useNavigate();
   const {
     phase,
     questions,
@@ -40,7 +43,16 @@ export function IntakePage() {
   return (
     <main className="flex min-h-screen flex-col items-center bg-gray-50 px-4 py-12">
       <div className="w-full max-w-2xl">
-        <h1 className="mb-8 text-2xl font-bold text-gray-900">Simple 모드</h1>
+        <div className="mb-8 flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-gray-900">Simple 모드</h1>
+          <button
+            type="button"
+            onClick={() => { reset(); navigate("/"); }}
+            className="text-sm text-gray-400 transition hover:text-gray-600"
+          >
+            모드 선택으로 돌아가기
+          </button>
+        </div>
 
         {phase === "input" && <TextInput onSubmit={handleAnalyze} />}
 

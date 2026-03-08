@@ -20,6 +20,7 @@ interface AdvancedState {
   services: ServiceFormData[];
   phaseErrors: Record<number, string[]>;
   recommendLoading: string | null;
+  recommendError: string | null;
   submitPhase: SubmitPhase;
   yamlContent: string | null;
   error: string | null;
@@ -68,6 +69,7 @@ const initialState = {
   services: [] as ServiceFormData[],
   phaseErrors: {} as Record<number, string[]>,
   recommendLoading: null as string | null,
+  recommendError: null as string | null,
   submitPhase: "idle" as SubmitPhase,
   yamlContent: null as string | null,
   error: null as string | null,
@@ -157,7 +159,7 @@ export const useAdvancedStore = create<AdvancedState>((set, get) => ({
   setRecommendLoading: (fieldPath) => set({ recommendLoading: fieldPath }),
 
   requestRecommendation: async (fieldPath, fieldInfo) => {
-    set({ recommendLoading: fieldPath });
+    set({ recommendLoading: fieldPath, recommendError: null });
     try {
       const { formData } = get();
       const result = await api.recommend({
@@ -166,8 +168,10 @@ export const useAdvancedStore = create<AdvancedState>((set, get) => ({
         field_info: fieldInfo,
       });
       set({ formData: setByPath(get().formData, fieldPath, result.suggestion) });
-    } catch {
-      // Silently fail — the field just won't be populated
+    } catch (err) {
+      console.error("[AI 추천 실패]", err);
+      const message = err instanceof Error ? err.message : "AI 추천에 실패했습니다.";
+      set({ recommendError: message });
     } finally {
       set({ recommendLoading: null });
     }
