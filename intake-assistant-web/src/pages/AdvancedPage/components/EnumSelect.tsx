@@ -2,10 +2,12 @@ interface EnumSelectProps {
   value: string;
   onChange: (value: string) => void;
   options: string[];
+  /** Extra options from backend template not in static schema */
+  dynamicOptions?: string[];
   disabled?: boolean;
 }
 
-export function EnumSelect({ value, onChange, options, disabled }: EnumSelectProps) {
+export function EnumSelect({ value, onChange, options, dynamicOptions, disabled }: EnumSelectProps) {
   return (
     <select
       value={value}
@@ -19,6 +21,15 @@ export function EnumSelect({ value, onChange, options, disabled }: EnumSelectPro
           {opt}
         </option>
       ))}
+      {dynamicOptions && dynamicOptions.length > 0 && (
+        <>
+          {dynamicOptions.map((opt) => (
+            <option key={`dyn_${opt}`} value={opt}>
+              {opt} (new)
+            </option>
+          ))}
+        </>
+      )}
     </select>
   );
 }

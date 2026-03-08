@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAdvancedStore } from "@/stores/advancedStore";
 import { StepWizard } from "./components/StepWizard";
 import { PhaseRenderer } from "./components/PhaseRenderer";
 import { AdvancedNavigation } from "./components/AdvancedNavigation";
+import { SchemaDriftBanner } from "./components/SchemaDriftBanner";
 
 export function AdvancedPage() {
   const currentPhase = useAdvancedStore((s) => s.currentPhase);
@@ -11,7 +13,13 @@ export function AdvancedPage() {
   const error = useAdvancedStore((s) => s.error);
   const reset = useAdvancedStore((s) => s.reset);
   const setSubmitPhase = useAdvancedStore((s) => s.setSubmitPhase);
+  const schemaDrift = useAdvancedStore((s) => s.schemaDrift);
+  const fetchSchemaMeta = useAdvancedStore((s) => s.fetchSchemaMeta);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchSchemaMeta();
+  }, [fetchSchemaMeta]);
 
   const handleBack = () => {
     reset();
@@ -64,6 +72,9 @@ export function AdvancedPage() {
       </div>
 
       <StepWizard />
+
+      {/* Schema drift banner */}
+      {schemaDrift && <SchemaDriftBanner drift={schemaDrift} />}
 
       {/* Error banner */}
       {submitPhase === "error" && error && (

@@ -19,13 +19,14 @@ from intake_assistant_api.routers.finalize import router as finalize_router
 from intake_assistant_api.routers.generate import router as generate_router
 from intake_assistant_api.routers.health import router as health_router
 from intake_assistant_api.routers.recommend import router as recommend_router
+from intake_assistant_api.routers.schema_meta import router as schema_meta_router
 from intake_assistant_api.routers.validate import router as validate_router
 from intake_assistant_api.services import template_cache
 from intake_assistant_api.services.sdwc_client import SDwCClient
 
 logger = structlog.get_logger()
 
-_RATE_LIMIT_SKIP_PATHS = {"/api/v1/health"}
+_RATE_LIMIT_SKIP_PATHS = {"/api/v1/health", "/api/v1/schema-meta"}
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
@@ -115,3 +116,4 @@ app.include_router(generate_router)
 app.include_router(finalize_router)
 app.include_router(validate_router)
 app.include_router(recommend_router)
+app.include_router(schema_meta_router)

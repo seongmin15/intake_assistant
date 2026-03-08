@@ -5,6 +5,7 @@ import type {
   QaAnswer,
   RecommendRequest,
   RecommendResponse,
+  SchemaMetaResponse,
   StreamEvent,
   ValidateYamlResponse,
 } from "./types";
@@ -156,6 +157,14 @@ export async function validateYaml(yamlContent: string): Promise<ValidateYamlRes
 
 export async function recommend(body: RecommendRequest): Promise<RecommendResponse> {
   return request<RecommendResponse>("/api/v1/recommend", body);
+}
+
+export async function fetchSchemaMeta(): Promise<SchemaMetaResponse> {
+  const resp = await fetch(`${API_URL}/api/v1/schema-meta`);
+  if (!resp.ok) {
+    throw new Error(`스키마 메타데이터 요청 실패 (${resp.status})`);
+  }
+  return resp.json() as Promise<SchemaMetaResponse>;
 }
 
 export async function finalize(yamlContent: string): Promise<Blob> {
