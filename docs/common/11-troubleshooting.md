@@ -48,3 +48,10 @@
 - **해결**: regex 대신 `_find_raw_json()` 헬퍼 추가 — `"architecture_card"` 키워드를 찾고 역방향으로 `{` 탐색 후 brace-balancing으로 정확한 JSON 범위 추출.
 - **예방**: 중첩 구조가 있는 JSON/YAML 파싱에 regex 대신 brace-balancing 또는 구조적 파서 사용.
 - **발견일**: 2026-03-08
+
+### [환경] 스키마 드리프트 배너 — "제거된 서비스 타입: backend_api, web_ui, ..." 오탐지
+- **증상**: Advanced 모드 진입 시 "제거된 서비스 타입: backend_api, web_ui, worker, mobile_app, data_pipeline" 경고 배너 표시. 실제로 서비스 타입은 제거되지 않았음.
+- **원인**: sdwc-platform에서 Traefik이 HTTP:8080 → HTTPS:8443으로 변경됨. intake-assistant-api의 SDWC_API_URL이 이전 URL(`http://sdwc.local:8080`)을 가리켜 SDwC 연결 실패. 서버 startup 시 `field_requirements.yaml` fetch 실패 → `template_cache`에 캐시 없음. `GET /api/v1/schema-meta` 엔드포인트가 fallback으로 빈 `service_types: []` 반환. 프론트엔드 `schemaDrift.ts`가 빈 리스트를 정적 스키마(5개 타입)와 비교하여 모두 "제거됨"으로 판정.
+- **해결**: `.env`와 `.env.example`의 `SDWC_API_URL`을 `https://sdwc.local:8443`으로 변경.
+- **예방**: sdwc-platform 인프라 변경(프로토콜, 포트 등) 시 intake-assistant의 환경변수도 함께 업데이트. 또한 `schema_meta.py`의 fallback이 빈 리스트 대신 기본 서비스 타입 목록을 반환하도록 개선 필요 (별도 태스크).
+- **발견일**: 2026-03-08

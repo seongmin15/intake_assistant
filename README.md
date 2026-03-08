@@ -83,14 +83,14 @@ cp intake-assistant-api/.env.example intake-assistant-api/.env
 
 ```bash
 ANTHROPIC_API_KEY=sk-ant-your-actual-key   # 필수: Anthropic API 키
-SDWC_API_URL=http://sdwc.local:8080         # k3d 로컬 배포 시 기본값
+SDWC_API_URL=https://sdwc.local:8443         # k3d 로컬 배포 시 기본값
 DEBUG=false
 ```
 
 | 환경 | `SDWC_API_URL` |
 |------|----------------|
 | K8s 클러스터 내부 | `http://sdwc-api.sdwc.svc.cluster.local:8000` |
-| 로컬 개발 (k3d 배포 후) | `http://sdwc.local:8080` |
+| 로컬 개발 (k3d 배포 후) | `https://sdwc.local:8443` |
 | 로컬 개발 (직접 실행) | `http://localhost:8000` |
 
 ### Backend (intake-assistant-api)
@@ -133,8 +133,8 @@ npx playwright test
 ./scripts/deploy-all.sh
 
 # 접속
-# http://intake.local:8080     (Web UI)
-# http://intake.local:8080/api (API)
+# https://intake.local:8443     (Web UI)
+# https://intake.local:8443/api (API)
 ```
 
 ## 프로젝트 구조
