@@ -36,6 +36,10 @@
 | 2026-03-07 | T017: Frontend API URL fallback 수정 — k3d에서 ERR_CONNECTION_REFUSED 해결 | 완료 |
 | 2026-03-07 | T018: analyze API JSON 파싱 오류 수정 — markdown 코드 블록 스트리핑 누락 | 완료 |
 | 2026-03-07 | T019: generate API YAML 파싱 오류 수정 — 코드 블록 패턴 유연화 | 완료 |
+| 2026-03-08 | T031: Advanced Mode 기반 구조 — phaseSchema, advancedStore, /advanced 라우트, StepWizard | 완료 |
+| 2026-03-08 | T032~T035: Advanced Mode 폼 컴포넌트, 배열/서비스 에디터, 검증, YAML 직렬화+제출 | 완료 |
+| 2026-03-08 | T036: AI 추천 백엔드 — POST /api/v1/recommend Haiku 엔드포인트 + 단위 테스트 11개 | 완료 |
+| 2026-03-08 | T037: AI 추천 UI 연동 — AiRecommendButton, FormField 통합, advancedStore.requestRecommendation | 완료 |
 
 <!-- Claude: §5.8 작업 완료, §5.12 작업 중단/취소 시 한 줄 추가.
      작업 내용은 "무엇을 왜" 중심 1줄 요약.
@@ -274,6 +278,20 @@
 - **변경된 파일**: services/sdwc_client.py (수정), services/template_cache.py (수정), main.py (수정), services/prompts/prompt_builder.py (신규), services/prompts/generate.py (수정), services/generate_service.py (수정), tests/unit/test_prompt_builder.py (신규), tests/unit/test_sdwc_client.py (수정), tests/unit/test_generate_service.py (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
 - **의사결정**: fallback 전략 — SDwC 미접속/invalid YAML/phases 키 누락 → None → 기존 하드코딩 텍스트 사용. 최악의 경우 = 기존 동작과 동일. yaml 라이브러리는 이미 의존성에 포함(pyyaml).
 - **미완료/후속**: SDwC 측에 GET /api/v1/field-requirements 엔드포인트 추가 필요 (사용자가 구현).
+
+### 2026-03-08 — T036: AI 추천 백엔드 (POST /api/v1/recommend)
+
+- **작업**: Haiku 기반 개별 필드 AI 추천 엔드포인트 구현. prompts/recommend.py(시스템 프롬프트), schemas/recommend.py(RecommendRequest/Response), services/recommend_service.py(Haiku 호출 + 2회 재시도 + JSON 파싱), routers/recommend.py(POST /api/v1/recommend), main.py에 라우터 등록.
+- **변경된 파일**: services/prompts/recommend.py (신규), schemas/recommend.py (신규), services/recommend_service.py (신규), routers/recommend.py (신규), main.py (수정), tests/unit/test_recommend_service.py (신규), tests/unit/test_recommend_api.py (신규), 21-api-contract.md (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: analyze_service.py와 동일 패턴. max_tokens=256으로 제한(단일 필드 추천). enum 필드는 허용 값 목록을 user message에 포함.
+- **미완료/후속**: 없음.
+
+### 2026-03-08 — T037: AI 추천 UI 연동
+
+- **작업**: AiRecommendButton 컴포넌트 생성(로딩 스피너 + AI 추천 버튼), FormField에 aiRecommend 플래그 기반 통합, advancedStore에 requestRecommendation() 비동기 액션 추가(api.recommend 호출 → 필드 값 자동 설정).
+- **변경된 파일**: components/AiRecommendButton.tsx (신규), components/FormField.tsx (수정), stores/advancedStore.ts (수정), 07-workplan.md, 09-working-log.md, 10-changelog.md
+- **의사결정**: api/client.ts의 recommend() 함수는 T035에서 이미 추가됨. 추천 실패 시 silent fail(필드 미변경).
+- **미완료/후속**: 없음. T031~T037 Advanced Mode 전체 완료.
 
 ### 2026-03-07 — T015: infra/ 매니페스트를 sdwc-platform으로 이관
 

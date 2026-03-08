@@ -186,4 +186,62 @@
 ---
 
 
+### POST /api/v1/validate-yaml
+
+> Advanced 모드에서 작성한 YAML을 SDwC 스키마로 검증
+
+- **인증**: False
+
+**요청**
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| yaml_content | string | True | 검증할 intake_data.yaml 텍스트 |
+
+**응답**
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| valid | boolean | 검증 통과 여부 |
+| errors | string[] | 검증 에러 목록 |
+| warnings | string[] | 검증 경고 목록 |
+
+**처리 로직**
+
+1. SDwC /api/v1/validate 호출로 YAML 검증
+2. SDwC 응답 형식(dict 또는 list)을 플랫 문자열 목록으로 변환
+3. SDwC 연결 실패 시 valid=false + 연결 에러 메시지 반환
+
+---
+
+### POST /api/v1/recommend
+
+> Advanced 모드에서 개별 필드에 대한 AI 추천 값 생성
+
+- **인증**: False
+
+**요청**
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| context | json | False | 사용자가 이미 입력한 부분 폼 데이터 (기본값: {}) |
+| field_path | string | True | 추천할 필드의 dot-notation 경로 (e.g., "problem.severity") |
+| field_info | json | False | 필드 메타데이터 (description, enum_values, field_type) |
+
+**응답**
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| suggestion | string | AI가 추천하는 필드 값 |
+| rationale | string | 추천 이유 (한국어) |
+
+**처리 로직**
+
+1. context + field_path + field_info를 사용자 메시지로 조합
+2. Haiku 호출로 단일 필드 추천 값 + 근거 생성
+3. JSON 응답 파싱 (마크다운 코드 블록 자동 제거)
+4. API 에러 시 최대 2회 재시도 (1초, 2초 백오프)
+
+---
+
 <!-- Claude: 수정/추가 시 기존 섹션 구조와 형식을 유지. -->
