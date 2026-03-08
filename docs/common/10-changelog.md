@@ -11,6 +11,9 @@
 - intake-assistant-api: SDwCClient.fetch_field_requirements() — GET /api/v1/field-requirements에서 field_requirements.yaml fetch (T030)
 - intake-assistant-api: template_cache에 field_requirements 캐시 추가 — startup 시 fetch + 캐시 (T030)
 
+### Documentation
+- README.md를 현재 상태로 동기화 — 모드별(Simple/Advanced) 설명 분리, 동적 질문 5~6개 자유 텍스트 반영, SSE 스트리밍 엔드포인트 추가, 주요 기능(SSE/Prompt Caching/동적 프롬프트/Rate Limiting/Sanitization) 섹션 추가
+
 ### Changed
 - intake-assistant-api: generate.py를 static header/dynamic sections/fallback/footer로 분리 — build_system_prompt(template, field_requirements) 시그니처 변경 (T030)
 - intake-assistant-api: generate_service.py에서 field_requirements를 build_system_prompt에 전달 (T030)
