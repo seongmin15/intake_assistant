@@ -7,6 +7,7 @@
 ## [Unreleased]
 
 ### Changed
+- intake-assistant-api: SDWC_API_URL을 HTTPS:8443으로 변경 — sdwc-platform Traefik HTTP:8080→HTTPS:8443 인프라 변경 반영 (.env, .env.example, README.md) (T042)
 - intake-assistant-web: AI 추천 필드를 12개에서 46개로 확장 — phaseSchema 28개 + serviceSchema 6개 필드에 aiRecommend: true 추가, 전 Phase 및 serviceSchema에 AI 추천 커버리지 확보 (T041)
 
 ### Fixed

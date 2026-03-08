@@ -655,6 +655,19 @@ Any active status -> Cancelled
 
 ---
 
+### T042: SDWC_API_URL HTTPS 전환 (sdwc-platform 인프라 변경 반영)
+- Status: Done
+- Service: intake-assistant-api
+- Description: sdwc-platform에서 Traefik HTTP:8080 → HTTPS:8443으로 변경됨. .env, .env.example, README.md의 SDwC/intake URL을 HTTPS:8443으로 업데이트. K8s 내부 통신(config.py 기본값)은 변경 없음.
+- Acceptance Criteria:
+  - [x] .env — SDWC_API_URL을 https://sdwc.local:8443으로 변경
+  - [x] .env.example — 동일 변경 + 주석 업데이트
+  - [x] README.md — k3d URL 3곳 HTTPS:8443으로 변경
+  - [x] 11-troubleshooting — 스키마 드리프트 오탐지 원인/해결 기록
+- Result: .env, .env.example, README.md의 외부 URL을 HTTPS:8443으로 업데이트. config.py(K8s 내부 HTTP:8000)는 변경 없음. 11-troubleshooting에 스키마 드리프트 오탐지 원인/해결/예방 기록.
+
+---
+
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
      Claude fills the Tasks section during Init based on docs/common/05-roadmap.md.
