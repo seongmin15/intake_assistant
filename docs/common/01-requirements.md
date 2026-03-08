@@ -23,7 +23,6 @@
 
 | 비목표 | 근거 | 재검토 시점 |
 |--------|------|-----------|
-| Advanced 모드(직접 YAML 업로드/편집) 자체 구현 | Advanced 모드는 기존 sdwc-web이 담당. intake-assistant-web은 모드 선택에서 sdwc-web으로 리다이렉트만 제공. |  |
 | 실시간 대화형 코딩 어시스턴트 | intake-assistant는 intake_data.yaml 생성까지만 담당. 이후 개발 과정 지원은 SDwC와 Claude Code의 역할. |  |
 | intake_data.yaml의 부분 수정 (diff 기반) | 전체 재생성 방식이 비용 차이 미미하고 정합성 보장. 부분 수정은 불필요한 복잡도. |  |
 
@@ -35,7 +34,8 @@
 
 | 기능 | 사용자 스토리 | 우선순위 | 복잡도 |
 |------|-------------|---------|--------|
-| 모드 선택 (Simple / Advanced) | 사용자가 Simple 모드와 Advanced 모드 중 선택한다. Advanced 선택 시 sdwc-web으로 이동한다. | must | S |
+| 모드 선택 (Simple / Advanced) | 사용자가 Simple 모드와 Advanced 모드 중 선택한다. Advanced 선택 시 8단계 위저드 폼으로 이동한다. | must | S |
+| Advanced 모드 (8단계 위저드 폼) | 개발자가 intake_template.yaml의 8 phase(WHY~WHAT-NEXT)를 단계별 폼으로 직접 입력하고, 필드별 AI 추천을 받아 YAML을 생성한다. | must | XL |
 | 자유 텍스트 입력 | 사용자가 만들고 싶은 서비스를 자유롭게 설명한다 | must | S |
 | 동적 질문 생성 (Q1~Q4) | AI가 첫 입력을 분석하여 플랫폼, 데이터 영속성, 멀티유저, 외부 의존성 질문을 제시한다 | must | M |
 | intake_data.yaml 생성 | 사용자 응답 기반으로 AI가 SDwC 호환 intake_data.yaml 전체를 생성한다 | must | L |
@@ -50,7 +50,7 @@
 |------|----------|----------|
 | 대화 이력 저장 | stateless 설계. 브라우저 탭을 닫으면 대화 종료. |  |
 | 사용자 계정/인증 | 내부 도구 수준이며 개인 데이터를 저장하지 않음 |  |
-| intake_data.yaml 직접 편집 UI | SDwC Advanced 모드의 역할. intake-assistant는 AI 대화 기반만 지원. |  |
+| intake_data.yaml 직접 편집 UI (텍스트 에디터) | 폼 기반 UI를 제공하므로 raw YAML 텍스트 에디터는 불필요. |  |
 
 ---
 

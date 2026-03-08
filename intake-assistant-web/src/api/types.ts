@@ -68,3 +68,25 @@ export type AnalyzeStreamEvent =
   | { event: "chunk"; data: ChunkData }
   | { event: "result"; data: AnalyzeResponse }
   | { event: "error"; data: ErrorData };
+
+// Advanced mode types
+export interface ValidateYamlResponse {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+}
+
+export interface RecommendRequest {
+  context: Record<string, unknown>;
+  field_path: string;
+  field_info: {
+    description?: string;
+    enum_values?: string[];
+    field_type?: string;
+  };
+}
+
+export interface RecommendResponse {
+  suggestion: string;
+  rationale: string;
+}

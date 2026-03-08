@@ -7,6 +7,17 @@
 ## [Unreleased]
 
 ### Added
+- intake-assistant-api: POST /api/v1/recommend 엔드포인트 — Haiku 기반 개별 필드 AI 추천 (context + field_path → suggestion + rationale), 2회 재시도, 단위 테스트 11개 (T036)
+- intake-assistant-api: POST /api/v1/validate-yaml 엔드포인트 — SDwC 스키마 YAML 검증 프록시 (T035)
+- intake-assistant-web: Advanced 모드 8단계 위저드 폼 — phaseSchema(150+ 필드), advancedStore, StepWizard, PhaseRenderer, FormField, ArrayField, ServiceEditor, 검증, YAML 직렬화, ZIP 제출 (T031-T035)
+- intake-assistant-web: AiRecommendButton 컴포넌트 — FormField에 aiRecommend 플래그 기반 AI 추천 버튼 통합, advancedStore.requestRecommendation() 액션 (T037)
+
+### Changed
+- intake-assistant-web: ModeSelectorPage Advanced 모드를 sdwc-web 리다이렉트에서 내장 /advanced 라우트로 변경 (T031)
+- docs: 01-requirements.md — Advanced 모드를 non-goals에서 in-scope로 이동 (T031)
+- docs: 21-api-contract.md — validate-yaml + recommend 엔드포인트 문서 추가 (T035, T036)
+
+### Added
 - intake-assistant-api: prompt_builder.py 모듈 — SDwC field_requirements.yaml을 동적 파싱하여 generate 프롬프트의 Required Sections, Per-Service Fields, Array Minimums, Enum Reference 자동 생성 (T030)
 - intake-assistant-api: SDwCClient.fetch_field_requirements() — GET /api/v1/field-requirements에서 field_requirements.yaml fetch (T030)
 - intake-assistant-api: template_cache에 field_requirements 캐시 추가 — startup 시 fetch + 캐시 (T030)

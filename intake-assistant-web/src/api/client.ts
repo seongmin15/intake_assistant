@@ -3,7 +3,10 @@ import type {
   AnalyzeStreamEvent,
   GenerateResponse,
   QaAnswer,
+  RecommendRequest,
+  RecommendResponse,
   StreamEvent,
+  ValidateYamlResponse,
 } from "./types";
 
 const API_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? "";
@@ -145,6 +148,14 @@ export async function generateStream(
       }
     }
   }
+}
+
+export async function validateYaml(yamlContent: string): Promise<ValidateYamlResponse> {
+  return request<ValidateYamlResponse>("/api/v1/validate-yaml", { yaml_content: yamlContent });
+}
+
+export async function recommend(body: RecommendRequest): Promise<RecommendResponse> {
+  return request<RecommendResponse>("/api/v1/recommend", body);
 }
 
 export async function finalize(yamlContent: string): Promise<Blob> {

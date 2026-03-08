@@ -18,6 +18,8 @@ from intake_assistant_api.routers.analyze import router as analyze_router
 from intake_assistant_api.routers.finalize import router as finalize_router
 from intake_assistant_api.routers.generate import router as generate_router
 from intake_assistant_api.routers.health import router as health_router
+from intake_assistant_api.routers.recommend import router as recommend_router
+from intake_assistant_api.routers.validate import router as validate_router
 from intake_assistant_api.services import template_cache
 from intake_assistant_api.services.sdwc_client import SDwCClient
 
@@ -111,3 +113,5 @@ app.include_router(health_router)
 app.include_router(analyze_router)
 app.include_router(generate_router)
 app.include_router(finalize_router)
+app.include_router(validate_router)
+app.include_router(recommend_router)

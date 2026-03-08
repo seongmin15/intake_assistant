@@ -488,6 +488,115 @@ Any active status -> Cancelled
 
 ---
 
+### T031: Advanced Mode 기반 구조 (스키마, 스토어, 라우트, 네비게이션)
+- Status: Done
+- Service: intake-assistant-web
+- Description: phaseSchema.ts + fieldTypes.ts — 8 phases 필드 정의, useAdvancedStore — formData/currentPhase/setField/navigation, pathUtils.ts — dot-notation get/set, /advanced 라우트 + AdvancedPage 스켈레톤 + StepWizard, ModeSelectorPage 수정 — /advanced 내비게이션, 01-requirements.md 스코프 변경
+- Acceptance Criteria:
+  - [x] phaseSchema.ts에 8 phases 필드 정의 완료
+  - [x] fieldTypes.ts에 FieldDef/SectionDef/PhaseDef 타입 정의
+  - [x] useAdvancedStore — formData, currentPhase, setField, navigation actions
+  - [x] pathUtils.ts — getByPath/setByPath/deleteByPath
+  - [x] /advanced 라우트 + AdvancedPage + StepWizard + AdvancedNavigation
+  - [x] ModeSelectorPage — /advanced 내비게이션으로 변경
+  - [x] 01-requirements.md — Advanced 모드 비목표에서 in-scope로 이동
+  - [x] npm run build + lint 통과
+- Result: phaseSchema.ts(8 phases, ~150+ 필드), fieldTypes.ts(FieldDef/SectionDef/PhaseDef), advancedStore.ts(Zustand — formData/services/navigation/array/AI actions), pathUtils.ts(getByPath/setByPath/deleteByPath), router.tsx에 /advanced 추가, AdvancedPage(StepWizard+PhaseRenderer 스켈레톤+AdvancedNavigation), ModeSelectorPage 수정(/advanced 네비게이션+설명 업데이트), 01-requirements.md 스코프 변경. build+lint 통과.
+
+---
+
+### T032: 기본 폼 컴포넌트 (Phase 1-2 렌더링)
+- Status: Done
+- Service: intake-assistant-web
+- Description: FormField, TextField, TextAreaField, EnumSelect, BooleanToggle, NumberField, FieldGroup, PhaseRenderer 실제 폼 렌더링. Phase 1 (WHY), Phase 2 (WHAT) 폼 렌더링 동작 확인.
+- Acceptance Criteria:
+  - [x] FormField — 필드 타입별 dispatch
+  - [x] TextField, TextAreaField, EnumSelect, BooleanToggle, NumberField 컴포넌트
+  - [x] FieldGroup — collapsible section
+  - [x] PhaseRenderer — 실제 폼 필드 렌더링
+  - [x] ArrayField + ArrayItemCard — simple/complex array items (T033 범위이나 Phase 1-2에 필요하여 선행 구현)
+  - [x] Phase 1, Phase 2 폼 입력 동작 확인
+  - [x] npm run build + lint 통과
+- Result: FormField(타입별 dispatch), TextField, TextAreaField, EnumSelect, BooleanToggle, NumberField, FieldGroup(collapsible), ArrayField(동적 추가/삭제), ArrayItemCard(simple string/complex object) 컴포넌트 구현. PhaseRenderer를 FieldGroup 기반 실제 폼으로 업데이트. build+lint 통과.
+
+---
+
+### T033: 배열 필드 + 서비스 에디터 (Phase 3-4)
+- Status: Done
+- Service: intake-assistant-web
+- Description: ArrayField, ArrayItemCard, ServiceTypeSelector, ServiceEditor — 5개 서비스 타입별 조건부 필드. Phase 3 (WHO), Phase 4 (HOW) 렌더링. advancedStore 서비스 관리 액션.
+- Acceptance Criteria:
+  - [x] ArrayField — 동적 아이템 추가/삭제 (T032에서 선행 구현)
+  - [x] ArrayItemCard — 배열 아이템 카드 UI (T032에서 선행 구현)
+  - [x] ServiceTypeSelector — 서비스 타입 선택
+  - [x] ServiceEditor — 타입별 조건부 필드 렌더링
+  - [x] serviceSchema.ts — 5개 서비스 타입별 필드 정의 (common + type-specific + deployment)
+  - [x] ServiceArrayField — 서비스 내 배열 필드 관리
+  - [x] Phase 3, Phase 4 폼 렌더링 동작 확인
+  - [x] npm run build + lint 통과
+- Result: serviceSchema.ts(5개 서비스 타입 — backend_api/web_ui/worker/mobile_app/data_pipeline별 필드 + common + deployment), ServiceTypeSelector, ServiceEditor, ServiceArrayField 컴포넌트 구현. FieldGroup에서 service_list 타입을 ServiceListRenderer로 연결. advancedStore.setServiceField 중첩 경로 지원 추가. build+lint 통과.
+
+---
+
+### T034: Phase 5-8 폼 + 검증
+- Status: Done
+- Service: intake-assistant-web
+- Description: Phase 5-8 폼 렌더링. validators.ts — required/enum/array minimum/조건부/교차참조 검증. PhaseValidationSummary 컴포넌트. nextPhase() 검증 연동.
+- Acceptance Criteria:
+  - [x] Phase 5-8 폼 렌더링 동작 확인 (phaseSchema에 이미 정의, FieldGroup으로 자동 렌더링)
+  - [x] validators.ts — required/array minimum/교차참조(per_service↔services) 검증
+  - [x] PhaseValidationSummary 컴포넌트
+  - [x] nextPhase() 검증 연동 — AdvancedNavigation에서 다음 클릭 시 검증
+  - [x] npm run build + lint 통과
+- Result: validators.ts(validatePhase, validateAllPhases, phaseHasErrors — required 필드 검증, 배열 최소 요건, per_service↔services 교차참조), PhaseValidationSummary(에러 목록 표시), AdvancedNavigation에 검증 연동(다음/제출 클릭 시 에러 있으면 차단). build+lint 통과.
+
+---
+
+### T035: YAML 직렬화 + 제출 흐름
+- Status: Done
+- Service: intake-assistant-web, intake-assistant-api
+- Description: js-yaml 의존성 추가, yamlSerializer.ts — formData → YAML (DELETE 원칙), POST /api/v1/validate-yaml 엔드포인트, 제출 흐름 — 직렬화 → SDwC 검증 → ZIP 다운로드.
+- Acceptance Criteria:
+  - [x] js-yaml + @types/js-yaml 의존성 추가
+  - [x] yamlSerializer.ts — formData → YAML (DELETE 원칙 — 빈값 재귀 삭제)
+  - [x] Backend POST /api/v1/validate-yaml 엔드포인트 (schemas/validate.py, routers/validate.py)
+  - [x] 제출 흐름 연동 (직렬화 → SDwC 검증 → ZIP 다운로드)
+  - [x] AdvancedPage 완료/에러/로딩 상태 UI
+  - [x] api/client.ts — validateYaml(), recommend() 함수 추가
+  - [x] api/types.ts — ValidateYamlResponse, RecommendRequest/Response 타입 추가
+  - [x] npm run build + lint + pytest(84개) 통과
+- Result: yamlSerializer.ts(js-yaml + deleteEmpty 재귀), POST /api/v1/validate-yaml(SDwC proxy — errors/warnings flatten), advancedStore.submitAdvanced(직렬화→검증→ZIP 다운로드), AdvancedPage(complete/validating/generating/error UI), api/client.ts(validateYaml+recommend). build+lint+84 pytest 통과.
+
+---
+
+### T036: AI 추천 백엔드 (POST /api/v1/recommend)
+- Status: Done
+- Service: intake-assistant-api
+- Description: routers/recommend.py, schemas/recommend.py, services/recommend_service.py, prompts/recommend.py. Haiku 호출 — context + field_path → suggestion + rationale. 단위 테스트.
+- Acceptance Criteria:
+  - [x] POST /api/v1/recommend 엔드포인트
+  - [x] Haiku 기반 필드 추천 서비스
+  - [x] 단위 테스트
+  - [x] 21-api-contract.md 업데이트
+  - [x] pytest 통과
+- Result: recommend 엔드포인트 구현 완료. 신규 파일: prompts/recommend.py, schemas/recommend.py, services/recommend_service.py, routers/recommend.py, tests/unit/test_recommend_service.py(7), tests/unit/test_recommend_api.py(4). 전체 95 테스트 통과. 21-api-contract.md에 validate-yaml + recommend 엔드포인트 문서 추가.
+
+---
+
+### T037: AI 추천 UI 연동
+- Status: Done
+- Service: intake-assistant-web
+- Description: AiRecommendButton 컴포넌트, FormField에 AI 추천 버튼 통합, advancedStore.requestRecommendation() 액션, api/client.ts에 recommend() 함수 추가.
+- Acceptance Criteria:
+  - [x] AiRecommendButton 컴포넌트
+  - [x] FormField에 AI 추천 버튼 통합
+  - [x] advancedStore.requestRecommendation() 액션
+  - [x] api/client.ts recommend() 함수 (T035에서 이미 추가됨)
+  - [x] npm run build + lint 통과
+- Result: AiRecommendButton.tsx 생성 (로딩 상태 + AI 추천 버튼). FormField.tsx에 aiRecommend 플래그 기반 버튼 통합. advancedStore에 requestRecommendation() 액션 추가 (recommend API 호출 → 필드 값 자동 설정). build + lint 통과.
+
+---
+
 <!-- Claude: This is a hybrid document.
      Template Engine fills Operating Rules, Status Flow, Task Format.
      Claude fills the Tasks section during Init based on docs/common/05-roadmap.md.
