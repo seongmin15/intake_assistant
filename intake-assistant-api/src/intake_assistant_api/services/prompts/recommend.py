@@ -14,7 +14,8 @@ Based on the context provided, suggest the most appropriate value for the field.
 - If enum_values are provided, you MUST choose one of those values exactly.
 - If the field is a text field, provide a concise but informative suggestion in Korean.
 - If the field is a boolean, respond with "true" or "false".
-- If there is insufficient context to make a good recommendation, still provide your best guess and explain your reasoning.
+- If there is insufficient context to make a good recommendation,
+  still provide your best guess and explain your reasoning.
 - Write the rationale in Korean.
 - Keep the rationale to 1-2 sentences.
 
