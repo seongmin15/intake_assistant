@@ -202,7 +202,8 @@ export const useAdvancedStore = create<AdvancedState>((set, get) => ({
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "project.zip";
+      const projectName = (getByPath(get().formData, "project.name") as string) || "project";
+      a.download = `${projectName}.zip`;
       a.click();
       URL.revokeObjectURL(url);
 

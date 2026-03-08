@@ -204,7 +204,9 @@ export const useIntakeStore = create<IntakeState>((set, get) => ({
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "project.zip";
+      const nameMatch = yamlContent.match(/project_name:\s*(.+)/);
+      const projectName = nameMatch?.[1]?.trim() || "project";
+      a.download = `${projectName}.zip`;
       a.click();
       URL.revokeObjectURL(url);
       set({ phase: "complete" });
